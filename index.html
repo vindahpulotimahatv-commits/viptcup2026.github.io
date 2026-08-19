@@ -73,6 +73,11 @@ main{padding:0 14px}
 .sosmed-btn { display: flex; align-items: center; gap: 6px; background: #1e5e57; border: 1px solid #348a80; padding: 8px 12px; border-radius: 12px; color: #fff; text-decoration: none; font-size: 10px; font-weight: 900; transition: transform 0.2s; }
 .sosmed-btn:hover { transform: scale(1.05); background: #236e65; }
 
+/* STYLING FOOTER SPONSOR */
+.sponsor-footer { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line); }
+.sponsor-title { font-size: 11px; color: var(--muted); font-weight: bold; letter-spacing: 1px; }
+.sponsor-logo-img { width: 100%; max-width: 300px; height: auto; object-fit: contain; display: block; border-radius: 12px; padding: 5px; }
+
 .bottom{position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);width:min(620px,100%);
  display:grid;grid-template-columns:repeat(5,1fr);padding:8px 8px 11px;background:rgba(18,61,56,.97);border-top:1px solid var(--line)}
 .nav{text-decoration:none;text-align:center;color:#82beb5;font-size:8px}.nav span{display:block;font-size:17px;margin-bottom:3px}.nav.active{color:#8ff5d8}
@@ -109,14 +114,14 @@ main{padding:0 14px}
   <a class="btn" href="#hasil">DETAIL HASIL</a>
 </div>
 
-<!-- Tab Live Streaming -->
+<!-- Tab Live Streaming (Diperbarui dengan link baru) -->
 <div class="section"><h2>🎥 Live Streaming</h2></div>
 <div class="card">
 <iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"
 src="https://www.youtube.com/embed/nlMvrMtmvxA?autoplay=1&rel=0"
 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 allowfullscreen></iframe>
-<a class="btn" id="youtubeBtn" href="https://www.youtube.com/live/nlMvrMtmvxA" target="_blank">BUKA DI YOUTUBE</a>
+<a class="btn" id="youtubeBtn" href="https://www.youtube.com/live/nlMvrMtmvxA?si=9KTmWNdTcsDFn1KH" target="_blank">BUKA DI YOUTUBE</a>
 </div>
 
 <!-- Card Dukungan Saweria -->
@@ -166,6 +171,14 @@ allowfullscreen></iframe>
 
 <div class="section"><h2>📰 Update VIPT CUP</h2></div>
 <div class="card news"><div class="thumb">VIPT CUP</div><div><b>Semua jadwal pertandingan dipusatkan di Lapangan Central.</b><small>VIPT CUP IV 2026 • Update jadwal sesuai poster resmi terbaru.</small></div></div>
+
+<!-- BAGIAN PALING BAWAH: SPONSOR DENGAN LATAR BELAKANG PUTIH -->
+<div class="sponsor-footer">
+  <div class="sponsor-title">DISPONSORI OLEH:</div>
+  <div class="card" style="background: #ffffff; padding: 10px; width: 100%; text-align: center; border-radius: 14px;">
+    <img src="https://i.ibb.co.com/tPbXf4fB/sponsor1.jpg" alt="Disponsori Oleh" class="sponsor-logo-img" onerror="this.src='https://i.ibb.co.com/DH8mg8Sb/sponsor2.jpg'">
+  </div>
+</div>
 
 <div class="footer">© 2026 VIPT CUP IV • Sportivitas • Fairplay • Solidaritas • Prestasi</div>
 </main>
