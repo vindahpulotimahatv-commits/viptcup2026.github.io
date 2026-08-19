@@ -285,7 +285,6 @@ function renderTopSkor(){
     </tr>
   `).join("");
 
-  // Hitung Otomatis Total Gol
   const totalGol = TOPSCOR_FUTSAL.reduce((acc, curr) => acc + curr.goals, 0);
   document.getElementById("totalGolDisplay").textContent = totalGol + " Gol";
   document.getElementById("tableTotalGoal").textContent = totalGol;
@@ -293,7 +292,6 @@ function renderTopSkor(){
 }
 renderTopSkor();
 
-/* FUNGSI SWITCH TAB */
 function switchTab(tabName, element){
   document.getElementById("tab-beranda").classList.add("hidden");
   document.getElementById("tab-topskor").classList.add("hidden");
@@ -314,7 +312,7 @@ function switchTab(tabName, element){
 
 <script>
 /* ==========================================================
-   FIREBASE LIVE SCORE SYNC
+   FIREBASE LIVE SCORE & HISTORY SYNC
    ========================================================== */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBIww6sg-mRtUUx3rIylnu6qfYG6Ahfih8",
@@ -332,12 +330,13 @@ let liveTimerBase = 0;
 let liveTimerRunning = false;
 let liveTimerStartedAt = 0;
 
-function initLiveScoreSync(){
+function initFirebaseSync(){
   try{
     if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-    const ref = firebase.database().ref("vipt_scoreboard/live");
-
-    ref.on("value", snap=>{
+    
+    // 1. Sinkronisasi Live Score
+    const liveRef = firebase.database().ref("vipt_scoreboard/live");
+    liveRef.on("value", snap=>{
       const data = snap.val();
       if(!data){ setLiveOffline("BELUM ADA DATA LIVE"); return; }
       liveState = data;
@@ -345,6 +344,32 @@ function initLiveScoreSync(){
       liveTimerRunning = !!data.timerRunning;
       liveTimerStartedAt = Date.now();
       renderWebsiteLiveScore();
+    });
+
+    // 2. Sinkronisasi History / Hasil Pertandingan Selesai
+    const historyRef = firebase.database().ref("vipt_scoreboard/history");
+    historyRef.on("value", snap => {
+      const data = snap.val();
+      const resultsContainer = document.getElementById("results");
+      
+      if (!data) {
+        resultsContainer.innerHTML = `<div class="card empty">Belum ada pertandingan SELESAI.</div>`;
+        return;
+      }
+
+      const historyArray = Object.values(data);
+      resultsContainer.innerHTML = historyArray.reverse().map(m => `
+        <div class="card">
+          <div class="round">${esc(m.sport || "PERTANDINGAN")} • ${esc(m.period || "-")} • SELESAI</div>
+          <div class="result">
+            <strong>${esc(m.teamA.name)}</strong>
+            <span class="vs">${Number(m.teamA.score || 0)} - ${Number(m.teamB.score || 0)}</span>
+            <strong>${esc(m.teamB.name)}</strong>
+          </div>
+          <div class="venue">📍 ${esc(VENUE)}</div>
+          <span class="status done">SELESAI</span>
+        </div>
+      `).join("");
     });
 
     setInterval(renderWebsiteLiveScore, 500);
@@ -399,7 +424,7 @@ function setLiveOffline(msg){
   document.getElementById("liveRound").textContent = "MENUNGGU DATA";
 }
 
-initLiveScoreSync();
+initFirebaseSync();
 </script>
 
 <script>
@@ -409,25 +434,16 @@ initLiveScoreSync();
 const VENUE = "Lapangan Central";
 
 const MATCHES = [
-  /* VOLLY PUTRA - BABAK 8 BESAR */
   {id:"VP-8B1", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-22", time:"21:30 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL"},
   {id:"VP-8B2", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"20:00 WIB", a:"RT 02 / RW 021", b:"RT 04 / RW 021", status:"JADWAL"},
   {id:"VP-8B3", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"21:00 WIB", a:"RT 10 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
   {id:"VP-8B4", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"22:00 WIB", a:"RT 06 / RW 021", b:"RT 07 / RW 021", status:"JADWAL"},
-
-  /* VOLLY PUTRI - BABAK SEMIFINAL */
   {id:"VW-SF1", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"16:00 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL"},
   {id:"VW-SF2", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"16:00 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
-
-  /* FUTSAL - BABAK SEMIFINAL */
   {id:"FS-SF1", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:00 WIB", a:"RT 13 / RW 021", b:"RT 04 / RW 021", status:"JADWAL"},
   {id:"FS-SF2", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:45 WIB", a:"RT 11 / RW 021", b:"RT 02 / RW 021", status:"JADWAL"},
-
-  /* TENIS MEJA */
   {id:"TM-1", sport:"TENIS MEJA", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"20:00 WIB", a:"RT 08 / RW 014", b:"RT 10 / RW 014", status:"JADWAL"},
   {id:"TM-2", sport:"TENIS MEJA", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"21:30 WIB", a:"RT 11 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
-
-  /* BADMINTON */
   {id:"BD-1", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRI)", date:"2026-08-21", time:"20:15 WIB", a:"RT 10 / RW 021", b:"RT 13 / RW 021", status:"JADWAL"},
   {id:"BD-2", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRA)", date:"2026-08-21", time:"21:30 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
   {id:"BD-3", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRA)", date:"2026-08-21", time:"22:30 WIB", a:"RT 11 / RW 021", b:"RT 08 / RW 014", status:"JADWAL"}
@@ -472,12 +488,7 @@ function renderBracket(){
     <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${sport}</div></div></div>`;
 }
 
-function renderResults(){
-  const done=MATCHES.filter(m=>m.status==="SELESAI");
-  document.getElementById("results").innerHTML=done.length?done.map(m=>`<div class="card"><div class="round">${esc(m.sport)} • SELESAI</div><div class="result"><strong>${esc(m.a)}</strong><b>—</b><strong>${esc(m.b)}</strong></div><div class="venue">${esc(prettyDate(m.date))}</div></div>`).join(""):`<div class="card empty">Belum ada pertandingan SELESAI.</div>`;
-}
-
-function renderAll(){renderSchedule();renderBracket();renderResults();}
+function renderAll(){renderSchedule();renderBracket();}
 
 document.getElementById("sportFilters").addEventListener("click",e=>{
   const b=e.target.closest("[data-sport]"); if(!b)return;
