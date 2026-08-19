@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIPT SCOREBOARD - GitHub Pages Edition</title>
+    <!-- Font Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase Realtime Database: sinkronisasi antar perangkat -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { navy: '#0f172a', red: '#dc2626', silver: '#cbd5e1', dark: '#1e293b' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --team-a-color: #dc2626;
+            --team-b-color: #2563eb;
+            --bg-glass: rgba(15, 23, 42, 0.85);
+            --border-silver: #94a3b8;
+        }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Roboto', sans-serif; background-color: #0f172a;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body.mode-output { background: transparent !important; overflow: hidden; }
+        
+        .scoreboard-root {
+            width: 1280px; height: 720px; position: absolute; top: 0; left: 0;
+            pointer-events: none; display: flex; justify-content: center;
+        }
+        
+        #preview-container {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            background-image: linear-gradient(45deg, #1e293b 25%, transparent 25%), 
+                              linear-gradient(-45deg, #1e293b 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #1e293b 75%), 
+                              linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+            background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            overflow: hidden; border-radius: 0.5rem; border: 1px solid #334155;
+        }
+
+        .sb-main-bar {
+            margin-top: 55px; display: flex; align-items: stretch; height: 70px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); border-radius: 8px; overflow: visible;
+            border: 2px solid rgba(255,255,255,0.1); background: var(--bg-glass);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+        .sb-event-logo {
+            padding: 5px 20px; background: #ffffff; display: flex; align-items: center;
+            justify-content: center; border-top-left-radius: 6px; border-bottom-left-radius: 6px;
+            border-right: 3px solid var(--border-silver);
+        }
+        .sb-event-logo img { max-height: 50px; max-width: 100px; object-fit: contain; }
+        .sb-team { display: flex; align-items: center; padding: 0 20px; min-width: 280px; position: relative; overflow: hidden; }
+        .sb-team::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.5) 100%); z-index: 0;
+        }
+        .sb-team-a { background-color: var(--team-a-color); justify-content: flex-end; }
+        .sb-team-b { background-color: var(--team-b-color); justify-content: flex-start; }
+        .sb-team-a::before { background: linear-gradient(90deg, rgba(0,0,0,0.5) 0%, rgba(255,255,255,0.1) 100%); }
+        .sb-team-name {
+            font-size: 32px; font-weight: 700; color: #ffffff; z-index: 1;
+            text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); white-space: nowrap;
+        }
+        .sb-team-logo { height: 50px; width: 50px; object-fit: contain; z-index: 1; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5)); }
+        .sb-team-a .sb-team-logo { margin-left: 15px; }
+        .sb-team-b .sb-team-logo { margin-right: 15px; }
+        .sb-score-box {
+            background: #000000; display: flex; align-items: center; justify-content: center;
+            min-width: 80px; font-size: 46px; font-weight: 900; color: #ffffff;
+            border-left: 1px solid #333; border-right: 1px solid #333;
+            text-shadow: 0px 0px 10px rgba(255,255,255,0.3); font-variant-numeric: tabular-nums;
+        }
+        .sb-center { display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 220px; background: var(--bg-glass); position: relative; }
+        .sb-timer { font-size: 36px; font-weight: 900; color: #fbbf24; letter-spacing: 2px; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); line-height: 1; margin-top: 5px; }
+        .sb-period { font-size: 14px; font-weight: 700; color: var(--border-silver); text-transform: uppercase; letter-spacing: 3px; margin-top: 2px; }
+        .sb-live { position: absolute; top: -15px; background: #dc2626; color: white; font-size: 12px; font-weight: 900; padding: 2px 10px; border-radius: 10px; letter-spacing: 2px; animation: pulse-live 2s infinite; }
+        
+        @keyframes pulse-live { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
+        @keyframes score-pop { 0% { transform: scale(1); color: white; } 50% { transform: scale(1.4); color: #fbbf24; } 100% { transform: scale(1); color: white; } }
+        .anim-pop { animation: score-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        #custom-modal { display: none; backdrop-filter: blur(5px); }
+        #custom-modal.active { display: flex; }
+        #btn-back-operator { position: fixed; top: 15px; left: 15px; z-index: 9999; background: #dc2626; color: white; padding: 8px 16px; border-radius: 5px; font-weight: bold; cursor: pointer; display: none; border: 2px solid white; font-size: 12px; }
+    </style>
+</head>
+<body class="text-white">
+
+    <button id="btn-back-operator" onclick="exitTestOutput()">⬅ KEMBALI</button>
+
+    <!-- UI OPERATOR PANEL -->
+    <div id="operator-view" class="hidden min-h-screen flex flex-col bg-brand-navy">
+        <header class="bg-brand-dark border-b border-gray-700 p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-black tracking-wider text-white text-center sm:text-left">VIPT<span class="text-brand-red">SCOREBOARD</span></h1>
+                <p id="sync-status" class="text-[10px] sm:text-xs text-yellow-400 tracking-widest uppercase font-bold text-center sm:text-left">● MENYAMBUNG KE SERVER...</p>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-1.5 rounded border border-gray-600 text-xs">
+                    <input type="checkbox" id="inp-transparent" class="w-4 h-4 rounded text-blue-600" onchange="toggleTransparent()">
+                    <span class="font-bold">TRANSPARENT</span>
+                </label>
+                <button onclick="testFullOutput()" class="bg-blue-600 hover:bg-blue-500 px-4 py-1.5 rounded font-black text-xs shadow-lg">TEST OUTPUT</button>
+                <button onclick="openOutput()" class="bg-brand-red hover:bg-red-700 px-4 py-1.5 rounded font-black text-xs shadow-lg">BUKA TAB OUTPUT</button>
+            </div>
+        </header>
+
+        <div class="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden">
+            <!-- Sidebar Panel Kontrol -->
+            <div class="w-full lg:w-[480px] bg-gray-800 border-r border-gray-700 flex flex-col shrink-0">
+                <div class="p-3 sm:p-5 space-y-4 sm:space-y-6">
+                    
+                    <div class="grid grid-cols-2 gap-3 bg-gray-900 p-3 rounded-lg border border-gray-700">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1">CABANG OLAHRAGA</label>
+                            <select id="inp-sport" onchange="updateSport()" class="w-full bg-gray-800 border border-gray-600 rounded p-2 text-xs sm:text-sm font-bold outline-none">
+                                <option value="FUTSAL">FUTSAL</option>
+                                <option value="VOLLEYBALL">VOLLEYBALL</option>
+                                <option value="BADMINTON">BADMINTON</option>
+                                <option value="BASKETBALL">BASKETBALL</option>
+                                <option value="CUSTOM">CUSTOM</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1">PERIODE / BABAK</label>
+                            <div class="flex gap-1">
+                                <select id="inp-period-select" onchange="updatePeriodFromSelect()" class="w-full bg-gray-800 border border-gray-600 rounded p-2 text-xs sm:text-sm font-bold outline-none">
+                                    <option value="BABAK 1">BABAK 1</option>
+                                    <option value="BABAK 2">BABAK 2</option>
+                                    <option value="SET 1">SET 1</option>
+                                    <option value="SET 2">SET 2</option>
+                                    <option value="CUSTOM">CUSTOM...</option>
+                                </select>
+                                <input type="text" id="inp-period-custom" oninput="updatePeriodCustom()" class="hidden w-full bg-gray-800 border border-gray-600 rounded p-2 text-xs font-bold" placeholder="Ketik...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Tim A -->
+                        <div class="bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-700 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1" id="indicator-color-a" style="background-color: var(--team-a-color)"></div>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1">TIM A (KIRI)</label>
+                            <input type="text" id="inp-name-a" oninput="updateTeamData()" class="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white font-black text-base sm:text-lg mb-2 text-center uppercase" value="RT 08">
+                            
+                            <div class="flex items-center gap-2 mb-3">
+                                <input type="color" id="inp-color-a" onchange="updateTeamData()" class="w-8 h-8 rounded cursor-pointer border-none p-0 bg-transparent">
+                                <label class="flex-1 cursor-pointer bg-gray-800 border border-gray-600 hover:bg-gray-700 rounded py-1.5 px-2 text-center text-[11px] font-bold transition">
+                                    UPLOAD LOGO
+                                    <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(event, 'teamA')">
+                                </label>
+                            </div>
+
+                            <div class="flex justify-between items-center bg-black p-2 rounded">
+                                <button onclick="changeScore('A', -1)" class="w-10 h-10 bg-gray-800 hover:bg-red-900 rounded text-xl font-black flex items-center justify-center active:scale-95 transition">−</button>
+                                <span id="op-score-a" class="text-4xl font-black">0</span>
+                                <button onclick="changeScore('A', 1)" class="w-10 h-10 bg-gray-800 hover:bg-green-900 rounded text-xl font-black flex items-center justify-center active:scale-95 transition">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Tim B -->
+                        <div class="bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-700 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1" id="indicator-color-b" style="background-color: var(--team-b-color)"></div>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1">TIM B (KANAN)</label>
+                            <input type="text" id="inp-name-b" oninput="updateTeamData()" class="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white font-black text-base sm:text-lg mb-2 text-center uppercase" value="RT 07">
+                            
+                            <div class="flex items-center gap-2 mb-3">
+                                <input type="color" id="inp-color-b" onchange="updateTeamData()" class="w-8 h-8 rounded cursor-pointer border-none p-0 bg-transparent">
+                                <label class="flex-1 cursor-pointer bg-gray-800 border border-gray-600 hover:bg-gray-700 rounded py-1.5 px-2 text-center text-[11px] font-bold transition">
+                                    UPLOAD LOGO
+                                    <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(event, 'teamB')">
+                                </label>
+                            </div>
+
+                            <div class="flex justify-between items-center bg-black p-2 rounded">
+                                <button onclick="changeScore('B', -1)" class="w-10 h-10 bg-gray-800 hover:bg-red-900 rounded text-xl font-black flex items-center justify-center active:scale-95 transition">−</button>
+                                <span id="op-score-b" class="text-4xl font-black">0</span>
+                                <button onclick="changeScore('B', 1)" class="w-10 h-10 bg-gray-800 hover:bg-green-900 rounded text-xl font-black flex items-center justify-center active:scale-95 transition">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="promptResetScore()" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 py-2 rounded font-bold text-xs">RESET SKOR KEDUA TIM</button>
+
+                    <!-- Timer -->
+                    <div class="bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-700 text-center">
+                        <label class="block text-[10px] font-bold text-gray-400 mb-1">TIMER PERTANDINGAN</label>
+                        <div class="text-4xl sm:text-5xl font-black text-amber-400 mb-3 font-mono tracking-wider" id="op-timer-display">10:00</div>
+                        
+                        <div class="grid grid-cols-5 gap-1.5 mb-3">
+                            <button onclick="modifyTimer(-60)" class="bg-gray-800 hover:bg-gray-700 rounded py-1.5 text-xs font-bold border border-gray-600">-1M</button>
+                            <button onclick="modifyTimer(-10)" class="bg-gray-800 hover:bg-gray-700 rounded py-1.5 text-xs font-bold border border-gray-600">-10S</button>
+                            <button onclick="promptResetTimer()" class="bg-gray-800 hover:bg-gray-700 rounded py-1.5 text-xs font-bold border border-gray-600 text-red-400">RST</button>
+                            <button onclick="modifyTimer(10)" class="bg-gray-800 hover:bg-gray-700 rounded py-1.5 text-xs font-bold border border-gray-600">+10S</button>
+                            <button onclick="modifyTimer(60)" class="bg-gray-800 hover:bg-gray-700 rounded py-1.5 text-xs font-bold border border-gray-600">+1M</button>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="startTimer()" id="btn-timer-start" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2.5 rounded font-black text-base shadow-lg transition">START</button>
+                            <button onclick="pauseTimer()" id="btn-timer-pause" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded font-black text-base shadow-lg transition hidden">PAUSE</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Live Preview -->
+            <div class="flex-1 bg-black p-4 sm:p-6 flex flex-col justify-center items-center min-h-[300px] lg:min-h-0">
+                <div class="w-full max-w-4xl flex flex-col">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-gray-400 font-bold flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span> LIVE PREVIEW (16:9)
+                        </span>
+                    </div>
+                    <div id="preview-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPLATE SCOREBOARD (1920x1080) -->
+    <div id="scoreboard-template" style="display: none;">
+        <div class="scoreboard-root" id="sb-root">
+            <div class="sb-main-bar">
+                <div class="sb-event-logo" id="ui-event-box" style="display: none;"><img id="ui-event-img" src="" alt=""></div>
+                <div class="sb-team sb-team-a" id="ui-team-a-bg">
+                    <div class="sb-team-name" id="ui-team-a-name">TEAM A</div>
+                    <img id="ui-team-a-logo" class="sb-team-logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="display:none;">
+                </div>
+                <div class="sb-score-box" id="ui-score-a">0</div>
+                <div class="sb-center">
+                    <div class="sb-live" id="ui-live-badge">LIVE</div>
+                    <div class="sb-timer" id="ui-timer">10:00</div>
+                    <div class="sb-period" id="ui-period">BABAK 1</div>
+                </div>
+                <div class="sb-score-box" id="ui-score-b">0</div>
+                <div class="sb-team sb-team-b" id="ui-team-b-bg">
+                    <img id="ui-team-b-logo" class="sb-team-logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="display:none;">
+                    <div class="sb-team-name" id="ui-team-b-name">TEAM B</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="output-view" class="hidden h-screen w-screen overflow-hidden relative"></div>
+
+    <!-- CUSTOM MODAL -->
+    <div id="custom-modal" class="fixed inset-0 z-50 bg-black/80 items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-700 rounded-lg p-5 max-w-xs w-full shadow-2xl">
+            <h3 id="modal-title" class="text-lg font-black text-white mb-2">Title</h3>
+            <p id="modal-message" class="text-gray-400 text-xs mb-5">Message...</p>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-3 py-1.5 bg-gray-800 rounded text-xs font-bold">BATAL</button>
+                <button id="modal-confirm-btn" class="px-3 py-1.5 bg-brand-red rounded text-xs font-bold">YA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIC SCRIPT (LOCAL STORAGE & BROADCAST SYNC) -->
+    <script>
+        let state = {
+            sport: 'FUTSAL',
+            period: 'BABAK 1',
+            timer: 600,
+            timerRunning: false,
+            teamA: { name: 'RT 08', score: 0, logo: '', color: '#dc2626' },
+            teamB: { name: 'RT 07', score: 0, logo: '', color: '#2563eb' },
+            eventLogo: '',
+            sponsorLogo: '',
+            showSponsor: false,
+            transparentMode: false
+        };
+
+        // ============================================================
+        // FIREBASE REALTIME SYNC
+        // 1) Buat project Firebase
+        // 2) Aktifkan Authentication > Anonymous
+        // 3) Aktifkan Realtime Database
+        // 4) Tempel konfigurasi Web App Anda di bawah ini.
+        // ============================================================
+        const FIREBASE_CONFIG = {
+            apiKey: "GANTI_DENGAN_API_KEY",
+            authDomain: "GANTI_DENGAN_PROJECT.firebaseapp.com",
+            databaseURL: "https://GANTI_DENGAN_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "GANTI_DENGAN_PROJECT",
+            storageBucket: "GANTI_DENGAN_PROJECT.firebasestorage.app",
+            messagingSenderId: "GANTI_DENGAN_SENDER_ID",
+            appId: "GANTI_DENGAN_APP_ID"
+        };
+
+        let firebaseReady = false;
+        let firebaseDb = null;
+        let firebaseStateRef = null;
+        let isOutputMode = false;
+        let timerInterval = null;
+        let cloudSyncStarted = false;
+
+        function initApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            isOutputMode = urlParams.get('mode') === 'output';
+
+            loadSettings();
+            initFirebaseSync();
+
+            if (isOutputMode) {
+                initOutputMode();
+            } else {
+                initOperatorMode();
+            }
+        }
+
+        async function initFirebaseSync() {
+            const configured = FIREBASE_CONFIG.apiKey &&
+                !FIREBASE_CONFIG.apiKey.startsWith('GANTI_') &&
+                FIREBASE_CONFIG.databaseURL &&
+                !FIREBASE_CONFIG.databaseURL.includes('GANTI_DENGAN');
+
+            if (!configured) {
+                console.warn('Firebase belum dikonfigurasi. Aplikasi berjalan lokal.');
+                loadSettings();
+                return;
+            }
+
+            try {
+                if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+                await firebase.auth().signInAnonymously();
+                firebaseDb = firebase.database();
+                firebaseStateRef = firebaseDb.ref('vipt_scoreboard/live');
+                firebaseReady = true;
+                cloudSyncStarted = true;
+
+                // Ambil state terbaru dari server, lalu dengarkan perubahan realtime.
+                firebaseStateRef.on('value', (snapshot) => {
+                    const remote = snapshot.val();
+                    if (!remote) {
+                        firebaseStateRef.set(state);
+                        return;
+                    }
+                    state = remote;
+                    if (!isOutputMode) populateUI();
+                    renderScoreboard();
+                });
+
+                const status = document.getElementById('sync-status');
+                if (status) {
+                    status.textContent = '● ONLINE • REALTIME SYNC';
+                    status.className = 'text-[10px] sm:text-xs text-green-400 tracking-widest uppercase font-bold text-center sm:text-left';
+                }
+                console.log('Firebase realtime sync aktif.');
+            } catch (err) {
+                console.error('Firebase sync gagal:', err);
+                firebaseReady = false;
+                const status = document.getElementById('sync-status');
+                if (status) {
+                    status.textContent = '● OFFLINE / FIREBASE BELUM AKTIF';
+                    status.className = 'text-[10px] sm:text-xs text-red-400 tracking-widest uppercase font-bold text-center sm:text-left';
+                }
+                loadSettings();
+            }
+        }
+
+        function initOperatorMode() {
+            document.getElementById('operator-view').classList.remove('hidden');
+            const previewContainer = document.getElementById('preview-container');
+            previewContainer.innerHTML = document.getElementById('scoreboard-template').innerHTML;
+            window.addEventListener('resize', resizePreview);
+            resizePreview();
+            populateUI();
+            renderScoreboard();
+        }
+
+        function initOutputMode() {
+            document.getElementById('output-view').classList.remove('hidden');
+            document.body.classList.add('mode-output');
+            const outputView = document.getElementById('output-view');
+            outputView.innerHTML = document.getElementById('scoreboard-template').innerHTML;
+            renderScoreboard();
+            applyTransparentMode();
+        }
+
+        window.testFullOutput = function() {
+            document.getElementById('operator-view').classList.add('hidden');
+            document.getElementById('output-view').classList.remove('hidden');
+            document.getElementById('btn-back-operator').style.display = 'block';
+            document.body.classList.add('mode-output');
+            isOutputMode = true;
+            document.getElementById('output-view').innerHTML = document.getElementById('scoreboard-template').innerHTML;
+            renderScoreboard();
+            applyTransparentMode();
+        }
+
+        window.exitTestOutput = function() {
+            document.getElementById('operator-view').classList.remove('hidden');
+            document.getElementById('output-view').classList.add('hidden');
+            document.getElementById('btn-back-operator').style.display = 'none';
+            document.body.classList.remove('mode-output', 'transparent-on');
+            isOutputMode = false;
+            renderScoreboard();
+            resizePreview();
+        }
+
+        window.renderScoreboard = function() {
+            const rootId = isOutputMode ? 'output-view' : 'preview-container';
+            const root = document.getElementById(rootId);
+            if (!root) return;
+
+            const setVal = (id, val) => { const el = root.querySelector('#' + id); if(el) el.textContent = val; };
+            const setCSS = (id, prop, val) => { const el = root.querySelector('#' + id); if(el) el.style[prop] = val; };
+            const setSrc = (id, src) => { const el = root.querySelector('#' + id); if(el) { if(src) { el.src = src; el.style.display = 'block'; } else { el.style.display = 'none'; } } };
+
+            setVal('ui-team-a-name', state.teamA.name);
+            setVal('ui-team-b-name', state.teamB.name);
+            setVal('ui-period', state.period);
+            setVal('ui-timer', formatTime(state.timer));
+
+            const elScoreA = root.querySelector('#ui-score-a');
+            const elScoreB = root.querySelector('#ui-score-b');
+            if (elScoreA && parseInt(elScoreA.textContent) !== state.teamA.score) {
+                elScoreA.textContent = state.teamA.score;
+                elScoreA.classList.remove('anim-pop'); void elScoreA.offsetWidth; elScoreA.classList.add('anim-pop');
+            }
+            if (elScoreB && parseInt(elScoreB.textContent) !== state.teamB.score) {
+                elScoreB.textContent = state.teamB.score;
+                elScoreB.classList.remove('anim-pop'); void elScoreB.offsetWidth; elScoreB.classList.add('anim-pop');
+            }
+
+            setCSS('ui-team-a-bg', 'backgroundColor', state.teamA.color);
+            setCSS('ui-team-b-bg', 'backgroundColor', state.teamB.color);
+            setSrc('ui-team-a-logo', state.teamA.logo);
+            setSrc('ui-team-b-logo', state.teamB.logo);
+
+            const liveBadge = root.querySelector('#ui-live-badge');
+            if(liveBadge) liveBadge.style.display = state.timerRunning ? 'block' : 'none';
+
+            if (!isOutputMode) {
+                const opA = document.getElementById('op-score-a');
+                const opB = document.getElementById('op-score-b');
+                if(opA) opA.textContent = state.teamA.score;
+                if(opB) opB.textContent = state.teamB.score;
+                const opTimer = document.getElementById('op-timer-display');
+                if(opTimer) opTimer.textContent = formatTime(state.timer);
+                
+                const btnStart = document.getElementById('btn-timer-start');
+                const btnPause = document.getElementById('btn-timer-pause');
+                if(btnStart && btnPause) {
+                    btnStart.style.display = state.timerRunning ? 'none' : 'block';
+                    btnPause.style.display = state.timerRunning ? 'block' : 'none';
+                }
+            }
+            if(isOutputMode) applyTransparentMode();
+        }
+
+        function resizePreview() {
+            if (isOutputMode) return;
+            const container = document.getElementById('preview-container');
+            const root = container?.querySelector('.scoreboard-root');
+            if (!container || !root) return;
+            const scale = Math.min(container.clientWidth / 1920, container.clientHeight / 1080) * 0.98;
+            root.style.transform = `scale(${scale})`;
+            root.style.transformOrigin = 'center top';
+            root.style.top = '10%';
+        }
+
+        window.populateUI = function() {
+            const sp = document.getElementById('inp-sport'); if(sp) sp.value = state.sport;
+            const na = document.getElementById('inp-name-a'); if(na && document.activeElement !== na) na.value = state.teamA.name;
+            const ca = document.getElementById('inp-color-a'); if(ca) ca.value = state.teamA.color;
+            const nb = document.getElementById('inp-name-b'); if(nb && document.activeElement !== nb) nb.value = state.teamB.name;
+            const cb = document.getElementById('inp-color-b'); if(cb) cb.value = state.teamB.color;
+            const tr = document.getElementById('inp-transparent'); if(tr) tr.checked = state.transparentMode;
+        }
+
+        window.changeScore = function(team, amount) {
+            if (team === 'A') state.teamA.score = Math.max(0, state.teamA.score + amount);
+            else state.teamB.score = Math.max(0, state.teamB.score + amount);
+            updateAndSave();
+        }
+
+        window.updateTeamData = function() {
+            state.teamA.name = document.getElementById('inp-name-a').value;
+            state.teamA.color = document.getElementById('inp-color-a').value;
+            state.teamB.name = document.getElementById('inp-name-b').value;
+            state.teamB.color = document.getElementById('inp-color-b').value;
+            updateAndSave();
+        }
+
+        window.updateSport = function() {
+            state.sport = document.getElementById('inp-sport').value;
+            updateAndSave();
+        }
+
+        window.updatePeriodFromSelect = function() {
+            const select = document.getElementById('inp-period-select');
+            const custom = document.getElementById('inp-period-custom');
+            if (select.value === 'CUSTOM') {
+                custom.classList.remove('hidden');
+                state.period = custom.value || 'CUSTOM';
+            } else {
+                custom.classList.add('hidden');
+                state.period = select.value;
+            }
+            updateAndSave();
+        }
+
+        window.updatePeriodCustom = function() {
+            state.period = document.getElementById('inp-period-custom').value.toUpperCase();
+            updateAndSave();
+        }
+
+        window.toggleTransparent = function() {
+            state.transparentMode = document.getElementById('inp-transparent').checked;
+            updateAndSave();
+        }
+
+        function applyTransparentMode() {
+            if(state.transparentMode) document.body.classList.add('transparent-on');
+            else document.body.classList.remove('transparent-on');
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        window.startTimer = function() {
+            if (!state.timerRunning && state.timer > 0) {
+                state.timerRunning = true;
+                timerInterval = setInterval(() => {
+                    if (state.timer > 0) {
+                        state.timer--;
+                        updateAndSave();
+                    } else {
+                        window.pauseTimer();
+                    }
+                }, 1000);
+                updateAndSave();
+            }
+        }
+
+        window.pauseTimer = function() {
+            state.timerRunning = false;
+            clearInterval(timerInterval);
+            updateAndSave();
+        }
+
+        window.modifyTimer = function(amount) {
+            state.timer = Math.max(0, state.timer + amount);
+            updateAndSave();
+        }
+
+        window.handleImageUpload = function(event, target) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_SIZE = 400;
+                    let w = img.width, h = img.height;
+                    if (w > h && w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; }
+                    else if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    const compressed = canvas.toDataURL('image/webp', 0.7);
+                    if (target === 'teamA') state.teamA.logo = compressed;
+                    else if (target === 'teamB') state.teamB.logo = compressed;
+                    updateAndSave();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateAndSave() {
+            renderScoreboard();
+            saveSettings();
+        }
+
+        function saveSettings() {
+            const jsonStr = JSON.stringify(state);
+            // Fallback lokal untuk mode offline / sebelum Firebase dikonfigurasi.
+            localStorage.setItem('vipt_state_live', jsonStr);
+
+            // Jika Firebase aktif, semua HP/PC yang membuka link yang sama
+            // akan menerima perubahan secara realtime.
+            if (firebaseReady && firebaseStateRef) {
+                firebaseStateRef.set(JSON.parse(jsonStr)).catch(err => {
+                    console.error('Gagal mengirim state ke Firebase:', err);
+                });
+            }
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('vipt_state_live');
+            if (saved) {
+                try {
+                    state = JSON.parse(saved);
+                    // Jangan menjalankan timer otomatis ketika halaman dibuka.
+                    state.timerRunning = false;
+                } catch(e) {}
+            }
+        }
+
+        window.openOutput = function() {
+            const currentUrl = window.location.href.split('?')[0];
+            window.open(currentUrl + '?mode=output', '_blank', 'width=1920,height=1080');
+        }
+
+        let modalCallback = null;
+        window.showModal = function(title, msg, btnText, cb) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = msg;
+            document.getElementById('modal-confirm-btn').textContent = btnText;
+            modalCallback = cb;
+            document.getElementById('custom-modal').classList.add('active');
+        }
+        window.closeModal = function() {
+            document.getElementById('custom-modal').classList.remove('active');
+            modalCallback = null;
+        }
+        document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+            if(modalCallback) modalCallback();
+            closeModal();
+        });
+
+        window.promptResetScore = function() {
+            showModal("RESET SKOR?", "Kembalikan skor tim A dan B ke 0?", "RESET", () => {
+                state.teamA.score = 0; state.teamB.score = 0;
+                updateAndSave();
+            });
+        }
+        window.promptResetTimer = function() {
+            showModal("RESET TIMER?", "Atur ulang timer pertandingan?", "RESET", () => {
+                pauseTimer(); state.timer = 600;
+                updateAndSave();
+            });
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
