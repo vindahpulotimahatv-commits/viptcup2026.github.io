@@ -68,6 +68,15 @@ main{padding:0 14px}
 .news{display:flex;gap:11px}.thumb{width:72px;height:60px;flex:none;border-radius:11px;background:linear-gradient(135deg,#1a665d,#103f39);display:grid;place-items:center;font-size:9px;font-weight:900}
 .news b{font-size:10px;line-height:1.35}.news small{display:block;color:var(--muted);font-size:8px;margin-top:6px}
 
+/* STYLING TAB TOP SKOR */
+.topskor-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
+.topskor-table th { background: #1e5e57; color: var(--gold); padding: 10px 8px; font-weight: 900; border-bottom: 2px solid var(--line); text-transform: uppercase; letter-spacing: 0.5px; }
+.topskor-table td { padding: 9px 8px; border-bottom: 1px solid #215c54; color: var(--text); font-weight: bold; }
+.topskor-table tr:last-child td { border-bottom: none; }
+.topskor-table tr:hover { background: rgba(30,211,147,0.05); }
+.rank-badge { display: inline-grid; place-items: center; width: 20px; height: 20px; background: #236e65; border-radius: 50%; font-size: 9px; font-weight: 900; color: var(--gold); }
+.goal-badge { background: rgba(40,119,255,0.2); color: #8ff5d8; padding: 3px 8px; border-radius: 6px; font-weight: 900; }
+
 /* STYLING SOSIAL MEDIA */
 .sosmed-container { display: flex; justify-content: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
 .sosmed-btn { display: flex; align-items: center; gap: 6px; background: #1e5e57; border: 1px solid #348a80; padding: 8px 12px; border-radius: 12px; color: #fff; text-decoration: none; font-size: 10px; font-weight: 900; transition: transform 0.2s; }
@@ -80,7 +89,7 @@ main{padding:0 14px}
 
 .bottom{position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);width:min(620px,100%);
  display:grid;grid-template-columns:repeat(5,1fr);padding:8px 8px 11px;background:rgba(18,61,56,.97);border-top:1px solid var(--line)}
-.nav{text-decoration:none;text-align:center;color:#82beb5;font-size:8px}.nav span{display:block;font-size:17px;margin-bottom:3px}.nav.active{color:#8ff5d8}
+.nav{text-decoration:none;text-align:center;color:#82beb5;font-size:8px;cursor:pointer}.nav span{display:block;font-size:17px;margin-bottom:3px}.nav.active{color:#8ff5d8}
 .footer{text-align:center;color:#6d9e96;font-size:8px;padding:20px 0 30px}
 .footer a{color:#8ff5d8;text-decoration:none;font-weight:bold}
 .hidden{display:none!important}
@@ -104,76 +113,105 @@ main{padding:0 14px}
   <div class="location">📍 <span>LOKASI UTAMA</span> Lapangan Central</div>
 </section>
 
-<div class="section"><h2>🔴 Live Score</h2><a href="#jadwal">Lihat Jadwal</a></div>
-<div class="card live" id="live">
-  <div class="livebar"><span class="on">● LIVE SEKARANG</span><span class="sportname" id="liveSport">BELUM ADA PERTANDINGAN LIVE</span></div>
-  <div class="teams">
-    <div class="team"><div class="teamlogo">A</div><b id="liveA">-</b></div>
-    <div class="score" id="liveScore">-<small id="liveRound">MENUNGGU DATA LIVE</small></div>
-    <div class="team"><div class="teamlogo">B</div><b id="liveB">-</b></div>
+<!-- SECTION TAB KONTEN UTAMA -->
+<div id="tab-beranda">
+  <div class="section"><h2>🔴 Live Score</h2><a href="#jadwal">Lihat Jadwal</a></div>
+  <div class="card live" id="live">
+    <div class="livebar"><span class="on">● LIVE SEKARANG</span><span class="sportname" id="liveSport">BELUM ADA PERTANDINGAN LIVE</span></div>
+    <div class="teams">
+      <div class="team"><div class="teamlogo">A</div><b id="liveA">-</b></div>
+      <div class="score" id="liveScore">-<small id="liveRound">MENUNGGU DATA LIVE</small></div>
+      <div class="team"><div class="teamlogo">B</div><b id="liveB">-</b></div>
+    </div>
+    <a class="btn" href="#hasil">DETAIL HASIL</a>
   </div>
-  <a class="btn" href="#hasil">DETAIL HASIL</a>
+
+  <!-- Tab Live Streaming -->
+  <div class="section"><h2>🎥 Live Streaming</h2></div>
+  <div class="card">
+  <iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"
+  src="https://www.youtube.com/embed/nlMvrMtmvxA?autoplay=1&rel=0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen></iframe>
+  <a class="btn" id="youtubeBtn" href="https://www.youtube.com/live/nlMvrMtmvxA?si=9KTmWNdTcsDFn1KH" target="_blank">BUKA DI YOUTUBE</a>
+  </div>
+
+  <!-- Card Dukungan Saweria -->
+  <div class="section"><h2>🤝 Support VIPT 2026</h2></div>
+  <div class="card" style="text-align:center; background:linear-gradient(135deg, rgba(246,184,63,0.15), rgba(30,211,147,0.1)); border-color:var(--gold);">
+    <b style="font-size:12px; color:var(--gold);">🔥 Bikin VIPT CUP IV 2026 Makin Meriah!</b>
+    <p style="color:var(--muted); font-size:10px; margin:6px 0 12px; line-height:1.4;">Yuk, dukung kelancaran dan kemeriahan turnamen kita lewat Saweria agar fasilitas dan hadiah makin mantap!</p>
+    <a class="btn" href="https://saweria.co/VIPTSPORT" target="_blank" style="background:linear-gradient(135deg,#f6b83f,#ff7a00); color:#050914;">☕ DUKUNG VIA SAWERIA</a>
+  </div>
+
+  <!-- SECTION SOCIAL MEDIA -->
+  <div class="section"><h2>📱 Ikuti Keseruan Kami</h2></div>
+  <div class="card" style="text-align:center;">
+    <p style="font-size: 10px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+      Jangan ketinggalan update skor, cuplikan pertandingan, dan keseruan lapangan! Yuk follow semua sosial media resmi <b>VIPT</b>:
+    </p>
+    <div class="sosmed-container">
+      <a href="https://www.tiktok.com/@vipt_sport?_r=1&_t=ZS-9917030NxiM" class="sosmed-btn" target="_blank">🎵 TikTok</a>
+      <a href="https://www.instagram.com/vipt_sport?igsh=aTlqNzZyd3Q2dnFk&igsi=aTlqNzZyd3Q2dnFk" class="sosmed-btn" target="_blank">📸 Instagram</a>
+      <a href="https://youtube.com/@villaindahpulotimaha?si=SnUcr3c9uesEbayA" class="sosmed-btn" target="_blank">▶️ YouTube</a>
+      <a href="https://www.facebook.com/share/1FEvZ9XKSq/" class="sosmed-btn" target="_blank">👥 Facebook</a>
+    </div>
+  </div>
+
+  <div class="section"><h2>🏆 Cabang Olahraga</h2></div>
+  <div class="filters" id="sportFilters">
+    <button class="pill active" data-sport="SEMUA">Semua</button>
+    <button class="pill" data-sport="VOLLY PUTRA">Volly Putra</button>
+    <button class="pill" data-sport="VOLLY PUTRI">Volly Putri</button>
+    <button class="pill" data-sport="FUTSAL">FUTSAL</button>
+    <button class="pill" data-sport="TENIS MEJA">Tenis Meja</button>
+    <button class="pill" data-sport="BADMINTON">Badminton</button>
+  </div>
+
+  <div class="section"><h2>📅 Semua Pertandingan Terbaru</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
+  <input class="search" id="search" type="search" placeholder="Cari RT / RW / cabang olahraga...">
+  <div id="jadwal"></div>
+
+  <div class="section"><h2>🏆 Bracket</h2></div>
+  <div class="card" id="bracket">
+    <div class="filters" id="bracketFilters"></div>
+    <div class="bracket-wrap"><div class="bracket" id="bracketGrid"></div></div>
+  </div>
+
+  <div class="section" id="hasil"><h2>📋 Hasil Pertandingan</h2></div>
+  <div id="results"></div>
+
+  <div class="section"><h2>📰 Update VIPT CUP</h2></div>
+  <div class="card news"><div class="thumb">VIPT CUP</div><div><b>Semua jadwal pertandingan dipusatkan di Lapangan Central.</b><small>VIPT CUP IV 2026 • Update jadwal sesuai poster resmi terbaru.</small></div></div>
 </div>
 
-<!-- Tab Live Streaming -->
-<div class="section"><h2>🎥 Live Streaming</h2></div>
-<div class="card">
-<iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"
-src="https://www.youtube.com/embed/nlMvrMtmvxA?autoplay=1&rel=0"
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-allowfullscreen></iframe>
-<a class="btn" id="youtubeBtn" href="https://www.youtube.com/live/nlMvrMtmvxA?si=9KTmWNdTcsDFn1KH" target="_blank">BUKA DI YOUTUBE</a>
-</div>
-
-<!-- Card Dukungan Saweria -->
-<div class="section"><h2>🤝 Support VIPT 2026</h2></div>
-<div class="card" style="text-align:center; background:linear-gradient(135deg, rgba(246,184,63,0.15), rgba(30,211,147,0.1)); border-color:var(--gold);">
-  <b style="font-size:12px; color:var(--gold);">🔥 Bikin VIPT CUP IV 2026 Makin Meriah!</b>
-  <p style="color:var(--muted); font-size:10px; margin:6px 0 12px; line-height:1.4;">Yuk, dukung kelancaran dan kemeriahan turnamen kita lewat Saweria agar fasilitas dan hadiah makin mantap!</p>
-  <a class="btn" href="https://saweria.co/VIPTSPORT" target="_blank" style="background:linear-gradient(135deg,#f6b83f,#ff7a00); color:#050914;">☕ DUKUNG VIA SAWERIA</a>
-</div>
-
-<!-- SECTION SOCIAL MEDIA -->
-<div class="section"><h2>📱 Ikuti Keseruan Kami</h2></div>
-<div class="card" style="text-align:center;">
-  <p style="font-size: 10px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
-    Jangan ketinggalan update skor, cuplikan pertandingan, dan keseruan lapangan! Yuk follow semua sosial media resmi <b>VIPT</b>:
-  </p>
-  <div class="sosmed-container">
-    <a href="https://www.tiktok.com/@vipt_sport?_r=1&_t=ZS-9917030NxiM" class="sosmed-btn" target="_blank">🎵 TikTok</a>
-    <a href="https://www.instagram.com/vipt_sport?igsh=aTlqNzZyd3Q2dnFk&igsi=aTlqNzZyd3Q2dnFk" class="sosmed-btn" target="_blank">📸 Instagram</a>
-    <a href="https://youtube.com/@villaindahpulotimaha?si=SnUcr3c9uesEbayA" class="sosmed-btn" target="_blank">▶️ YouTube</a>
-    <a href="https://www.facebook.com/share/1FEvZ9XKSq/" class="sosmed-btn" target="_blank">👥 Facebook</a>
+<!-- TAB KHUSUS TOP SKOR FUTSAL -->
+<div id="tab-topskor" class="hidden">
+  <div class="section"><h2>⚡ Top Skor Futsal VIPT CUP IV</h2></div>
+  <div class="card" style="padding: 10px;">
+    <div style="text-align: center; margin-bottom: 14px;">
+      <b style="font-size: 13px; color: var(--gold); letter-spacing: 1px;">DAFTAR PENCETAK GOL TERBANYAK</b>
+      <p style="font-size: 9px; color: var(--muted); margin: 4px 0 0;">Update resmi perolehan gol cabang olahraga Futsal</p>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="topskor-table">
+        <thead>
+          <tr>
+            <th style="width: 45px; text-align: center;">NO</th>
+            <th>NAMA PEMAIN</th>
+            <th>ASAL TIM</th>
+            <th style="text-align: center; width: 60px;">GOL</th>
+          </tr>
+        </thead>
+        <tbody id="topSkorBody">
+          <!-- Data Top Skor Futsal dari Gambar -->
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<div class="section"><h2>🏆 Cabang Olahraga</h2></div>
-<div class="filters" id="sportFilters">
-  <button class="pill active" data-sport="SEMUA">Semua</button>
-  <button class="pill" data-sport="VOLLY PUTRA">Volly Putra</button>
-  <button class="pill" data-sport="VOLLY PUTRI">Volly Putri</button>
-  <button class="pill" data-sport="FUTSAL">Futsal</button>
-  <button class="pill" data-sport="TENIS MEJA">Tenis Meja</button>
-  <button class="pill" data-sport="BADMINTON">Badminton</button>
-</div>
-
-<div class="section"><h2>📅 Semua Pertandingan Terbaru</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
-<input class="search" id="search" type="search" placeholder="Cari RT / RW / cabang olahraga...">
-<div id="jadwal"></div>
-
-<div class="section"><h2>🏆 Bracket</h2></div>
-<div class="card" id="bracket">
-  <div class="filters" id="bracketFilters"></div>
-  <div class="bracket-wrap"><div class="bracket" id="bracketGrid"></div></div>
-</div>
-
-<div class="section" id="hasil"><h2>📋 Hasil Pertandingan</h2></div>
-<div id="results"></div>
-
-<div class="section"><h2>📰 Update VIPT CUP</h2></div>
-<div class="card news"><div class="thumb">VIPT CUP</div><div><b>Semua jadwal pertandingan dipusatkan di Lapangan Central.</b><small>VIPT CUP IV 2026 • Update jadwal sesuai poster resmi terbaru.</small></div></div>
-
-<!-- BAGIAN SPONSOR (DIPERBAIKI DENGAN PENANGANAN ERROR & FALLBACK) -->
+<!-- BAGIAN SPONSOR -->
 <div class="sponsor-footer">
   <div class="sponsor-title">DISPONSORI OLEH:</div>
   <div class="card" style="background: #ffffff; padding: 10px; width: 100%; text-align: center; border-radius: 14px;">
@@ -181,21 +219,68 @@ allowfullscreen></iframe>
   </div>
 </div>
 
-<!-- FOOTER PALING BAWAH DENGAN DESIGN BY UDA_RNL -->
+<!-- FOOTER PALING BAWAH -->
 <div class="footer">
   <div>© 2026 VIPT CUP IV • Sportivitas • Fairplay • Solidaritas • Prestasi</div>
   <div style="margin-top: 6px;">Design By <a href="#" target="_blank">Uda_RnL</a></div>
 </div>
 </main>
 
+<!-- NAVIGASI BAWAH (DITAMBAHKAN TOMBOL TOP SKOR) -->
 <nav class="bottom">
-  <a class="nav active" href="#"><span>🏠</span>Beranda</a>
-  <a class="nav" href="#jadwal"><span>📅</span>Jadwal</a>
-  <a class="nav" href="#live"><span>🔴</span>Live</a>
-  <a class="nav" href="#bracket"><span>🏆</span>Bracket</a>
-  <a class="nav" href="#hasil"><span>☰</span>Hasil</a>
+  <a class="nav active" onclick="switchTab('beranda', this)"><span>🏠</span>Beranda</a>
+  <a class="nav" onclick="switchTab('beranda'); location.hash='#jadwal';"><span>📅</span>Jadwal</a>
+  <a class="nav" onclick="switchTab('topskor', this)"><span>⚡</span>Top Skor</a>
+  <a class="nav" onclick="switchTab('beranda'); location.hash='#bracket';"><span>🏆</span>Bracket</a>
+  <a class="nav" onclick="switchTab('beranda'); location.hash='#hasil';"><span>☰</span>Hasil</a>
 </nav>
 </div>
+
+<script>
+/* ==========================================================
+   DATA TOP SKOR FUTSAL SESUAI GAMBAR
+   ========================================================== */
+const TOPSCOR_FUTSAL = [
+  {no: 1, name: "ARIFIN", team: "RT 13 / 021", goals: 7},
+  {no: 2, name: "TOTO", team: "RT 11 / 021", goals: 6},
+  {no: 3, name: "SATRIA", team: "RT 10 / 014", goals: 5},
+  {no: 4, name: "SYARIF", team: "RT 08 / 014", goals: 5},
+  {no: "4", name: "RIO", team: "RT 02 / 021", goals: 4},
+  {no: 5, name: "MOZA", team: "RT 11 / 021", goals: 4},
+  {no: 6, name: "FAJAR", team: "RT 02 / 021", goals: 3}
+];
+
+function renderTopSkor(){
+  const tbody = document.getElementById("topSkorBody");
+  tbody.innerHTML = TOPSCOR_FUTSAL.map(p => `
+    <tr>
+      <td style="text-align: center;"><span class="rank-badge">${p.no}</span></td>
+      <td><b>${esc(p.name)}</b></td>
+      <td style="color: var(--muted);">${esc(p.team)}</td>
+      <td style="text-align: center;"><span class="goal-badge">${p.goals}</span></td>
+    </tr>
+  `).join("");
+}
+renderTopSkor();
+
+/* FUNGSI SWITCH TAB */
+function switchTab(tabName, element){
+  document.getElementById("tab-beranda").classList.add("hidden");
+  document.getElementById("tab-topskor").classList.add("hidden");
+
+  if(tabName === 'beranda'){
+    document.getElementById("tab-beranda").classList.remove("hidden");
+  } else if(tabName === 'topskor'){
+    document.getElementById("tab-topskor").classList.remove("hidden");
+  }
+
+  if(element){
+    document.querySelectorAll(".bottom .nav").forEach(n => n.classList.remove("active"));
+    element.classList.add("active");
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
 
 <script>
 /* ==========================================================
@@ -305,7 +390,7 @@ const MATCHES = [
   {id:"VW-SF2", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"16:00 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
 
   /* FUTSAL - BABAK SEMIFINAL */
-  {id:"FS-SF1", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:00 WIB", a:"RT 13 / RW 021", b:"RT 04 / RW 021", status:"JADWAL"},
+  {id:"FS-SF1", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:00 WIB", a:"RT 13 / RW 021", b:"RT 04 / RW 021", status:"JADVAL"},
   {id:"FS-SF2", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:45 WIB", a:"RT 11 / RW 021", b:"RT 02 / RW 021", status:"JADWAL"},
 
   /* TENIS MEJA */
