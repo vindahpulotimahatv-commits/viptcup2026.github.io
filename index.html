@@ -28,7 +28,7 @@ header{position:sticky;top:0;z-index:50;padding:11px 14px;
 .brand b{font-size:16px}.brand small{display:block;color:#a3e4dc;font-size:8px;letter-spacing:1.4px;margin-top:3px}
 main{padding:0 14px}
 
-/* HERO SECTION DENGAN LOGO MATCH CENTER */
+/* HERO SECTION */
 .hero{padding:24px 4px 14px;text-align:center;background:linear-gradient(180deg, rgba(31,102,94,0.4) 0%, transparent 100%);border-radius:0 0 20px 20px;margin:0 -14px 14px -14px;padding-left:14px;padding-right:14px}
 .eyebrow{font-size:10px;letter-spacing:2px;color:#7ef0cb;font-weight:900}
 .hero-logo{width:120px;max-height:120px;object-fit:contain;margin:12px auto 6px;display:block;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4));border-radius:12px;}
@@ -90,16 +90,13 @@ main{padding:0 14px}
 </header>
 
 <main>
-<!-- HERO SECTION DENGAN LOGO ANDA -->
+<!-- HERO SECTION -->
 <section class="hero">
   <div class="eyebrow">OFFICIAL MATCH CENTER • 2026</div>
-  
-  <!-- Logo Anda yang terhubung langsung di Match Center -->
   <img src="https://i.ibb.co.com/1V2zk03/logo.jpg" alt="VIPT CUP - IV 2026" class="hero-logo" onerror="this.src='https://i.ibb.co.com/6c6C1s25/logo-vipt.jpg'">
-
   <h1>VIPT CUP - IV</h1>
   <h2 class="subhead">2026</h2>
-  <p>MENJALIN SILATURAHMI • JUNJUNG TINGGI SPORTIVITAS • RAIH KEMENANGAN</p>
+  <p>INDONESIA BERDAULAT ADIL DAN MAKMUR</p>
   <div class="location">📍 <span>LOKASI UTAMA</span> Lapangan Central</div>
 </section>
 
@@ -151,12 +148,12 @@ allowfullscreen></iframe>
   <button class="pill active" data-sport="SEMUA">Semua</button>
   <button class="pill" data-sport="VOLLY PUTRA">Volly Putra</button>
   <button class="pill" data-sport="VOLLY PUTRI">Volly Putri</button>
+  <button class="pill" data-sport="FUTSAL">Futsal</button>
   <button class="pill" data-sport="TENIS MEJA">Tenis Meja</button>
-  <button class="pill" data-sport="BADMINTON PUTRA">Badminton Putra</button>
-  <button class="pill" data-sport="BADMINTON PUTRI">Badminton Putri</button>
+  <button class="pill" data-sport="BADMINTON">Badminton</button>
 </div>
 
-<div class="section"><h2>📅 Semua Pertandingan</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
+<div class="section"><h2>📅 Semua Pertandingan Terbaru</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
 <input class="search" id="search" type="search" placeholder="Cari RT / RW / cabang olahraga...">
 <div id="jadwal"></div>
 
@@ -174,7 +171,7 @@ allowfullscreen></iframe>
 <div id="results"></div>
 
 <div class="section"><h2>📰 Update VIPT CUP</h2></div>
-<div class="card news"><div class="thumb">VIPT CUP</div><div><b>Semua jadwal pertandingan dipusatkan di Lapangan Central.</b><small>VIPT CUP IV 2026 • Update pertandingan dapat diubah dari bagian DATA di dalam file ini.</small></div></div>
+<div class="card news"><div class="thumb">VIPT CUP</div><div><b>Semua jadwal pertandingan dipusatkan di Lapangan Central.</b><small>VIPT CUP IV 2026 • Update jadwal sesuai poster resmi terbaru.</small></div></div>
 
 <div class="footer">© 2026 VIPT CUP IV • Sportivitas • Fairplay • Solidaritas • Prestasi</div>
 </main>
@@ -280,24 +277,36 @@ initLiveScoreSync();
 
 <script>
 /* ==========================================================
-   DATA PERTANDINGAN VIPT CUP IV 2026
+   DATA PERTANDINGAN TERBARU VIPT CUP IV 2026 (SESUAI POSTER)
    ========================================================== */
 const VENUE = "Lapangan Central";
-const YOUTUBE_URL = "https://www.youtube.com/live/rQJoEpzKkNk";
 
 const MATCHES = [
-  {id:"VP-QF1",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR • MATCH 1",date:"2026-08-22",time:"21.30 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 014",status:"JADWAL"},
-  {id:"VP-QF2",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR • MATCH 2",date:"2026-08-23",time:"20.00 WIB",a:"RT 02 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
-  {id:"VP-QF3",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR • MATCH 3",date:"2026-08-23",time:"21.00 WIB",a:"RT 10 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
-  {id:"VP-QF4",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR • MATCH 4",date:"2026-08-23",time:"22.00 WIB",a:"RT 06 / RW 021",b:"RT 07 / RW 021",status:"JADWAL"},
-  {id:"VW-QF1",sport:"VOLLY PUTRI",round:"BABAK 8 BESAR • MATCH 1",date:"2026-08-08",time:"15.30 WIB",a:"RT 09 / RW 014",b:"RT 10 / RW 021",status:"JADWAL"},
-  {id:"VW-QF2",sport:"VOLLY PUTRI",round:"BABAK 8 BESAR • MATCH 2",date:"2026-08-08",time:"16.30 WIB",a:"RT 06 / RW 021",b:"RT 07 / RW 021",status:"JADWAL"},
-  {id:"TM-QF1",sport:"TENIS MEJA",round:"BABAK 8 BESAR • MATCH 1",date:"2026-07-26",time:"20.00 WIB",a:"RT 06 / 21",b:"RT 13 / 21",status:"JADWAL"},
-  {id:"BP-QF1",sport:"BADMINTON PUTRA",round:"BABAK 8 BESAR • MATCH 1",date:"2026-08-09",time:"21.15 WIB",a:"RT 13 / RW 021",b:"RT 10 / RW 021",status:"JADWAL"},
-  {id:"BW-QF1",sport:"BADMINTON PUTRI",round:"BABAK 8 BESAR • MATCH 1",date:"2026-08-01",time:"19.45 WIB",a:"RT 04 / RW 021",b:"RT 06 / RW 021",status:"JADWAL"}
+  /* VOLLY PUTRA - BABAK 8 BESAR */
+  {id:"VP-8B1", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-22", time:"21:30 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL"},
+  {id:"VP-8B2", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"20:00 WIB", a:"RT 02 / RW 021", b:"RT 04 / RW 021", status:"JADWAL"},
+  {id:"VP-8B3", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"21:00 WIB", a:"RT 10 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
+  {id:"VP-8B4", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"22:00 WIB", a:"RT 06 / RW 021", b:"RT 07 / RW 021", status:"JADWAL"},
+
+  /* VOLLY PUTRI - BABAK SEMIFINAL */
+  {id:"VW-SF1", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"16:00 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL"},
+  {id:"VW-SF2", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"16:00 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
+
+  /* FUTSAL - BABAK SEMIFINAL */
+  {id:"FS-SF1", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:00 WIB", a:"RT 13 / RW 021", b:"RT 04 / RW 021", status:"JADWAL"},
+  {id:"FS-SF2", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:45 WIB", a:"RT 11 / RW 021", b:"RT 02 / RW 021", status:"JADWAL"},
+
+  /* TENIS MEJA */
+  {id:"TM-1", sport:"TENIS MEJA", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"20:00 WIB", a:"RT 08 / RW 014", b:"RT 10 / RW 014", status:"JADWAL"},
+  {id:"TM-2", sport:"TENIS MEJA", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"21:30 WIB", a:"RT 11 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
+
+  /* BADMINTON */
+  {id:"BD-1", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRI)", date:"2026-08-21", time:"20:15 WIB", a:"RT 10 / RW 021", b:"RT 13 / RW 021", status:"JADWAL"},
+  {id:"BD-2", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRA)", date:"2026-08-21", time:"21:30 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
+  {id:"BD-3", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRA)", date:"2026-08-21", time:"22:30 WIB", a:"RT 11 / RW 021", b:"RT 08 / RW 014", status:"JADWAL"}
 ];
 
-const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","TENIS MEJA","BADMINTON PUTRA","BADMINTON PUTRI"];
+const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];
 let activeSport="SEMUA";
 
 function prettyDate(d){
@@ -328,17 +337,16 @@ function renderSchedule(){
 function renderBracket(){
   const sport=activeSport==="SEMUA"?"VOLLY PUTRA":activeSport;
   const data=MATCHES.filter(m=>m.sport===sport);
-  const qf=data.filter(m=>m.round.includes("BABAK 8 BESAR"));
   document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`<button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>`).join("");
   document.getElementById("bracketGrid").innerHTML=`
-    <div class="col"><h3>BABAK 8 BESAR</h3>${qf.map(g=>`<div class="game"><div>${esc(g.a)} <b>—</b></div><div>${esc(g.b)} <b>—</b></div><small>${esc(prettyDate(g.date))}</small></div>`).join("") || '<div class="game"><small>Belum ada data</small></div>'}</div>
-    <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Menunggu babak sebelumnya</small></div></div>
+    <div class="col"><h3>DAFTAR MATCH</h3>${data.map(g=>`<div class="game"><div>${esc(g.a)} <b>—</b></div><div>${esc(g.b)} <b>—</b></div><small>${esc(g.round)} (${esc(prettyDate(g.date))})</small></div>`).join("") || '<div class="game"><small>Belum ada data</small></div>'}</div>
+    <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Menunggu babak berjalan</small></div></div>
     <div class="col final"><h3>FINAL</h3><div class="game"><small>Menunggu semifinal</small></div></div>
     <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${sport}</div></div></div>`;
 }
 
 function renderStandings(){
-  const teams=[...new Set(MATCHES.filter(m=>m.sport===activeSport).flatMap(m=>[m.a,m.b]))].slice(0,8);
+  const teams=[...new Set(MATCHES.filter(m=>m.sport===activeSport||activeSport==="SEMUA").flatMap(m=>[m.a,m.b]))].slice(0,8);
   document.getElementById("standings").innerHTML=(teams.length?teams:["Tim Turnamen"]).map((t,i)=>`<tr><td class="pos">${i+1}</td><td>${esc(t)}</td><td>0</td><td>0</td><td>0</td></tr>`).join("");
 }
 
