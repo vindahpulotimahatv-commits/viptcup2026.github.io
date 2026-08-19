@@ -65,8 +65,6 @@ main{padding:0 14px}
 .col h3{font-size:9px;text-align:center;color:#8ff5d8;margin:0 0 10px}.game{background:#133d37;border:1px solid #2f7d73;border-radius:12px;padding:9px;margin-bottom:16px}
 .game div{display:flex;justify-content:space-between;font-size:9px;padding:6px 0;border-bottom:1px solid #215c54}.game div:last-of-type{border:0}
 .game small{display:block;color:#8ab5af;font-size:8px;margin-top:4px}.final .game{border-color:#f6b83f}
-.table{width:100%;border-collapse:collapse;font-size:9px}.table th{color:var(--muted);text-align:left;padding:8px 4px;border-bottom:1px solid var(--line)}
-.table td{padding:9px 4px;border-bottom:1px solid #1f5a52}.pos{color:#f6b83f;font-weight:900}
 .news{display:flex;gap:11px}.thumb{width:72px;height:60px;flex:none;border-radius:11px;background:linear-gradient(135deg,#1a665d,#103f39);display:grid;place-items:center;font-size:9px;font-weight:900}
 .news b{font-size:10px;line-height:1.35}.news small{display:block;color:var(--muted);font-size:8px;margin-top:6px}
 
@@ -162,10 +160,6 @@ allowfullscreen></iframe>
   <div class="filters" id="bracketFilters"></div>
   <div class="bracket-wrap"><div class="bracket" id="bracketGrid"></div></div>
 </div>
-
-<div class="section"><h2>📊 Klasemen</h2></div>
-<div class="card"><table class="table"><thead><tr><th>POS</th><th>TIM</th><th>M</th><th>W</th><th>PTS</th></tr></thead>
-<tbody id="standings"></tbody></table></div>
 
 <div class="section" id="hasil"><h2>📋 Hasil Pertandingan</h2></div>
 <div id="results"></div>
@@ -345,17 +339,12 @@ function renderBracket(){
     <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${sport}</div></div></div>`;
 }
 
-function renderStandings(){
-  const teams=[...new Set(MATCHES.filter(m=>m.sport===activeSport||activeSport==="SEMUA").flatMap(m=>[m.a,m.b]))].slice(0,8);
-  document.getElementById("standings").innerHTML=(teams.length?teams:["Tim Turnamen"]).map((t,i)=>`<tr><td class="pos">${i+1}</td><td>${esc(t)}</td><td>0</td><td>0</td><td>0</td></tr>`).join("");
-}
-
 function renderResults(){
   const done=MATCHES.filter(m=>m.status==="SELESAI");
   document.getElementById("results").innerHTML=done.length?done.map(m=>`<div class="card"><div class="round">${esc(m.sport)} • SELESAI</div><div class="result"><strong>${esc(m.a)}</strong><b>—</b><strong>${esc(m.b)}</strong></div><div class="venue">${esc(prettyDate(m.date))}</div></div>`).join(""):`<div class="card empty">Belum ada pertandingan SELESAI.</div>`;
 }
 
-function renderAll(){renderSchedule();renderBracket();renderStandings();renderResults();}
+function renderAll(){renderSchedule();renderBracket();renderResults();}
 
 document.getElementById("sportFilters").addEventListener("click",e=>{
   const b=e.target.closest("[data-sport]"); if(!b)return;
