@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<!-- KODE ANTI-CACHE (Agar Aplikasi/Web Selalu Mengambil Versi Terbaru) -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
 <meta name="theme-color" content="#123d38">
 <title>VIPT CUP IV 2026 • Official Match Center</title>
 
@@ -908,7 +914,7 @@ main{
 
   </div>
 
-  <!-- LIVE STREAMING -->
+  <!-- LIVE STREAMING (OTOMATIS BERUBAH DARI FIREBASE) -->
 
   <div class="section">
     <h2>🎥 Live Streaming</h2>
@@ -917,6 +923,7 @@ main{
   <div class="card">
 
     <iframe
+      id="youtubeFrame"
       style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"
       src="https://www.youtube.com/embed/5jrJcK_nrQI"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -1532,7 +1539,7 @@ function switchTab(tabName, element){
 <script>
 
 /* ==========================================================
-   FIREBASE LIVE SCORE
+   FIREBASE LIVE SCORE & YOUTUBE STREAMING AUTO UPDATE
    ========================================================== */
 
 const FIREBASE_CONFIG = {
@@ -1580,6 +1587,23 @@ function initFirebaseSync(){
       );
 
     }
+
+    /* AUTO UPDATE YOUTUBE LIVE DARI FIREBASE */
+    const youtubeRef = firebase.database().ref("vipt_scoreboard/youtube_id");
+    youtubeRef.on("value", snap => {
+      const ytId = snap.val();
+      if (ytId) {
+        const iframe = document.getElementById("youtubeFrame");
+        const btn = document.getElementById("youtubeBtn");
+        
+        if (iframe) {
+          iframe.src = "https://www.youtube.com/embed/" + ytId;
+        }
+        if (btn) {
+          btn.href = "https://www.youtube.com/live/" + ytId;
+        }
+      }
+    });
 
     /* LIVE SCORE */
 
