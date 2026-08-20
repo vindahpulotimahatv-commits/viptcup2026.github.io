@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123d38">
+<title>VIPT CUP IV 2026 • Official Match Center</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+:root{
+  --bg:#123d38;--panel:#174c46;--panel2:#1e5e57;--line:#2c736b;
+  --text:#ffffff;--muted:#b0ded8;--blue:#2877ff;--gold:#f6b83f;--green:#1ed393;--red:#ff4d67;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+ radial-gradient(circle at 50% -10%,#1f665e 0,#123d38 38%,#0a2623 80%);
+ color:var(--text);font-family:Arial,Helvetica,sans-serif}
+button,input{font:inherit}
+.app{max-width:620px;margin:auto;min-height:100vh;padding-bottom:86px}
+header{position:sticky;top:0;z-index:50;padding:11px 14px;
+ background:rgba(18,61,56,.95);backdrop-filter:blur(15px);
+ border-bottom:1px solid #24635c;display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;gap:10px;align-items:center}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#1ed393,#17514a);
+ display:grid;place-items:center;font-size:10px;line-height:1.05;text-align:center;font-weight:900;color:#fff}
+.brand b{font-size:16px}.brand small{display:block;color:#a3e4dc;font-size:8px;letter-spacing:1.4px;margin-top:3px}
+main{padding:0 14px}
+
+/* HERO SECTION */
+.hero{padding:24px 4px 14px;text-align:center;background:linear-gradient(180deg, rgba(31,102,94,0.4) 0%, transparent 100%);border-radius:0 0 20px 20px;margin:0 -14px 14px -14px;padding-left:14px;padding-right:14px}
+.eyebrow{font-size:10px;letter-spacing:2px;color:#7ef0cb;font-weight:900}
+.hero-logo{width:120px;max-height:120px;object-fit:contain;margin:12px auto 6px;display:block;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4));border-radius:12px;}
+.hero h1{font-size:32px;margin:4px 0 2px;font-weight:900;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
+.hero h2.subhead{font-size:24px;margin:0 0 8px 0;font-weight:900;color:#f6b83f;letter-spacing:1px;text-transform:uppercase}
+.hero p{margin:0;color:var(--muted);font-size:11px;font-weight:bold;letter-spacing:0.5px}
+.location{display:flex;align-items:center;gap:8px;margin-top:13px;padding:10px 12px;border:1px solid #338a80;
+ border-radius:13px;background:linear-gradient(135deg,rgba(30,131,118,.3),rgba(20,77,70,.2));font-size:11px;font-weight:900;text-align:left}
+.location span{color:#8ff5d8}
+
+.section{display:flex;justify-content:space-between;align-items:center;margin:19px 2px 9px}
+.section h2{font-size:15px;margin:0}.section a{font-size:10px;color:#8ff5d8;text-decoration:none}
+.card{background:linear-gradient(145deg,#174c46,#0e332f);border:1px solid var(--line);border-radius:17px;padding:14px;margin-bottom:11px}
+.live{border-color:#358c82}.livebar{display:flex;justify-content:space-between;font-size:9px;font-weight:900;margin-bottom:10px}
+.livebar .on{color:var(--green)}.livebar .sportname{color:#9ef5dc}
+.teams{display:grid;grid-template-columns:1fr 64px 1fr;align-items:center;gap:7px;text-align:center}
+.teamlogo{height:46px;width:46px;margin:auto;border-radius:14px;background:#1e5e57;border:1px solid #348a80;display:grid;place-items:center;font-weight:900;color:#a3f4e8}
+.team b{font-size:10px;line-height:1.25;display:block;margin-top:6px}.score{font-size:25px;font-weight:900}.score small{display:block;color:var(--muted);font-size:8px;font-weight:500;margin-top:3px}
+.btn{display:block;text-align:center;text-decoration:none;color:white;background:linear-gradient(135deg,#1ed393,#118a66);
+ border-radius:12px;padding:11px;margin-top:12px;font-size:10px;font-weight:900}
+.filters{display:flex;gap:7px;overflow:auto;padding:2px 1px 6px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}
+.pill{white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:9px 11px;font-size:10px;cursor:pointer}
+.pill.active{background:#236e65;border-color:#4bc4b6;color:white}
+.search{width:100%;background:#0e332f;border:1px solid var(--line);color:white;border-radius:12px;padding:10px 12px;outline:none;margin-bottom:10px}
+.match{position:relative;overflow:hidden}.match:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#2877ff}
+.match[data-status="LIVE"]:before{background:var(--green)}.match[data-status="SELESAI"]:before{background:#777}
+.match .round{font-size:9px;color:#8ff5d8;font-weight:900;letter-spacing:1px}.match .date{color:var(--gold);font-weight:900;font-size:10px;margin-top:4px}
+.match .venue{color:var(--muted);font-size:9px;margin-top:6px}.result{display:grid;grid-template-columns:1fr 34px 1fr;align-items:center;gap:5px;margin-top:9px}
+.result strong{font-size:10px;line-height:1.25}.result strong:last-child{text-align:right}.vs{text-align:center;font-size:13px;color:#d3f5f0;font-weight:900}
+.status{display:inline-block;margin-top:9px;padding:5px 7px;border-radius:7px;background:#1e5b53;color:#a3f4e8;font-size:8px;font-weight:900}
+.status.live{background:rgba(30,211,147,.18);color:var(--green)}.status.done{background:#223633;color:#a3b5b1}
+.empty{padding:20px;text-align:center;color:var(--muted);font-size:10px}
+.bracket-wrap{overflow-x:auto;padding-bottom:4px}.bracket{min-width:880px;display:grid;grid-template-columns:repeat(4,205px);gap:14px}
+.col h3{font-size:9px;text-align:center;color:#8ff5d8;margin:0 0 10px}.game{background:#133d37;border:1px solid #2f7d73;border-radius:12px;padding:9px;margin-bottom:16px}
+.game div{display:flex;justify-content:space-between;font-size:9px;padding:6px 0;border-bottom:1px solid #215c54}.game div:last-of-type{border:0}
+.game small{display:block;color:#8ab5af;font-size:8px;margin-top:4px}.final .game{border-color:#f6b83f}
+.news{display:flex;gap:11px}.thumb{width:72px;height:60px;flex:none;border-radius:11px;background:linear-gradient(135deg,#1a665d,#103f39);display:grid;place-items:center;font-size:9px;font-weight:900}
+.news b{font-size:10px;line-height:1.35}.news small{display:block;color:var(--muted);font-size:8px;margin-top:6px}
+
+/* STYLING TAB TOP SKOR & STATISTIK */
+.topskor-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+.stat-box { background: rgba(30,94,87,0.5); border: 1px solid var(--line); border-radius: 12px; padding: 10px; text-align: center; }
+.stat-box small { display: block; font-size: 8px; color: var(--muted); text-transform: uppercase; font-weight: bold; }
+.stat-box b { font-size: 16px; color: var(--gold); }
+
+.topskor-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
+.topskor-table th { background: #1e5e57; color: var(--gold); padding: 10px 8px; font-weight: 900; border-bottom: 2px solid var(--line); text-transform: uppercase; letter-spacing: 0.5px; }
+.topskor-table td { padding: 9px 8px; border-bottom: 1px solid #215c54; color: var(--text); font-weight: bold; }
+.topskor-table tr:hover { background: rgba(30,211,147,0.05); }
+.topskor-table tfoot td { background: #133d37; color: var(--gold); font-weight: 900; border-top: 2px solid var(--line); }
+.rank-badge { display: inline-grid; place-items: center; width: 20px; height: 20px; background: #236e65; border-radius: 50%; font-size: 9px; font-weight: 900; color: var(--gold); }
+.goal-badge { background: rgba(40,119,255,0.2); color: #8ff5d8; padding: 3px 8px; border-radius: 6px; font-weight: 900; }
+
+/* STYLING SOSIAL MEDIA */
+.sosmed-container { display: flex; justify-content: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.sosmed-btn { display: flex; align-items: center; gap: 6px; background: #1e5e57; border: 1px solid #348a80; padding: 8px 12px; border-radius: 12px; color: #fff; text-decoration: none; font-size: 10px; font-weight: 900; transition: transform 0.2s; }
+.sosmed-btn:hover { transform: scale(1.05); background: #236e65; }
+
+/* STYLING FOOTER SPONSOR */
+.sponsor-footer { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line); }
+.sponsor-title { font-size: 11px; color: var(--muted); font-weight: bold; letter-spacing: 1px; }
+.sponsor-logo-img { width: 100%; max-width: 300px; height: auto; object-fit: contain; display: block; border-radius: 12px; padding: 5px; }
+
+.bottom{position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);width:min(620px,100%);
+ display:grid;grid-template-columns:repeat(5,1fr);padding:8px 8px 11px;background:rgba(18,61,56,.97);border-top:1px solid var(--line)}
+.nav{text-decoration:none;text-align:center;color:#82beb5;font-size:8px;cursor:pointer}.nav span{display:block;font-size:17px;margin-bottom:3px}.nav.active{color:#8ff5d8}
+.footer{text-align:center;color:#6d9e96;font-size:8px;padding:20px 0 30px}
+.footer a{color:#8ff5d8;text-decoration:none;font-weight:bold}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- AUDIO AUTOPLAY DARI VOCA.RO -->
+<audio id="vocaAudio" autoplay loop>
+  <source src="https://media1.vocaroo.com/mp3/1oVLhmdzAasW" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+<div class="app">
+<header>
+  <div class="brand"><div class="logo">VIPT<br>CUP</div><div><b>VIPT CUP IV 2026</b><small>OFFICIAL MATCH CENTER</small></div></div>
+  <div style="font-size:20px">🔔</div>
+</header>
+
+<main>
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="eyebrow">OFFICIAL MATCH CENTER • 2026</div>
+  <img src="https://i.ibb.co.com/1V2zk03/logo.jpg" alt="VIPT CUP - IV 2026" class="hero-logo" onerror="this.src='https://i.ibb.co.com/6c6C1s25/logo-vipt.jpg'">
+  <h1>VIPT CUP - IV</h1>
+  <h2 class="subhead">2026</h2>
+  <p>MEDIA VILLA INDAH PULO TIMAHA</p>
+  <div class="location">📍 <span>LOKASI UTAMA</span> Lapangan Central Villa indah Pulo Timaha</div>
+</section>
+
+<!-- SECTION TAB KONTEN UTAMA -->
+<div id="tab-beranda">
+  <div class="section"><h2>🔴 Live Score</h2><a href="#jadwal">Lihat Jadwal</a></div>
+  <div class="card live" id="live">
+    <div class="livebar"><span class="on">● LIVE SEKARANG</span><span class="sportname" id="liveSport">BELUM ADA PERTANDINGAN LIVE</span></div>
+    <div class="teams">
+      <div class="team"><div class="teamlogo">A</div><b id="liveA">-</b></div>
+      <div class="score" id="liveScore">-<small id="liveRound">MENUNGGU DATA LIVE</small></div>
+      <div class="team"><div class="teamlogo">B</div><b id="liveB">-</b></div>
+    </div>
+    <a class="btn" href="#hasil">DETAIL HASIL</a>
+  </div>
+
+  <!-- Tab Live Streaming -->
+  <div class="section"><h2>🎥 Live Streaming</h2></div>
+  <div class="card">
+  <iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"
+  src="https://www.youtube.com/embed/nlMvrMtmvxA?autoplay=1&rel=0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen></iframe>
+  <a class="btn" id="youtubeBtn" href="https://www.youtube.com/live/nlMvrMtmvxA?si=9KTmWNdTcsDFn1KH" target="_blank">BUKA DI YOUTUBE</a>
+  </div>
+
+  <!-- Card Dukungan Saweria -->
+  <div class="section"><h2>🤝 Support VIPT 2026</h2></div>
+  <div class="card" style="text-align:center; background:linear-gradient(135deg, rgba(246,184,63,0.15), rgba(30,211,147,0.1)); border-color:var(--gold);">
+    <b style="font-size:12px; color:var(--gold);">🔥 Bikin VIPT CUP IV 2026 Makin Meriah!</b>
+    <p style="color:var(--muted); font-size:10px; margin:6px 0 12px; line-height:1.4;">Yuk, dukung kelancaran dan kemeriahan turnamen kita lewat Saweria agar fasilitas dan hadiah makin mantap!</p>
+    <a class="btn" href="https://saweria.co/VIPTSPORT" target="_blank" style="background:linear-gradient(135deg,#f6b83f,#ff7a00); color:#050914;">☕ DUKUNG VIA SAWERIA</a>
+  </div>
+
+  <!-- SECTION SOCIAL MEDIA -->
+  <div class="section"><h2>📱 Ikuti Keseruan Kami</h2></div>
+  <div class="card" style="text-align:center;">
+    <p style="font-size: 10px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+      Jangan ketinggalan update skor, cuplikan pertandingan, dan keseruan lapangan! Yuk follow semua sosial media resmi <b>VIPT</b>:
+    </p>
+    <div class="sosmed-container">
+      <a href="https://www.tiktok.com/@vipt_sport?_r=1&_t=ZS-9917030NxiM" class="sosmed-btn" target="_blank">🎵 TikTok</a>
+      <a href="https://www.instagram.com/vipt_sport?igsh=aTlqNzZyd3Q2dnFk&igsi=aTlqNzZyd3Q2dnFk" class="sosmed-btn" target="_blank">📸 Instagram</a>
+      <a href="https://youtube.com/@villaindahpulotimaha?si=SnUcr3c9uesEbayA" class="sosmed-btn" target="_blank">▶️ YouTube</a>
+      <a href="https://www.facebook.com/share/1FEvZ9XKSq/" class="sosmed-btn" target="_blank">👥 Facebook</a>
+    </div>
+  </div>
+
+  <div class="section"><h2>🏆 Cabang Olahraga</h2></div>
+  <div class="filters" id="sportFilters">
+    <button class="pill active" data-sport="SEMUA">Semua</button>
+    <button class="pill" data-sport="VOLLY PUTRA">Volly Putra</button>
+    <button class="pill" data-sport="VOLLY PUTRI">Volly Putri</button>
+    <button class="pill" data-sport="FUTSAL">FUTSAL</button>
+    <button class="pill" data-sport="TENIS MEJA">Tenis Meja</button>
+    <button class="pill" data-sport="BADMINTON">Badminton</button>
+  </div>
+
+  <div class="section"><h2>📅 Semua Pertandingan Terbaru</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
+  <input class="search" id="search" type="search" placeholder="Cari RT / RW / cabang olahraga...">
+  <div id="jadwal"></div>
+
+  <div class="section"><h2>🏆 Bracket</h2></div>
+  <div class="card" id="bracket">
+    <div class="filters" id="bracketFilters"></div>
+    <div class="bracket-wrap"><div class="bracket" id="bracketGrid"></div></div>
+  </div>
+
+  <div class="section" id="hasil"><h2>📋 Hasil Pertandingan</h2></div>
+  <div id="results"></div>
+
+  <div class="section"><h2>📰 Update VIPT CUP</h2></div>
+  <div class="card news"><div class="thumb">VIPT CUP</div><div><b>Semua jadwal pertandingan dipusatkan di Lapangan Central.</b><small>VIPT CUP IV 2026 • Update jadwal sesuai poster resmi terbaru.</small></div></div>
+
+  <!-- TOMBOL REKAMAN VOCA.RO -->
+  <div class="section"><h2>🎙️ Rekaman Pertandingan</h2></div>
+  <div class="card" style="text-align:center;">
+    <p style="font-size: 10px; color: var(--muted); margin-bottom: 12px;">
+      Putar atau buka ulang rekaman suara resmi VIPT CUP:
+    </p>
+    <a href="https://voca.ro/1oVLhmdzAasW" target="_blank" class="sosmed-btn" style="justify-content:center; background:linear-gradient(135deg,#2877ff,#1a5bbd);">
+      ▶️ BUKA HALAMAN REKAMAN
+    </a>
+  </div>
+</div>
+
+<!-- TAB KHUSUS TOP SKOR FUTSAL -->
+<div id="tab-topskor" class="hidden">
+  <div class="section"><h2>⚡ Top Skor Futsal VIPT CUP IV</h2></div>
+  <div class="card" style="padding: 12px;">
+    <div style="text-align: center; margin-bottom: 12px;">
+      <b style="font-size: 13px; color: var(--gold); letter-spacing: 1px;">DAFTAR PENCETAK GOL TERBANYAK</b>
+      <p style="font-size: 9px; color: var(--muted); margin: 4px 0 0;">Update resmi perolehan gol cabang olahraga Futsal</p>
+    </div>
+
+    <!-- KARTU RINGKASAN TOTAL GOL -->
+    <div class="topskor-stats">
+      <div class="stat-box">
+        <small>Total Gol Tercatat</small>
+        <b id="totalGolDisplay">0</b>
+      </div>
+      <div class="stat-box">
+        <small>Top Gol Sementara</small>
+        <b id="topScorerDisplay">-</b>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="topskor-table">
+        <thead>
+          <tr>
+            <th style="width: 45px; text-align: center;">NO</th>
+            <th>NAMA PEMAIN</th>
+            <th>ASAL TIM</th>
+            <th style="text-align: center; width: 60px;">GOL</th>
+          </tr>
+        </thead>
+        <tbody id="topSkorBody">
+          <!-- Data Top Skor dari JS -->
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="text-align: right; padding-right: 12px;">TOTAL GOL TERDAPTAR:</td>
+            <td style="text-align: center;"><span class="goal-badge" style="background:var(--gold); color:#000;" id="tableTotalGoal">0</span></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- BAGIAN SPONSOR -->
+<div class="sponsor-footer">
+  <div class="sponsor-title">DISPONSORI OLEH:</div>
+  <div class="card" style="background: #ffffff; padding: 10px; width: 100%; text-align: center; border-radius: 14px;">
+    <img src="https://i.ibb.co.com/7d8Bn4Z6/sponsor.jpg" alt="Disponsori Oleh" class="sponsor-logo-img" onerror="this.src='https://i.ibb.co.com/tPbXf4fB/sponsor1.jpg'">
+  </div>
+</div>
+
+<!-- FOOTER PALING BAWAH -->
+<div class="footer">
+  <div>© 2026 VIPT CUP IV • Sportivitas • Fairplay • Solidaritas • Prestasi</div>
+  <div style="margin-top: 6px;">Design By <a href="#" target="_blank">Uda_RnL</a></div>
+</div>
+</main>
+
+<!-- NAVIGASI BAWAH -->
+<nav class="bottom">
+  <a class="nav active" onclick="switchTab('beranda', this)"><span>🏠</span>Beranda</a>
+  <a class="nav" onclick="switchTab('beranda'); location.hash='#jadwal';"><span>📅</span>Jadwal</a>
+  <a class="nav" onclick="switchTab('topskor', this)"><span>⚡</span>Top Skor</a>
+  <a class="nav" onclick="switchTab('beranda'); location.hash='#bracket';"><span>🏆</span>Bracket</a>
+  <a class="nav" onclick="switchTab('beranda'); location.hash='#hasil';"><span>☰</span>Hasil</a>
+</nav>
+</div>
+
+<script>
+/* ==========================================================
+   SCRIPT TAMBAHAN UNTUK MEMASTIKAN AUDIO AUTOPLAY
+   ========================================================== */
+window.addEventListener('DOMContentLoaded', () => {
+  const audio = document.getElementById('vocaAudio');
+  if(audio) {
+    audio.volume = 1.0;
+    audio.play().catch(error => {
+      // Jika diblokir browser, audio akan otomatis berputar saat user melakukan interaksi klik pertama di layar
+      document.addEventListener('click', () => {
+        audio.play().catch(e => console.log("Audio play blocked"));
+      }, { once: true });
+    });
+  }
+});
+</script>
+
+<script>
+/* ==========================================================
+   DATA TOP SKOR FUTSAL BESERTA KALKULASI TOTAL GOL
+   ========================================================== */
+const TOPSCOR_FUTSAL = [
+  {no: 1, name: "ARIFIN", team: "RT 13 / 021", goals: 7},
+  {no: 2, name: "TOTO", team: "RT 11 / 021", goals: 6},
+  {no: 3, name: "SATRIA", team: "RT 10 / 014", goals: 5},
+  {no: 4, name: "SYARIF", team: "RT 08 / 014", goals: 5},
+  {no: "4", name: "RIO", team: "RT 02 / 021", goals: 4},
+  {no: 5, name: "MOZA", team: "RT 11 / 021", goals: 4},
+  {no: 6, name: "FAJAR", team: "RT 02 / 021", goals: 3}
+];
+
+function renderTopSkor(){
+  const tbody = document.getElementById("topSkorBody");
+  tbody.innerHTML = TOPSCOR_FUTSAL.map(p => `
+    <tr>
+      <td style="text-align: center;"><span class="rank-badge">${p.no}</span></td>
+      <td><b>${esc(p.name)}</b></td>
+      <td style="color: var(--muted);">${esc(p.team)}</td>
+      <td style="text-align: center;"><span class="goal-badge">${p.goals}</span></td>
+    </tr>
+  `).join("");
+
+  const totalGol = TOPSCOR_FUTSAL.reduce((acc, curr) => acc + curr.goals, 0);
+  document.getElementById("totalGolDisplay").textContent = totalGol + " Gol";
+  document.getElementById("tableTotalGoal").textContent = totalGol;
+  document.getElementById("topScorerDisplay").textContent = `${TOPSCOR_FUTSAL[0].name} (${TOPSCOR_FUTSAL[0].goals} Gol)`;
+}
+renderTopSkor();
+
+function switchTab(tabName, element){
+  document.getElementById("tab-beranda").classList.add("hidden");
+  document.getElementById("tab-topskor").classList.add("hidden");
+
+  if(tabName === 'beranda'){
+    document.getElementById("tab-beranda").classList.remove("hidden");
+  } else if(tabName === 'topskor'){
+    document.getElementById("tab-topskor").classList.remove("hidden");
+  }
+
+  if(element){
+    document.querySelectorAll(".bottom .nav").forEach(n => n.classList.remove("active"));
+    element.classList.add("active");
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+<script>
+/* ==========================================================
+   FIREBASE LIVE SCORE & HISTORY SYNC
+   ========================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBIww6sg-mRtUUx3rIylnu6qfYG6Ahfih8",
+  authDomain: "scorebordviptcup.firebaseapp.com",
+  databaseURL: "https://scorebordviptcup-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "scorebordviptcup",
+  storageBucket: "scorebordviptcup.firebasestorage.app",
+  messagingSenderId: "1001557073666",
+  appId: "1:1001557073666:web:10999e31e2b0c9add4ec1b",
+  measurementId: "G-WF9TT9MPNY"
+};
+
+let liveState = null;
+let liveTimerBase = 0;
+let liveTimerRunning = false;
+let liveTimerStartedAt = 0;
+
+function initFirebaseSync(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    
+    // 1. Sinkronisasi Live Score
+    const liveRef = firebase.database().ref("vipt_scoreboard/live");
+    liveRef.on("value", snap=>{
+      const data = snap.val();
+      if(!data){ setLiveOffline("BELUM ADA DATA LIVE"); return; }
+      liveState = data;
+      liveTimerBase = Number(data.timer || 0);
+      liveTimerRunning = !!data.timerRunning;
+      liveTimerStartedAt = Date.now();
+      renderWebsiteLiveScore();
+    });
+
+    // 2. Sinkronisasi History / Hasil Pertandingan Selesai
+    const historyRef = firebase.database().ref("vipt_scoreboard/history");
+    historyRef.on("value", snap => {
+      const data = snap.val();
+      const resultsContainer = document.getElementById("results");
+      
+      if (!data) {
+        resultsContainer.innerHTML = `<div class="card empty">Belum ada pertandingan SELESAI.</div>`;
+        return;
+      }
+
+      const historyArray = Object.values(data);
+      resultsContainer.innerHTML = historyArray.reverse().map(m => `
+        <div class="card">
+          <div class="round">${esc(m.sport || "PERTANDINGAN")} • ${esc(m.period || "-")} • SELESAI</div>
+          <div class="result">
+            <strong>${esc(m.teamA.name)}</strong>
+            <span class="vs">${Number(m.teamA.score || 0)} - ${Number(m.teamB.score || 0)}</span>
+            <strong>${esc(m.teamB.name)}</strong>
+          </div>
+          <div class="venue">📍 ${esc(VENUE)}</div>
+          <span class="status done">SELESAI</span>
+        </div>
+      `).join("");
+    });
+
+    setInterval(renderWebsiteLiveScore, 500);
+  }catch(err){ setLiveOffline("FIREBASE TIDAK AKTIF"); }
+}
+
+function getLiveTimer(){
+  if(!liveTimerRunning) return liveTimerBase;
+  const elapsed = Math.floor((Date.now()-liveTimerStartedAt)/1000);
+  return Math.max(0, liveTimerBase-elapsed);
+}
+
+function formatLiveTime(sec){
+  sec = Math.max(0, Number(sec)||0);
+  return String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");
+}
+
+function renderWebsiteLiveScore(){
+  if(!liveState) return;
+  const a = liveState.teamA || {};
+  const b = liveState.teamB || {};
+
+  document.getElementById("liveSport").textContent = liveState.sport ? String(liveState.sport) : "LIVE SCORE";
+  document.getElementById("liveA").textContent = a.name || "-";
+  document.getElementById("liveB").textContent = b.name || "-";
+
+  const score = `${Number(a.score||0)}  -  ${Number(b.score||0)}`;
+  document.getElementById("liveScore").firstChild.textContent = score;
+
+  const round = liveState.period || "LIVE";
+  const timer = formatLiveTime(getLiveTimer());
+  document.getElementById("liveRound").textContent = `${round} • ${timer}${liveState.timerRunning ? " • LIVE" : ""}`;
+
+  const matchId = String(liveState.matchId || "").trim();
+  if(matchId){
+    MATCHES.forEach(m=>{
+      if(m.id===matchId){
+        m.status = liveState.timerRunning ? "LIVE" : (m.status==="SELESAI" ? "SELESAI" : "JADWAL");
+        m.scoreA = Number(a.score||0);
+        m.scoreB = Number(b.score||0);
+      }else if(m.status==="LIVE"){ m.status = "JADWAL"; }
+    });
+    renderSchedule();
+  }
+}
+
+function setLiveOffline(msg){
+  document.getElementById("liveSport").textContent = msg;
+  document.getElementById("liveA").textContent = "-";
+  document.getElementById("liveB").textContent = "-";
+  document.getElementById("liveScore").firstChild.textContent = "-";
+  document.getElementById("liveRound").textContent = "MENUNGGU DATA";
+}
+
+initFirebaseSync();
+</script>
+
+<script>
+/* ==========================================================
+   DATA PERTANDINGAN TERBARU VIPT CUP IV 2026 (SESUAI POSTER)
+   ========================================================== */
+const VENUE = "Lapangan Central";
+
+const MATCHES = [
+  {id:"VP-8B1", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-22", time:"21:30 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL"},
+  {id:"VP-8B2", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"20:00 WIB", a:"RT 02 / RW 021", b:"RT 04 / RW 021", status:"JADWAL"},
+  {id:"VP-8B3", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"21:00 WIB", a:"RT 10 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
+  {id:"VP-8B4", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"22:00 WIB", a:"RT 06 / RW 021", b:"RT 07 / RW 021", status:"JADWAL"},
+  {id:"VW-SF1", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"16:00 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL"},
+  {id:"VW-SF2", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"16:00 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
+  {id:"FS-SF1", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:00 WIB", a:"RT 13 / RW 021", b:"RT 04 / RW 021", status:"JADWAL"},
+  {id:"FS-SF2", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:45 WIB", a:"RT 11 / RW 021", b:"RT 02 / RW 021", status:"JADWAL"},
+  {id:"TM-1", sport:"TENIS MEJA", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"20:00 WIB", a:"RT 08 / RW 014", b:"RT 10 / RW 014", status:"JADWAL"},
+  {id:"TM-2", sport:"TENIS MEJA", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"21:30 WIB", a:"RT 11 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
+  {id:"BD-1", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRI)", date:"2026-08-21", time:"20:15 WIB", a:"RT 10 / RW 021", b:"RT 13 / RW 021", status:"JADWAL"},
+  {id:"BD-2", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRA)", date:"2026-08-21", time:"21:30 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL"},
+  {id:"BD-3", sport:"BADMINTON", round:"BABAK SEMIFINAL (PUTRA)", date:"2026-08-21", time:"22:30 WIB", a:"RT 11 / RW 021", b:"RT 08 / RW 014", status:"JADWAL"}
+];
+
+const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];
+let activeSport="SEMUA";
+
+function prettyDate(d){
+  if(!d || d==="TBD") return "TBD";
+  const dt=new Date(d+"T12:00:00");
+  return Number.isNaN(dt.getTime()) ? d : dt.toLocaleDateString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+}
+function dateSort(a,b){
+  if(a.date==="TBD") return 1; if(b.date==="TBD") return -1;
+  return String(a.date).localeCompare(String(b.date)) || String(a.time).localeCompare(String(b.time));
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+
+function renderSchedule(){
+  const q=document.getElementById("search").value.trim().toLowerCase();
+  const data=MATCHES.filter(m=>(activeSport==="SEMUA"||m.sport===activeSport) && (!q || JSON.stringify(m).toLowerCase().includes(q))).sort(dateSort);
+  document.getElementById("count").textContent=data.length+" pertandingan";
+  document.getElementById("jadwal").innerHTML=data.length?data.map(m=>`
+    <div class="card match" data-status="${esc(m.status)}">
+      <div class="round">${esc(m.sport)} • ${esc(m.round)}</div>
+      <div class="date">${esc(prettyDate(m.date))} • ${esc(m.time)}</div>
+      <div class="result"><strong>${esc(m.a)}</strong><span class="vs">${m.status==="LIVE" || m.scoreA!=null ? `${Number(m.scoreA||0)} - ${Number(m.scoreB||0)}` : "VS"}</span><strong>${esc(m.b)}</strong></div>
+      <div class="venue">📍 ${esc(VENUE)}</div>
+      <span class="status ${m.status==="LIVE"?"live":m.status==="SELESAI"?"done":""}">${esc(m.status)}</span>
+    </div>`).join(""):`<div class="card empty">Pertandingan tidak ditemukan.</div>`;
+}
+
+function renderBracket(){
+  const sport=activeSport==="SEMUA"?"VOLLY PUTRA":activeSport;
+  const data=MATCHES.filter(m=>m.sport===sport);
+  document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`<button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>`).join("");
+  document.getElementById("bracketGrid").innerHTML=`
+    <div class="col"><h3>DAFTAR MATCH</h3>${data.map(g=>`<div class="game"><div>${esc(g.a)} <b>—</b></div><div>${esc(g.b)} <b>—</b></div><small>${esc(g.round)} (${esc(prettyDate(g.date))})</small></div>`).join("") || '<div class="game"><small>Belum ada data</small></div>'}</div>
+    <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Menunggu babak berjalan</small></div></div>
+    <div class="col final"><h3>FINAL</h3><div class="game"><small>Menunggu semifinal</small></div></div>
+    <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${sport}</div></div></div>`;
+}
+
+function renderAll(){renderSchedule();renderBracket();}
+
+document.getElementById("sportFilters").addEventListener("click",e=>{
+  const b=e.target.closest("[data-sport]"); if(!b)return;
+  activeSport=b.dataset.sport;
+  document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x===b));
+  renderAll();
+});
+document.getElementById("bracketFilters").addEventListener("click",e=>{
+  const b=e.target.closest("[data-bracket]"); if(!b)return;
+  activeSport=b.dataset.bracket;
+  document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x.dataset.sport===activeSport));
+  renderAll();
+});
+document.getElementById("search").addEventListener("input",renderSchedule);
+renderAll();
+</script>
+</body>
+</html>
