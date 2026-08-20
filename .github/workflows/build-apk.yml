@@ -30,6 +30,12 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Install Capacitor Assets
+        run: npm install --save-dev @capacitor/assets
+
+      - name: Generate Android icons
+        run: npx capacitor-assets generate --android --assetPath assets
+
       - name: Sync web files
         run: npx cap sync android
 
