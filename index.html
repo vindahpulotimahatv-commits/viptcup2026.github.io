@@ -101,6 +101,13 @@ main{padding:0 14px}
 </style>
 </head>
 <body>
+
+<!-- AUDIO AUTOPLAY DARI VOCA.RO -->
+<audio id="vocaAudio" autoplay loop>
+  <source src="https://media1.vocaroo.com/mp3/1oVLhmdzAasW" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
 <div class="app">
 <header>
   <div class="brand"><div class="logo">VIPT<br>CUP</div><div><b>VIPT CUP IV 2026</b><small>OFFICIAL MATCH CENTER</small></div></div>
@@ -193,10 +200,10 @@ main{padding:0 14px}
   <div class="section"><h2>🎙️ Rekaman Pertandingan</h2></div>
   <div class="card" style="text-align:center;">
     <p style="font-size: 10px; color: var(--muted); margin-bottom: 12px;">
-      Klik tombol di bawah ini untuk mendengarkan rekaman atau komentar pertandingan:
+      Putar atau buka ulang rekaman suara resmi VIPT CUP:
     </p>
     <a href="https://voca.ro/1oVLhmdzAasW" target="_blank" class="sosmed-btn" style="justify-content:center; background:linear-gradient(135deg,#2877ff,#1a5bbd);">
-      ▶️ DENGARKAN REKAMAN
+      ▶️ BUKA HALAMAN REKAMAN
     </a>
   </div>
 </div>
@@ -270,6 +277,24 @@ main{padding:0 14px}
   <a class="nav" onclick="switchTab('beranda'); location.hash='#hasil';"><span>☰</span>Hasil</a>
 </nav>
 </div>
+
+<script>
+/* ==========================================================
+   SCRIPT TAMBAHAN UNTUK MEMASTIKAN AUDIO AUTOPLAY
+   ========================================================== */
+window.addEventListener('DOMContentLoaded', () => {
+  const audio = document.getElementById('vocaAudio');
+  if(audio) {
+    audio.volume = 1.0;
+    audio.play().catch(error => {
+      // Jika diblokir browser, audio akan otomatis berputar saat user melakukan interaksi klik pertama di layar
+      document.addEventListener('click', () => {
+        audio.play().catch(e => console.log("Audio play blocked"));
+      }, { once: true });
+    });
+  }
+});
+</script>
 
 <script>
 /* ==========================================================
