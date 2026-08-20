@@ -24,6 +24,7 @@ jobs:
 
       - name: Prepare web files
         run: |
+          rm -rf www
           mkdir -p www
           cp index.html www/index.html
 
