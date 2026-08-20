@@ -1,0 +1,16 @@
+{
+  "name": "vipt-cup-iv-2026",
+  "version": "1.0.0",
+  "description": "VIPT CUP IV 2026 Official Match Center",
+  "private": true,
+  "scripts": {
+    "build": "echo Build selesai",
+    "cap:sync": "npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.0"
+  }
+}
