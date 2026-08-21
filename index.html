@@ -767,6 +767,44 @@ main{
     );
   }
 }
+
+/* ==========================================
+   INFORMASI - GOOGLE SLIDES
+========================================== */
+.informasi-section{
+  margin:24px 0 18px;
+}
+.informasi-section .info-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0 2px 9px;
+  font-size:15px;
+  font-weight:900;
+}
+.informasi-card{
+  background:linear-gradient(145deg,#174c46,#0e332f);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:10px;
+  overflow:hidden;
+}
+.informasi-slides{
+  width:100%;
+  aspect-ratio:16/9;
+  border:0;
+  border-radius:12px;
+  display:block;
+  background:#000;
+}
+.informasi-note{
+  margin:8px 2px 0;
+  color:var(--muted);
+  font-size:8px;
+  line-height:1.4;
+  text-align:center;
+}
+
 </style>
 </head>
 
@@ -1077,6 +1115,34 @@ main{
     </a>
 
   </div>
+
+
+  <!-- ==========================================
+       INFORMASI - GOOGLE SLIDES
+       Tampil di website dan APK karena APK
+       menggunakan URL website GitHub Pages.
+  =========================================== -->
+  <section class="informasi-section" id="informasi">
+
+    <h2 class="info-title">ℹ️ INFORMASI</h2>
+
+    <div class="informasi-card">
+
+      <iframe
+        class="informasi-slides"
+        src="https://docs.google.com/presentation/d/1XGhqW8y5ZLJSM-eXKN7SSEHUPW79gl76JG-pZxzXnn0/embed?start=false&loop=true&delayms=5000"
+        title="Informasi VIPT CUP IV 2026"
+        loading="lazy"
+        allowfullscreen>
+      </iframe>
+
+      <div class="informasi-note">
+        Informasi resmi VIPT CUP IV 2026
+      </div>
+
+    </div>
+
+  </section>
 
 </div>
 
