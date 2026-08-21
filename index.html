@@ -768,42 +768,16 @@ main{
   }
 }
 
-/* ==========================================
-   INFORMASI - GOOGLE SLIDES
-========================================== */
-.informasi-section{
-  margin:24px 0 18px;
-}
-.informasi-section .info-title{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin:0 2px 9px;
-  font-size:15px;
-  font-weight:900;
-}
-.informasi-card{
-  background:linear-gradient(145deg,#174c46,#0e332f);
-  border:1px solid var(--line);
-  border-radius:17px;
-  padding:10px;
-  overflow:hidden;
-}
-.informasi-slides{
-  width:100%;
-  aspect-ratio:16/9;
-  border:0;
-  border-radius:12px;
-  display:block;
-  background:#000;
-}
-.informasi-note{
-  margin:8px 2px 0;
-  color:var(--muted);
-  font-size:8px;
-  line-height:1.4;
-  text-align:center;
-}
+/* SCOREBOARD TEAM LOGOS */
+.team-logo-img{width:42px;height:42px;object-fit:contain;display:block;margin:0 auto 5px;border-radius:8px;background:#fff;padding:3px;}
+.match-teams{display:grid;grid-template-columns:1fr 46px 1fr;align-items:center;gap:6px;margin-top:9px;}
+.match-team{min-width:0;text-align:center;font-size:10px;line-height:1.25;}
+.match-team-name{font-weight:900;}
+.live .team-logo-img{width:58px;height:58px;margin-bottom:7px;}
+/* INFORMASI */
+.informasi-section{width:100%;margin:24px 0 18px;}
+.informasi-slides-wrap{width:100%;aspect-ratio:16/9;overflow:hidden;background:#000;border-radius:12px;}
+.informasi-slides{width:100%;height:100%;display:block;border:0;margin:0;padding:0;}
 
 </style>
 </head>
@@ -882,7 +856,8 @@ main{
     <div class="teams">
 
       <div class="team">
-        <div class="teamlogo">A</div>
+        <img id="liveLogoA" class="team-logo-img" alt="Logo Team A" hidden>
+        <div id="liveLogoFallbackA" class="teamlogo">A</div>
         <b id="liveA">-</b>
       </div>
 
@@ -892,7 +867,8 @@ main{
       </div>
 
       <div class="team">
-        <div class="teamlogo">B</div>
+        <img id="liveLogoB" class="team-logo-img" alt="Logo Team B" hidden>
+        <div id="liveLogoFallbackB" class="teamlogo">B</div>
         <b id="liveB">-</b>
       </div>
 
@@ -1116,17 +1092,10 @@ main{
 
   </div>
 
-
-  <!-- INFORMASI - GOOGLE SLIDES -->
   <section class="informasi-section" id="informasi">
-    <h2 class="info-title">ℹ️ INFORMASI</h2>
+    <div class="section"><h2>ℹ️ INFORMASI</h2></div>
     <div class="informasi-slides-wrap">
-      <iframe class="informasi-slides"
-        src="https://docs.google.com/presentation/d/1XGhqW8y5ZLJSM-eXKN7SSEHUPW79gl76JG-pZxzXnn0/embed?start=true&loop=true&delayms=5000"
-        title="Informasi VIPT CUP IV 2026"
-        loading="lazy"
-        allow="autoplay; fullscreen"
-        allowfullscreen></iframe>
+      <iframe class="informasi-slides" src="https://docs.google.com/presentation/d/1XGhqW8y5ZLJSM-eXKN7SSEHUPW79gl76JG-pZxzXnn0/embed?start=true&loop=true&delayms=5000" title="Informasi VIPT CUP IV 2026" loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
   </section>
 
@@ -1486,10 +1455,10 @@ function initFirebaseSync(){
       resultsContainer.innerHTML=historyArray.map(m=>`
         <div class="card">
           <div class="round">${esc(m.sport||"PERTANDINGAN")} • ${esc(m.period||"-")} • SELESAI</div>
-          <div class="result">
-            <strong>${esc((m.teamA||{}).name||"-")}</strong>
+          <div class="match-teams">
+            <div class="match-team">${logoHtml((m.teamA||{}).name||"")}<div class="match-team-name">${esc((m.teamA||{}).name||"-")}</div></div>
             <span class="vs">${Number((m.teamA||{}).score||0)} - ${Number((m.teamB||{}).score||0)}</span>
-            <strong>${esc((m.teamB||{}).name||"-")}</strong>
+            <div class="match-team">${logoHtml((m.teamB||{}).name||"")}<div class="match-team-name">${esc((m.teamB||{}).name||"-")}</div></div>
           </div>
           <div class="venue">📍 ${esc(m.venue||VENUE)}</div>
           <span class="status done">SELESAI</span>
@@ -1543,6 +1512,14 @@ function formatLiveTime(sec){
   return String(Math.floor(sec / 60)).padStart(2,"0") + ":" + String(sec % 60).padStart(2,"0");
 }
 
+function setLiveLogo(side,name){
+  const img=document.getElementById(side==="A"?"liveLogoA":"liveLogoB");
+  const fallback=document.getElementById(side==="A"?"liveLogoFallbackA":"liveLogoFallbackB");
+  if(!img||!fallback)return;
+  const src=getTeamLogo(name);
+  if(src){img.src=src;img.hidden=false;fallback.hidden=true;}else{img.hidden=true;fallback.hidden=false;}
+}
+
 function renderWebsiteLiveScore(){
   if(!liveState) return;
   const a = liveState.teamA || {};
@@ -1551,6 +1528,8 @@ function renderWebsiteLiveScore(){
   document.getElementById("liveSport").textContent = liveState.sport ? String(liveState.sport) : "LIVE SCORE";
   document.getElementById("liveA").textContent = a.name || "-";
   document.getElementById("liveB").textContent = b.name || "-";
+  setLiveLogo("A",a.name);
+  setLiveLogo("B",b.name);
 
   const score = `${Number(a.score || 0)} - ${Number(b.score || 0)}`;
   document.getElementById("liveScore").firstChild.textContent = score;
@@ -1578,6 +1557,8 @@ function setLiveOffline(msg){
   document.getElementById("liveSport").textContent = msg;
   document.getElementById("liveA").textContent = "-";
   document.getElementById("liveB").textContent = "-";
+  setLiveLogo("A","");
+  setLiveLogo("B","");
   document.getElementById("liveScore").firstChild.textContent = "-";
   document.getElementById("liveRound").textContent = "MENUNGGU DATA";
 }
@@ -1623,24 +1604,34 @@ function esc(s){
   return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;" }[m]));
 }
 
+function normalizeTeamName(name){
+  return String(name||"").toUpperCase().replace(/[.]/g,"").replace(/\s*\/\s*/g,"/").replace(/\s+/g," ").trim();
+}
+const TEAM_LOGOS={
+  "RT 02/RW 021":"RT_02-RW_021.png","RT 04/RW 021":"RT_04-RW_021.png","RT 06/RW 021":"RT_06-RW_021.png",
+  "RT 07/RW 014":"RT_07-RW_014.png","RT 07/RW 021":"RT_07-RW_021.png","RT 08/RW 014":"RT_08-RW_014.png",
+  "RT 08/RW 021":"RT_08-RW_021.png","RT 09/RW 014":"RT_09-RW_014.png","RT 10/RW 014":"RT_10-RW_014.png",
+  "RT 10/RW 021":"RT_10-RW_021.png","RT 11/RW 021":"RT_11-RW_021.png","RT 13/RW 021":"RT_13-RW_021.png"
+};
+const SCOREBOARD_LOGO_BASE="https://raw.githubusercontent.com/vindahpulotimahatv-commits/Scoreboard.github.io/main/assets/logos/";
+function getTeamLogo(name){const f=TEAM_LOGOS[normalizeTeamName(name)];return f?SCOREBOARD_LOGO_BASE+f:"";}
+function logoHtml(name){const src=getTeamLogo(name);return src?`<img class="team-logo-img" src="${src}" alt="Logo ${esc(name)}" loading="lazy" onerror="this.style.display='none'">`:"";}
 function renderSchedule(){
-  const q = document.getElementById("search").value.trim().toLowerCase();
-  const data = MATCHES.filter(m => (activeSport === "SEMUA" || m.sport === activeSport) && (!q || JSON.stringify(m).toLowerCase().includes(q))).sort(dateSort);
-
-  document.getElementById("count").textContent = data.length + " pertandingan";
-  document.getElementById("jadwal").innerHTML = data.length ? data.map(m => `
-        <div class="card match" data-status="${esc(m.status)}">
-          <div class="round">${esc(m.sport)} • ${esc(m.round)}</div>
-          <div class="date">${esc(prettyDate(m.date))} • ${esc(m.time)}</div>
-          <div class="result">
-            <strong>${esc(m.a)}</strong>
-            <span class="vs">${m.status === "LIVE" || m.scoreA != null ? `${Number(m.scoreA || 0)} - ${Number(m.scoreB || 0)}` : "VS"}</span>
-            <strong>${esc(m.b)}</strong>
-          </div>
-          <div class="venue">📍 ${esc(VENUE)}</div>
-          <span class="status ${m.status === "LIVE" ? "live" : m.status === "SELESAI" ? "done" : ""}">${esc(m.status)}</span>
-        </div>
-      `).join("") : `<div class="card empty">Pertandingan tidak ditemukan.</div>`;
+  const q=document.getElementById("search").value.trim().toLowerCase();
+  const data=MATCHES.filter(m=>(activeSport==="SEMUA"||m.sport===activeSport)&&(!q||JSON.stringify(m).toLowerCase().includes(q))).sort(dateSort);
+  document.getElementById("count").textContent=data.length+" pertandingan";
+  document.getElementById("jadwal").innerHTML=data.length?data.map(m=>`
+    <div class="card match" data-status="${esc(m.status)}">
+      <div class="round">${esc(m.sport)} • ${esc(m.round)}</div>
+      <div class="date">${esc(prettyDate(m.date))} • ${esc(m.time)}</div>
+      <div class="match-teams">
+        <div class="match-team">${logoHtml(m.a)}<div class="match-team-name">${esc(m.a)}</div></div>
+        <span class="vs">${m.status==="LIVE"||m.scoreA!=null?`${Number(m.scoreA||0)} - ${Number(m.scoreB||0)}`:"VS"}</span>
+        <div class="match-team">${logoHtml(m.b)}<div class="match-team-name">${esc(m.b)}</div></div>
+      </div>
+      <div class="venue">📍 ${esc(VENUE)}</div>
+      <span class="status ${m.status==="LIVE"?"live":m.status==="SELESAI"?"done":""}">${esc(m.status)}</span>
+    </div>`).join(""):`<div class="card empty">Pertandingan tidak ditemukan.</div>`;
 }
 
 function renderBracket(){
