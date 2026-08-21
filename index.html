@@ -1346,85 +1346,136 @@ let liveTimerRunning = false;
 let liveTimerStartedAt = 0;
 let currentYoutubeId = "";
 
+function normalizeYoutubeId(value){
+  if(!value) return "";
+  let v=String(value).trim();
+  const m=v.match(/(?:youtube\.com\/(?:live\/|watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);
+  return m ? m[1] : v.replace(/[^A-Za-z0-9_-]/g,"");
+}
+
+function normalizeRemoteMatches(value){
+  if(!value) return [];
+  if(Array.isArray(value)) return value.filter(Boolean);
+  return Object.entries(value).map(([id,m]) => ({id, ...(m||{})}));
+}
+
+function mergeRemoteMatchData(remote){
+  const list=normalizeRemoteMatches(remote);
+  if(!list.length) return;
+  const byId=new Map(MATCHES.map(m=>[String(m.id),m]));
+  list.forEach(m=>{
+    const id=String(m.id||m.matchId||"").trim();
+    if(!id) return;
+    const old=byId.get(id)||{id};
+    byId.set(id,{...old,...m});
+  });
+  MATCHES.splice(0,MATCHES.length,...Array.from(byId.values()));
+  renderAll();
+}
+
+function applyRemoteBracket(value){
+  if(!value) return;
+  window.REMOTE_BRACKET=value;
+  renderBracket();
+}
+
 function initFirebaseSync(){
   try{
     if(!firebase.apps.length){
       firebase.initializeApp(FIREBASE_CONFIG);
     }
 
-    /* KODE BARU: AUTO REFRESH STREAMING YOUTUBE & BYPASS CACHE APK */
-    const youtubeRef = firebase.database().ref("vipt_scoreboard/youtube_id");
-    youtubeRef.on("value", snap => {
-      const ytId = snap.val();
-      if (ytId && ytId !== currentYoutubeId) {
-        currentYoutubeId = ytId;
-        
-        // Memaksa WebView Android untuk mereload Iframe secara penuh
-        const container = document.getElementById("ytContainer");
-        if(container){
-          const cacheBuster = new Date().getTime();
-          container.innerHTML = `
-            <iframe
-              id="youtubeFrame"
-              style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"
-              src="https://www.youtube.com/embed/${ytId}?autoplay=1&cb=${cacheBuster}"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen>
-            </iframe>
-            <a
-              class="btn"
-              id="youtubeBtn"
-              href="https://www.youtube.com/live/${ytId}"
-              target="_blank">
-              BUKA DI YOUTUBE
-            </a>
-          `;
-        }
-      }
-    });
-
-    /* LIVE SCORE */
-    const liveRef = firebase.database().ref("vipt_scoreboard/live");
-    liveRef.on("value",snap=>{
-      const data = snap.val();
-      if(!data){
-        setLiveOffline("BELUM ADA DATA LIVE");
+    /* YOUTUBE: URL atau ID dapat diubah dari Firebase dan langsung tampil di web/APK online. */
+    const youtubeRef=firebase.database().ref("vipt_scoreboard/youtube_id");
+    youtubeRef.on("value",snap=>{
+      const ytId=normalizeYoutubeId(snap.val());
+      if(ytId===currentYoutubeId) return;
+      currentYoutubeId=ytId;
+      const container=document.getElementById("ytContainer");
+      if(!container) return;
+      if(!ytId){
+        container.innerHTML='<div class="card empty">LIVE YOUTUBE BELUM DIATUR.</div>';
         return;
       }
-      liveState = data;
-      liveTimerBase = Number(data.timer || 0);
-      liveTimerRunning = !!data.timerRunning;
-      liveTimerStartedAt = Date.now();
+      const cb=Date.now();
+      container.innerHTML=`
+        <iframe id="youtubeFrame"
+          style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"
+          src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&playsinline=1&cb=${cb}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+        <a class="btn" id="youtubeBtn" href="https://www.youtube.com/live/${ytId}" target="_blank" rel="noopener">BUKA DI YOUTUBE</a>`;
+    });
+
+    /* LIVE SCORE: realtime. */
+    const liveRef=firebase.database().ref("vipt_scoreboard/live");
+    liveRef.on("value",snap=>{
+      const data=snap.val();
+      if(!data){ setLiveOffline("BELUM ADA DATA LIVE"); return; }
+      liveState=data;
+      liveTimerBase=Number(data.timer||0);
+      liveTimerRunning=!!data.timerRunning;
+      liveTimerStartedAt=Date.now();
       renderWebsiteLiveScore();
     });
 
-    /* HISTORY */
-    const historyRef = firebase.database().ref("vipt_scoreboard/history");
+    /* HISTORY / HASIL: realtime. */
+    const historyRef=firebase.database().ref("vipt_scoreboard/history");
     historyRef.on("value",snap=>{
-      const data = snap.val();
-      const resultsContainer = document.getElementById("results");
+      const data=snap.val();
+      const resultsContainer=document.getElementById("results");
+      if(!resultsContainer) return;
       if(!data){
-        resultsContainer.innerHTML = `<div class="card empty">Belum ada pertandingan SELESAI.</div>`;
+        resultsContainer.innerHTML='<div class="card empty">Belum ada pertandingan SELESAI.</div>';
         return;
       }
-      const historyArray = Object.values(data);
-      resultsContainer.innerHTML = historyArray.reverse().map(m=>`
-          <div class="card">
-            <div class="round">${esc(m.sport || "PERTANDINGAN")} • ${esc(m.period || "-")} • SELESAI</div>
-            <div class="result">
-              <strong>${esc(m.teamA.name)}</strong>
-              <span class="vs">${Number(m.teamA.score || 0)} - ${Number(m.teamB.score || 0)}</span>
-              <strong>${esc(m.teamB.name)}</strong>
-            </div>
-            <div class="venue">📍 ${esc(VENUE)}</div>
-            <span class="status done">SELESAI</span>
+      const historyArray=Object.entries(data).map(([key,m])=>({...(m||{}),_historyKey:key}));
+      historyArray.sort((a,b)=>Number(b.finishedAt||b.timestamp||0)-Number(a.finishedAt||a.timestamp||0));
+      resultsContainer.innerHTML=historyArray.map(m=>`
+        <div class="card">
+          <div class="round">${esc(m.sport||"PERTANDINGAN")} • ${esc(m.period||"-")} • SELESAI</div>
+          <div class="result">
+            <strong>${esc((m.teamA||{}).name||"-")}</strong>
+            <span class="vs">${Number((m.teamA||{}).score||0)} - ${Number((m.teamB||{}).score||0)}</span>
+            <strong>${esc((m.teamB||{}).name||"-")}</strong>
           </div>
-        `).join("");
+          <div class="venue">📍 ${esc(m.venue||VENUE)}</div>
+          <span class="status done">SELESAI</span>
+        </div>`).join("");
     });
 
-    setInterval(renderWebsiteLiveScore, 500);
-  }
-  catch(err){
+    /* JADWAL/MATCHES: jika operator mengubah node ini, jadwal web/APK online ikut berubah. */
+    const matchesRef=firebase.database().ref("vipt_scoreboard/matches");
+    matchesRef.on("value",snap=>{
+      const remote=snap.val();
+      if(remote) mergeRemoteMatchData(remote);
+    });
+
+    /* BRACKET: data opsional dari Firebase. */
+    const bracketRef=firebase.database().ref("vipt_scoreboard/bracket");
+    bracketRef.on("value",snap=>{
+      if(snap.val()) applyRemoteBracket(snap.val());
+    });
+
+    /* KONTEN/SITUS: link YouTube alternatif dan data konfigurasi. */
+    const configRef=firebase.database().ref("vipt_scoreboard/site_config");
+    configRef.on("value",snap=>{
+      const cfg=snap.val()||{};
+      if(cfg.youtube_id && normalizeYoutubeId(cfg.youtube_id)!==currentYoutubeId){
+        youtubeRef.set(cfg.youtube_id);
+      }
+      if(cfg.venue){
+        window.VENUE=String(cfg.venue);
+        renderAll();
+      }
+      if(cfg.title){
+        document.title=String(cfg.title);
+      }
+    });
+
+    setInterval(renderWebsiteLiveScore,500);
+  }catch(err){
+    console.error("Firebase sync error",err);
     setLiveOffline("FIREBASE TIDAK AKTIF");
   }
 }
@@ -1483,7 +1534,7 @@ initFirebaseSync();
 </script>
 
 <script>
-const VENUE = "Lapangan Central";
+window.VENUE = "Lapangan Central";
 
 const MATCHES = [
   { id:"VP-8B1", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-22", time:"21:30 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL" },
@@ -1541,40 +1592,45 @@ function renderSchedule(){
 }
 
 function renderBracket(){
-  const sport = activeSport === "SEMUA" ? "VOLLY PUTRA" : activeSport;
-  const data = MATCHES.filter(m => m.sport === sport);
+  const sport=activeSport==="SEMUA"?"VOLLY PUTRA":activeSport;
+  const remote=window.REMOTE_BRACKET;
 
-  document.getElementById("bracketFilters").innerHTML = SPORT_ORDER.map(s => `
-        <button class="pill ${s === sport ? "active" : ""}" data-bracket="${s}">${s}</button>
-      `).join("");
+  document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`
+    <button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>
+  `).join("");
 
-  document.getElementById("bracketGrid").innerHTML = `
-    <div class="col">
-      <h3>DAFTAR MATCH</h3>
-      ${data.map(g => `
-            <div class="game">
-              <div>${esc(g.a)} <b>—</b></div>
-              <div>${esc(g.b)} <b>—</b></div>
-              <small>${esc(g.round)} (${esc(prettyDate(g.date))})</small>
-            </div>
-          `).join("") || `<div class="game"><small>Belum ada data</small></div>`}
-    </div>
-    <div class="col">
-      <h3>SEMIFINAL</h3>
-      <div class="game"><small>Menunggu babak berjalan</small></div>
-    </div>
-    <div class="col final">
-      <h3>FINAL</h3>
-      <div class="game"><small>Menunggu semifinal</small></div>
-    </div>
-    <div class="col">
-      <h3>JUARA</h3>
-      <div class="game" style="text-align:center">
-        <div style="justify-content:center;border:0">🏆</div>
-        <div style="justify-content:center;border:0">JUARA ${sport}</div>
+  if(remote && typeof remote==="object"){
+    const source=Array.isArray(remote)?remote:Object.entries(remote).map(([id,v])=>({id,...(v||{})}));
+    const data=source.filter(x=>!x.sport||x.sport===sport);
+    document.getElementById("bracketGrid").innerHTML=`
+      <div class="col">
+        <h3>DAFTAR MATCH</h3>
+        ${data.length?data.map(g=>`
+          <div class="game">
+            <div>${esc(g.a||g.teamA||"-")} <b>${g.scoreA!=null?esc(g.scoreA):"—"}</b></div>
+            <div>${esc(g.b||g.teamB||"-")} <b>${g.scoreB!=null?esc(g.scoreB):"—"}</b></div>
+            <small>${esc(g.round||"")} ${g.date?`(${esc(prettyDate(g.date))})`:""} ${g.status?`• ${esc(g.status)}`:""}</small>
+          </div>`).join(""):`<div class="game"><small>Belum ada data</small></div>`}
       </div>
+      <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Data mengikuti Firebase</small></div></div>
+      <div class="col final"><h3>FINAL</h3><div class="game"><small>Data mengikuti Firebase</small></div></div>
+      <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`;
+    return;
+  }
+
+  const data=MATCHES.filter(m=>m.sport===sport);
+  document.getElementById("bracketGrid").innerHTML=`
+    <div class="col"><h3>DAFTAR MATCH</h3>
+      ${data.map(g=>`
+        <div class="game">
+          <div>${esc(g.a)} <b>${g.scoreA!=null?esc(g.scoreA):"—"}</b></div>
+          <div>${esc(g.b)} <b>${g.scoreB!=null?esc(g.scoreB):"—"}</b></div>
+          <small>${esc(g.round)} (${esc(prettyDate(g.date))})</small>
+        </div>`).join("")||`<div class="game"><small>Belum ada data</small></div>`}
     </div>
-  `;
+    <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Menunggu babak berjalan</small></div></div>
+    <div class="col final"><h3>FINAL</h3><div class="game"><small>Menunggu semifinal</small></div></div>
+    <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`;
 }
 
 function renderAll(){
