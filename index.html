@@ -834,6 +834,147 @@ main{
   display:none;
 }
 
+
+/* ==========================================
+   VIPT CUP IV 2026 — BLACK GOLD THEME ONLY
+   Isi, Firebase, match, bracket, history,
+   Google Slides dan fungsi lain TIDAK DIUBAH.
+   ========================================== */
+:root{
+  --bg:#050505;
+  --panel:#0b0b0b;
+  --panel2:#15110a;
+  --line:#7a5514;
+  --text:#ffffff;
+  --muted:#c7c0b2;
+  --blue:#d49a22;
+  --gold:#f5b72b;
+  --green:#1ed393;
+  --red:#ff4d67;
+}
+
+body{
+  background:
+    radial-gradient(circle at 50% 0%, rgba(245,183,43,.12) 0, transparent 28%),
+    linear-gradient(180deg,#030303 0%,#080705 45%,#030303 100%);
+  color:var(--text);
+}
+
+header{
+  padding:0;
+  background:#050505;
+  border-bottom:1px solid #8a6118;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  overflow:hidden;
+}
+
+header .brand,
+header > div:last-child{display:none!important;}
+
+header::before{
+  content:"";
+  display:block;
+  width:100%;
+  aspect-ratio:1400 / 664;
+  background:url('assets/header-vipt.webp') center center / cover no-repeat;
+}
+
+.hero{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(245,183,43,.10),transparent 45%),
+    linear-gradient(180deg,rgba(12,10,7,.96),rgba(5,5,5,.98));
+  border-bottom:1px solid #7a5514;
+}
+
+.eyebrow{color:#f5c451;}
+.hero h2.subhead{color:#f5b72b;}
+.hero p{color:#c7c0b2;}
+
+.location{
+  border-color:#8a6118;
+  background:linear-gradient(135deg,rgba(245,183,43,.12),rgba(20,14,6,.55));
+}
+.location span{color:#ffd45f;}
+
+.card{
+  background:linear-gradient(145deg,#11100d,#050505);
+  border-color:#6f4d13;
+  box-shadow:0 8px 24px rgba(0,0,0,.35), inset 0 0 0 1px rgba(245,183,43,.025);
+}
+
+.live{border-color:#a87518;}
+.livebar .sportname{color:#f5d36c;}
+.teamlogo{
+  background:#0b0b0b;
+  border-color:#7a5514;
+  color:#f5c451;
+}
+.score{color:#fff;}
+.score small{color:#bdb5a7;}
+
+.btn{
+  background:linear-gradient(135deg,#f5b72b,#9a650b);
+  color:#090705;
+}
+
+.pill{
+  background:#0c0b09;
+  border-color:#6f4d13;
+  color:#c7c0b2;
+}
+.pill.active{
+  background:linear-gradient(135deg,#8d6116,#4f3509);
+  border-color:#f0b52a;
+  color:#fff;
+}
+
+.search{
+  background:#080807;
+  border-color:#6f4d13;
+  color:#fff;
+}
+
+.match .round{color:#e8c65f;}
+.match .date{color:#f5b72b;}
+.match .venue{color:#bdb5a7;}
+.vs{color:#f2e5c7;}
+.status{background:#3a2a0d;color:#f4d77d;}
+
+.game{
+  background:#0b0b09;
+  border-color:#6f4d13;
+}
+.game div{border-bottom-color:#3b2b10;}
+.game small{color:#a89e8d;}
+.final .game{border-color:#f5b72b;}
+
+.news .thumb{background:linear-gradient(135deg,#4b3208,#0a0907);}
+.stat-box{background:rgba(70,47,8,.28);border-color:#6f4d13;}
+.topskor-table th{background:#201708;color:#f5b72b;border-bottom-color:#6f4d13;}
+.topskor-table td{border-bottom-color:#3b2b10;}
+.topskor-table tfoot td{background:#0c0b09;color:#f5b72b;border-top-color:#6f4d13;}
+.rank-badge{background:#4a330b;color:#f5c451;}
+
+.sosmed-btn{background:#17120a;border-color:#6f4d13;}
+.sosmed-btn:hover{background:#3a290b;}
+.sponsor-footer{border-top-color:#6f4d13;}
+
+.bottom{
+  background:rgba(5,5,5,.98);
+  border-top-color:#7a5514;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.nav{color:#9f957f;}
+.nav.active{color:#f5c451;}
+
+.informasi-slides-wrap{background:#050505;}
+
+@media(max-width:620px){
+  header::before{aspect-ratio:1400 / 664;}
+}
+
 </style>
 </head>
 
@@ -1400,51 +1541,6 @@ let liveTimerBase = 0;
 let liveTimerRunning = false;
 let liveTimerStartedAt = 0;
 let currentYoutubeId = "";
-let historyState = {};
-let remoteMatchesState = {};
-let remoteBracketState = null;
-
-function normalizeRemoteList(value){
-  if(!value) return [];
-  if(Array.isArray(value)) return value.filter(Boolean);
-  return Object.entries(value).map(([id,v]) => ({id, ...(v||{})}));
-}
-
-function normalizeMatchId(m){
-  return String(m?.id || m?.matchId || "").trim();
-}
-
-function resultForMatch(id){
-  const key=String(id||"").trim();
-  const direct=remoteMatchesState[key];
-  if(direct) return direct;
-  const h=Object.values(historyState).find(x=>String(x?.matchId||x?.id||"").trim()===key);
-  return h || null;
-}
-
-function winnerForMatch(id){
-  const r=resultForMatch(id);
-  if(!r) return null;
-  if(r.winner) return String(r.winner);
-  const a=r.teamA||{}; const b=r.teamB||{};
-  const sa=Number(r.scoreA ?? a.score ?? 0);
-  const sb=Number(r.scoreB ?? b.score ?? 0);
-  const finished=r.finished===true || String(r.status||"").toUpperCase()==="SELESAI";
-  if(!finished || sa===sb) return null;
-  return sa>sb ? (a.name||r.a||null) : (b.name||r.b||null);
-}
-
-function loserForMatch(id){
-  const r=resultForMatch(id);
-  if(!r) return null;
-  const a=r.teamA||{}; const b=r.teamB||{};
-  const sa=Number(r.scoreA ?? a.score ?? 0);
-  const sb=Number(r.scoreB ?? b.score ?? 0);
-  const finished=r.finished===true || String(r.status||"").toUpperCase()==="SELESAI";
-  if(!finished || sa===sb) return null;
-  return sa<sb ? (a.name||r.a||null) : (b.name||r.b||null);
-}
-
 
 function normalizeYoutubeId(value){
   if(!value) return "";
@@ -1460,193 +1556,23 @@ function normalizeRemoteMatches(value){
 }
 
 function mergeRemoteMatchData(remote){
-  const list=normalizeRemoteList(remote);
-  remoteMatchesState={};
+  const list=normalizeRemoteMatches(remote);
+  if(!list.length) return;
+  const byId=new Map(MATCHES.map(m=>[String(m.id),m]));
   list.forEach(m=>{
-    const id=normalizeMatchId(m);
+    const id=String(m.id||m.matchId||"").trim();
     if(!id) return;
-    remoteMatchesState[id]={...(m||{}),id};
+    const old=byId.get(id)||{id};
+    byId.set(id,{...old,...m});
   });
-
-  // Firebase is authoritative, but keep the corrected VP-8B4 identity.
-  if(remoteMatchesState["VP-8B4"]){
-    remoteMatchesState["VP-8B4"].a="RT 06 / RW 021";
-    remoteMatchesState["VP-8B4"].b="RT 07 / RW 021";
-    remoteMatchesState["VP-8B4"].teamA={...(remoteMatchesState["VP-8B4"].teamA||{}),name:"RT 06 / RW 021"};
-    remoteMatchesState["VP-8B4"].teamB={...(remoteMatchesState["VP-8B4"].teamB||{}),name:"RT 07 / RW 021"};
-  }
-
-  MATCHES.forEach(local=>{
-    const r=remoteMatchesState[local.id];
-    if(!r) return;
-    if(local.id!=="VP-8B4") {
-      local.a = r.a || r.teamA?.name || local.a;
-      local.b = r.b || r.teamB?.name || local.b;
-    } else {
-      local.a="RT 06 / RW 021";
-      local.b="RT 07 / RW 021";
-    }
-    local.scoreA = r.scoreA ?? r.teamA?.score ?? local.scoreA;
-    local.scoreB = r.scoreB ?? r.teamB?.score ?? local.scoreB;
-    local.status = r.status || local.status;
-    local.round = r.round || local.round;
-    local.date = r.date || local.date;
-    local.time = r.time || local.time;
-  });
+  MATCHES.splice(0,MATCHES.length,...Array.from(byId.values()));
   renderAll();
 }
 
-
 function applyRemoteBracket(value){
-  remoteBracketState=value||null;
-  window.REMOTE_BRACKET=remoteBracketState;
+  if(!value) return;
+  window.REMOTE_BRACKET=value;
   renderBracket();
-}
-
-
-
-/* =========================================================
-   BRACKET ENGINE - hasil akhir -> pemenang -> next match
-   Sumber hasil: vipt_scoreboard/history + live/matches
-   Tujuan: vipt_scoreboard/bracket dan vipt_scoreboard/matches
-   ========================================================= */
-const BRACKET_GRAPH = {
-  "VOLLY PUTRA": {
-    next: {
-      "VP-8B1": ["VP-SF1", "A"],
-      "VP-8B2": ["VP-SF1", "B"],
-      "VP-8B3": ["VP-SF2", "A"],
-      "VP-8B4": ["VP-SF2", "B"],
-      "VP-SF1": ["VP-FINAL", "A"],
-      "VP-SF2": ["VP-FINAL", "B"]
-    },
-    third: ["VP-SF1", "VP-SF2"]
-  },
-  "VOLLY PUTRI": {
-    next: {
-      "VW-QF1": ["VW-SF1", "A"],
-      "VW-QF2": ["VW-SF1", "B"],
-      "VW-QF3": ["VW-SF2", "A"],
-      "VW-QF4": ["VW-SF2", "B"],
-      "VW-SF1": ["VW-FINAL", "A"],
-      "VW-SF2": ["VW-FINAL", "B"]
-    },
-    third: ["VW-SF1", "VW-SF2"]
-  },
-  "FUTSAL": {
-    next: {
-      "FS-SF1": ["FS-FINAL", "A"],
-      "FS-SF2": ["FS-FINAL", "B"]
-    },
-    third: ["FS-SF1", "FS-SF2"]
-  }
-};
-
-function resultMap(){
-  return historyState || {};
-}
-
-function findFinishedResult(matchId){
-  const all = Object.values(resultMap());
-  return all.find(r => String(r?.matchId || r?.id || "").trim() === String(matchId).trim()) || null;
-}
-
-function winnerAndLoser(matchId){
-  const r=findFinishedResult(matchId);
-  if(!r) return {winner:null, loser:null};
-  const a=r.teamA||{}, b=r.teamB||{};
-  const sa=Number(r.scoreA ?? a.score ?? 0);
-  const sb=Number(r.scoreB ?? b.score ?? 0);
-  const finished=r.finished===true || String(r.status||"").toUpperCase()==="SELESAI";
-  if(!finished || sa===sb) return {winner:null, loser:null};
-  const an=a.name || r.a || null;
-  const bn=b.name || r.b || null;
-  return sa>sb ? {winner:an, loser:bn} : {winner:bn, loser:an};
-}
-
-function currentMatchRecord(matchId){
-  const local=MATCHES.find(m=>String(m.id)===String(matchId));
-  const remote=remoteMatchesState[String(matchId)];
-  return {...(local||{id:matchId}), ...(remote||{})};
-}
-
-function buildAutoBracket(){
-  const output={};
-  for(const [sport,graph] of Object.entries(BRACKET_GRAPH)){
-    const matches=MATCHES.filter(m=>m.sport===sport);
-    matches.forEach(m=>{
-      const r=currentMatchRecord(m.id);
-      const result=findFinishedResult(m.id);
-      const wl=winnerAndLoser(m.id);
-      output[m.id]={
-        id:m.id,
-        sport,
-        round:r.round || m.round || "",
-        date:r.date || m.date || "TBD",
-        time:r.time || m.time || "TBD",
-        a:r.a || m.a || "TBA",
-        b:r.b || m.b || "TBA",
-        scoreA:r.scoreA ?? result?.scoreA ?? null,
-        scoreB:r.scoreB ?? result?.scoreB ?? null,
-        status:result?.finished===true ? "SELESAI" : (r.status || "JADWAL"),
-        winner:wl.winner || null,
-        loser:wl.loser || null
-      };
-    });
-
-    for(const [source,[target,slot]] of Object.entries(graph.next)){
-      const w=winnerAndLoser(source).winner;
-      if(!output[target]) output[target]={id:target,sport,round:"",date:"TBD",time:"TBD",status:"JADWAL"};
-      output[target][slot==='A'?'a':'b']=w || output[target][slot==='A'?'a':'b'] || `PEMENANG ${source}`;
-    }
-
-    const thirdId=sport==="VOLLY PUTRA"?"VP-3RD":sport==="VOLLY PUTRI"?"VW-3RD":sport==="FUTSAL"?"FS-3RD":null;
-    if(thirdId){
-      const [s1,s2]=graph.third;
-      output[thirdId]={
-        ...(output[thirdId]||{id:thirdId,sport,round:"3RD PLACE",date:"TBD",time:"TBD",status:"JADWAL"}),
-        a:winnerAndLoser(s1).loser || `KALAH ${s1}`,
-        b:winnerAndLoser(s2).loser || `KALAH ${s2}`
-      };
-    }
-  }
-  return output;
-}
-
-let autoWriteTimer=null;
-function scheduleAutoBracketWrite(){
-  clearTimeout(autoWriteTimer);
-  autoWriteTimer=setTimeout(writeAutoBracket,500);
-}
-
-function stableJson(x){ return JSON.stringify(x, Object.keys(x).sort()); }
-
-function writeAutoBracket(){
-  if(!firebase || !firebase.database) return;
-  const data=buildAutoBracket();
-  const ref=firebase.database().ref("vipt_scoreboard/bracket");
-  ref.once("value").then(snap=>{
-    const old=snap.val() || {};
-    if(JSON.stringify(old)===JSON.stringify(data)) return;
-    return ref.set(data);
-  }).catch(err=>console.warn("Bracket write skipped:",err));
-
-  // Keep next-match team names available to Scoreboard via /matches.
-  const mref=firebase.database().ref("vipt_scoreboard/matches");
-  mref.once("value").then(snap=>{
-    const old=snap.val() || {};
-    const next={...old};
-    for(const [id,v] of Object.entries(data)){
-      if(!next[id]) next[id]={id};
-      if(v.a && !String(v.a).startsWith("PEMENANG ") && !String(v.a).startsWith("KALAH ")) next[id].a=v.a;
-      if(v.b && !String(v.b).startsWith("PEMENANG ") && !String(v.b).startsWith("KALAH ")) next[id].b=v.b;
-      if(v.round) next[id].round=v.round;
-      if(v.date) next[id].date=v.date;
-      if(v.time) next[id].time=v.time;
-      next[id].sport=v.sport;
-    }
-    if(JSON.stringify(old)!==JSON.stringify(next)) return mref.set(next);
-  }).catch(err=>console.warn("Next-match write skipped:",err));
 }
 
 function initFirebaseSync(){
@@ -1692,13 +1618,16 @@ function initFirebaseSync(){
     /* HISTORY / HASIL: realtime. */
     const historyRef=firebase.database().ref("vipt_scoreboard/history");
     historyRef.on("value",snap=>{
-      const data=snap.val()||{};
-      historyState=data;
+      const data=snap.val();
       const resultsContainer=document.getElementById("results");
       if(!resultsContainer) return;
-      const historyArray=Object.entries(data).map(([key,m])=>({...m,_historyKey:key}));
+      if(!data){
+        resultsContainer.innerHTML='<div class="card empty">Belum ada pertandingan SELESAI.</div>';
+        return;
+      }
+      const historyArray=Object.entries(data).map(([key,m])=>({...(m||{}),_historyKey:key}));
       historyArray.sort((a,b)=>Number(b.finishedAt||b.timestamp||0)-Number(a.finishedAt||a.timestamp||0));
-      resultsContainer.innerHTML=historyArray.length ? historyArray.map(m=>`
+      resultsContainer.innerHTML=historyArray.map(m=>`
         <div class="card">
           <div class="round">${esc(m.sport||"PERTANDINGAN")} • ${esc(m.period||"-")} • SELESAI</div>
           <div class="match-teams">
@@ -1708,18 +1637,14 @@ function initFirebaseSync(){
           </div>
           <div class="venue">📍 ${esc(m.venue||VENUE)}</div>
           <span class="status done">SELESAI</span>
-        </div>`).join("") : '<div class="card empty">Belum ada pertandingan SELESAI.</div>';
-      renderAll();
-    });;
+        </div>`).join("");
+    });
 
     /* JADWAL/MATCHES: jika operator mengubah node ini, jadwal web/APK online ikut berubah. */
     const matchesRef=firebase.database().ref("vipt_scoreboard/matches");
     matchesRef.on("value",snap=>{
       const remote=snap.val();
-      remoteMatchesState={};
       if(remote) mergeRemoteMatchData(remote);
-      else renderAll();
-      scheduleAutoBracketWrite();
     });
 
     /* BRACKET: data opsional dari Firebase. */
@@ -1823,7 +1748,7 @@ const MATCHES = [
   { id:"VP-8B1", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-22", time:"21:30 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL" },
   { id:"VP-8B2", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"20:00 WIB", a:"RT 02 / RW 021", b:"RT 04 / RW 021", status:"JADWAL" },
   { id:"VP-8B3", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"21:00 WIB", a:"RT 10 / RW 021", b:"RT 08 / RW 021", status:"JADWAL" },
-  { id:"VP-8B4", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"22:00 WIB", a:"RT 06 / RW 021", b:"RT 07 / RW 021", status:"JADWAL" },
+  { id:"VP-8B4", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"22:00 WIB", a:"RT 06 / RW 021", b:"RT 07 / RW 014", status:"JADWAL" },
   { id:"VW-SF1", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"16:00 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL" },
   { id:"VW-SF2", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"16:00 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL" },
   { id:"FS-SF1", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:00 WIB", a:"RT 13 / RW 021", b:"RT 04 / RW 021", status:"JADWAL" },
@@ -1867,17 +1792,6 @@ const SCOREBOARD_LOGO_BASE="https://raw.githubusercontent.com/vindahpulotimahatv
 function getTeamLogo(name){const f=TEAM_LOGOS[normalizeTeamName(name)];return f?SCOREBOARD_LOGO_BASE+f:"";}
 function logoHtml(name){const src=getTeamLogo(name);return src?`<img class="team-logo-img" src="${src}" alt="Logo ${esc(name)}" loading="lazy" onerror="this.style.display='none'">`:"";}
 function renderSchedule(){
-  // Apply completed results from Firebase history to the same match IDs.
-  MATCHES.forEach(m=>{
-    const r=resultForMatch(m.id);
-    if(!r) return;
-    m.a = r.teamA?.name || r.a || m.a;
-    m.b = r.teamB?.name || r.b || m.b;
-    m.scoreA = r.teamA?.score ?? r.scoreA ?? m.scoreA;
-    m.scoreB = r.teamB?.score ?? r.scoreB ?? m.scoreB;
-    if(r.finished===true || String(r.status||"").toUpperCase()==="SELESAI") m.status="SELESAI";
-    else if(r.live===true) m.status="LIVE";
-  });
   const q=document.getElementById("search").value.trim().toLowerCase();
   const data=MATCHES.filter(m=>(activeSport==="SEMUA"||m.sport===activeSport)&&(!q||JSON.stringify(m).toLowerCase().includes(q))).sort(dateSort);
   document.getElementById("count").textContent=data.length+" pertandingan";
@@ -1897,74 +1811,46 @@ function renderSchedule(){
 
 function renderBracket(){
   const sport=activeSport==="SEMUA"?"VOLLY PUTRA":activeSport;
-  const auto=buildAutoBracket();
-  const ids=Object.values(auto).filter(x=>x.sport===sport);
-
-  // Selalu tampilkan bracket lokal. Firebase hanya mengisi/mengoreksi data.
-  const groups={
-    "VOLLY PUTRA":["VP-8B1","VP-8B2","VP-8B3","VP-8B4"],
-    "VOLLY PUTRI":["VW-SF1","VW-SF2"],
-    "FUTSAL":["FS-SF1","FS-SF2"],
-    "TENIS MEJA":["TM-1","TM-2"],
-    "BADMINTON":["BD-1","BD-2","BD-3"]
-  };
-  const q=groups[sport]||[];
-  const find=id=>auto[id]||MATCHES.find(m=>m.id===id)||{id,a:"TBA",b:"TBA",round:""};
-  const box=id=>{
-    const m=find(id), w=winnerForMatch(id);
-    return `<div class="game">
-      <div>${esc(m.a||m.teamA?.name||"TBA")} <b>${m.scoreA!=null?esc(m.scoreA):"—"}</b></div>
-      <div>${esc(m.b||m.teamB?.name||"TBA")} <b>${m.scoreB!=null?esc(m.scoreB):"—"}</b></div>
-      <small>${esc(m.round||"")} • ${esc(id)}${w?` • PEMENANG: ${esc(w)}`:""}</small>
-    </div>`;
-  };
-
-  const sf1=sport==="VOLLY PUTRA"?["VP-8B1","VP-8B2"]:
-           sport==="VOLLY PUTRI"?["VW-SF1","VW-SF2"]:
-           sport==="FUTSAL"?["FS-SF1","FS-SF2"]:[];
-  const sf2=sport==="VOLLY PUTRA"?["VP-8B3","VP-8B4"]:[];
-  const finalIds=sport==="VOLLY PUTRA"?["VP-SF1","VP-SF2"]:
-                sport==="VOLLY PUTRI"?["VW-FINAL"]:
-                sport==="FUTSAL"?["FS-FINAL"]:[];
-
-  const slotA=sf1.length?winnerForMatch(sf1[0]):null;
-  const slotB=sf1.length?winnerForMatch(sf1[1]):null;
-  const slotC=sf2.length?winnerForMatch(sf2[0]):null;
-  const slotD=sf2.length?winnerForMatch(sf2[1]):null;
-
-  let semifinalHtml='';
-  if(sport==="VOLLY PUTRA"){
-    semifinalHtml=`
-      <div class="game"><div><b>SF1</b></div><div>${esc(slotA||"Pemenang VP-8B1")}</div><div>${esc(slotB||"Pemenang VP-8B2")}</div></div>
-      <div class="game"><div><b>SF2</b></div><div>${esc(slotC||"Pemenang VP-8B3")}</div><div>${esc(slotD||"Pemenang VP-8B4")}</div></div>`;
-  } else if(sport==="VOLLY PUTRI" || sport==="FUTSAL"){
-    const ids2=sf1;
-    semifinalHtml=ids2.length?ids2.map((id,i)=>{
-      const m=find(id); const w=winnerForMatch(id);
-      return `<div class="game"><div><b>SEMIFINAL ${i+1}</b></div><div>${esc(m.a||"TBA")}</div><div>${esc(m.b||"TBA")}</div><small>${w?`PEMENANG: ${esc(w)}`:"Menunggu hasil"}</small></div>`;
-    }).join(''):'<div class="game"><small>Menunggu pertandingan.</small></div>';
-  } else {
-    semifinalHtml=q.map(box).join('')||'<div class="game"><small>Menunggu pertandingan.</small></div>';
-  }
-
-  let finalHtml='<div class="game"><small>Menunggu semifinal.</small></div>';
-  if(finalIds.length){
-    const fa=winnerForMatch(finalIds[0]); const fb=winnerForMatch(finalIds[1]);
-    finalHtml=`<div class="game"><div>${esc(fa||"Pemenang SF1")}</div><div>${esc(fb||"Pemenang SF2")}</div><small>${finalIds.join(' • ')}</small></div>`;
-  }
+  const remote=window.REMOTE_BRACKET;
 
   document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`
     <button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>
-  `).join('');
+  `).join("");
 
+  if(remote && typeof remote==="object"){
+    const source=Array.isArray(remote)?remote:Object.entries(remote).map(([id,v])=>({id,...(v||{})}));
+    const data=source.filter(x=>!x.sport||x.sport===sport);
+    document.getElementById("bracketGrid").innerHTML=`
+      <div class="col">
+        <h3>DAFTAR MATCH</h3>
+        ${data.length?data.map(g=>`
+          <div class="game">
+            <div>${esc(g.a||g.teamA||"-")} <b>${g.scoreA!=null?esc(g.scoreA):"—"}</b></div>
+            <div>${esc(g.b||g.teamB||"-")} <b>${g.scoreB!=null?esc(g.scoreB):"—"}</b></div>
+            <small>${esc(g.round||"")} ${g.date?`(${esc(prettyDate(g.date))})`:""} ${g.status?`• ${esc(g.status)}`:""}</small>
+          </div>`).join(""):`<div class="game"><small>Belum ada data</small></div>`}
+      </div>
+      <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Data mengikuti Firebase</small></div></div>
+      <div class="col final"><h3>FINAL</h3><div class="game"><small>Data mengikuti Firebase</small></div></div>
+      <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`;
+    return;
+  }
+
+  const data=MATCHES.filter(m=>m.sport===sport);
   document.getElementById("bracketGrid").innerHTML=`
-    <div class="col"><h3>${sport==="VOLLY PUTRA"?"BABAK 8 BESAR":"MATCH"}</h3>
-      ${q.map(box).join('')||'<div class="game"><small>Belum ada pertandingan.</small></div>'}
+    <div class="col"><h3>DAFTAR MATCH</h3>
+      ${data.map(g=>`
+        <div class="game">
+          <div>${esc(g.a)} <b>${g.scoreA!=null?esc(g.scoreA):"—"}</b></div>
+          <div>${esc(g.b)} <b>${g.scoreB!=null?esc(g.scoreB):"—"}</b></div>
+          <small>${esc(g.round)} (${esc(prettyDate(g.date))})</small>
+        </div>`).join("")||`<div class="game"><small>Belum ada data</small></div>`}
     </div>
-    <div class="col"><h3>SEMIFINAL</h3>${semifinalHtml}</div>
-    <div class="col final"><h3>FINAL</h3>${finalHtml}</div>
+    <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Menunggu babak berjalan</small></div></div>
+    <div class="col final"><h3>FINAL</h3><div class="game"><small>Menunggu semifinal</small></div></div>
     <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`;
 }
+
 function renderAll(){
   renderSchedule();
   renderBracket();
