@@ -33,16 +33,7 @@ jobs:
 
 
       # ==========================================
-      # 3. CEK JAVA
-      # ==========================================
-      - name: Check Java version
-        run: |
-          java -version
-          javac -version
-
-
-      # ==========================================
-      # 4. NODE JS
+      # 3. NODE JS
       # ==========================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -51,14 +42,14 @@ jobs:
 
 
       # ==========================================
-      # 5. INSTALL DEPENDENCIES
+      # 4. INSTALL DEPENDENCIES
       # ==========================================
       - name: Install dependencies
         run: npm install
 
 
       # ==========================================
-      # 6. SIAPKAN WWW
+      # 5. SIAPKAN WWW
       # ==========================================
       - name: Prepare Capacitor web directory
         run: |
@@ -83,14 +74,14 @@ jobs:
 
 
       # ==========================================
-      # 7. CEK CAPACITOR
+      # 6. CEK CAPACITOR
       # ==========================================
       - name: Check Capacitor
         run: npx cap --version
 
 
       # ==========================================
-      # 8. TAMBAHKAN ANDROID
+      # 7. TAMBAHKAN ANDROID
       # ==========================================
       - name: Add Android platform
         run: |
@@ -102,14 +93,90 @@ jobs:
 
 
       # ==========================================
-      # 9. SYNC CAPACITOR
+      # 8. SYNC CAPACITOR
       # ==========================================
       - name: Sync Android
         run: npx cap sync android
 
 
       # ==========================================
-      # 10. CEK GRADLE & JAVA
+      # 9. PASANG ICON VIPT CUP
+      # ==========================================
+      - name: Install VIPT CUP launcher icon
+        run: |
+          set -e
+
+          ICON="$GITHUB_WORKSPACE/assets/icon.png"
+          RES="$GITHUB_WORKSPACE/android/app/src/main/res"
+          MANIFEST="$GITHUB_WORKSPACE/android/app/src/main/AndroidManifest.xml"
+
+          echo "Memeriksa icon..."
+          test -f "$ICON"
+
+          echo "Icon ditemukan:"
+          file "$ICON"
+
+          # Buat folder drawable
+          mkdir -p "$RES/drawable"
+
+          # Salin icon VIPT CUP
+          cp "$ICON" "$RES/drawable/viptcup_launcher.png"
+
+          echo "Icon disalin ke:"
+          ls -lh "$RES/drawable/viptcup_launcher.png"
+
+          # Ubah AndroidManifest agar menggunakan icon VIPT CUP
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+
+          text = manifest.read_text(encoding="utf-8")
+
+          # Hapus icon lama
+          text = re.sub(
+              r'\s+android:icon="[^"]*"',
+              '',
+              text
+          )
+
+          text = re.sub(
+              r'\s+android:roundIcon="[^"]*"',
+              '',
+              text
+          )
+
+          # Pasang icon VIPT CUP
+          text = re.sub(
+              r'<application\b',
+              '<application android:icon="@drawable/viptcup_launcher" android:roundIcon="@drawable/viptcup_launcher"',
+              text,
+              count=1
+          )
+
+          manifest.write_text(text, encoding="utf-8")
+          PY
+
+          echo "Manifest icon:"
+          grep -n "android:icon" android/app/src/main/AndroidManifest.xml
+
+
+      # ==========================================
+      # 10. CEK ICON SEBELUM BUILD
+      # ==========================================
+      - name: Verify VIPT CUP icon
+        run: |
+          echo "=== ICON ==="
+          ls -lh android/app/src/main/res/drawable/viptcup_launcher.png
+
+          echo "=== MANIFEST ==="
+          grep -nE "android:icon|android:roundIcon" \
+            android/app/src/main/AndroidManifest.xml
+
+
+      # ==========================================
+      # 11. CEK GRADLE
       # ==========================================
       - name: Check Android build environment
         working-directory: android
@@ -120,27 +187,29 @@ jobs:
 
 
       # ==========================================
-      # 11. BUILD APK
+      # 12. BUILD APK
       # ==========================================
       - name: Build APK
         working-directory: android
         run: |
           chmod +x gradlew
+          ./gradlew clean
           ./gradlew assembleDebug
 
 
       # ==========================================
-      # 12. SIAPKAN APK
+      # 13. SIAPKAN APK
       # ==========================================
       - name: Prepare APK artifact
         run: |
           mkdir -p release
+
           cp android/app/build/outputs/apk/debug/app-debug.apk \
              release/VIPT-CUP-IV-2026.apk
 
 
       # ==========================================
-      # 13. UPLOAD APK
+      # 14. UPLOAD APK
       # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
