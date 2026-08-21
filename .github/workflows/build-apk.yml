@@ -15,17 +15,51 @@ jobs:
 
     steps:
 
+      # ==========================================
+      # 1. CHECKOUT
+      # ==========================================
       - name: Checkout repository
         uses: actions/checkout@v4
 
+
+      # ==========================================
+      # 2. JAVA 21
+      # ==========================================
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+
+      # ==========================================
+      # 3. CEK JAVA
+      # ==========================================
+      - name: Check Java version
+        run: |
+          java -version
+          javac -version
+
+
+      # ==========================================
+      # 4. NODE JS
+      # ==========================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+
+      # ==========================================
+      # 5. INSTALL DEPENDENCIES
+      # ==========================================
       - name: Install dependencies
         run: npm install
 
+
+      # ==========================================
+      # 6. SIAPKAN WWW
+      # ==========================================
       - name: Prepare Capacitor web directory
         run: |
           rm -rf www
@@ -47,9 +81,17 @@ jobs:
           </html>
           EOF
 
+
+      # ==========================================
+      # 7. CEK CAPACITOR
+      # ==========================================
       - name: Check Capacitor
         run: npx cap --version
 
+
+      # ==========================================
+      # 8. TAMBAHKAN ANDROID
+      # ==========================================
       - name: Add Android platform
         run: |
           if [ ! -d "android" ]; then
@@ -58,21 +100,48 @@ jobs:
             echo "Android platform sudah ada."
           fi
 
+
+      # ==========================================
+      # 9. SYNC CAPACITOR
+      # ==========================================
       - name: Sync Android
         run: npx cap sync android
 
+
+      # ==========================================
+      # 10. CEK GRADLE & JAVA
+      # ==========================================
+      - name: Check Android build environment
+        working-directory: android
+        run: |
+          java -version
+          javac -version
+          ./gradlew --version
+
+
+      # ==========================================
+      # 11. BUILD APK
+      # ==========================================
       - name: Build APK
         working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug
 
+
+      # ==========================================
+      # 12. SIAPKAN APK
+      # ==========================================
       - name: Prepare APK artifact
         run: |
           mkdir -p release
           cp android/app/build/outputs/apk/debug/app-debug.apk \
              release/VIPT-CUP-IV-2026.apk
 
+
+      # ==========================================
+      # 13. UPLOAD APK
+      # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
