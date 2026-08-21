@@ -1422,7 +1422,16 @@ function mergeRemoteMatchData(remote){
     const id=String(m.id||m.matchId||"").trim();
     if(!id) return;
     const old=byId.get(id)||{id};
-    byId.set(id,{...old,...m});
+    const merged={...old,...m};
+
+    // KUNCI VP-8B4: jangan izinkan data jadwal lama dari Firebase
+    // (RT 07 / RW 014) menimpa jadwal yang sudah dikoreksi.
+    if(id === "VP-8B4") {
+      merged.a = "RT 06 / RW 021";
+      merged.b = "RT 07 / RW 021";
+    }
+
+    byId.set(id,merged);
   });
   MATCHES.splice(0,MATCHES.length,...Array.from(byId.values()));
   renderAll();
@@ -1607,7 +1616,7 @@ const MATCHES = [
   { id:"VP-8B1", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-22", time:"21:30 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL" },
   { id:"VP-8B2", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"20:00 WIB", a:"RT 02 / RW 021", b:"RT 04 / RW 021", status:"JADWAL" },
   { id:"VP-8B3", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"21:00 WIB", a:"RT 10 / RW 021", b:"RT 08 / RW 021", status:"JADWAL" },
-  { id:"VP-8B4", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"22:00 WIB", a:"RT 06 / RW 021", b:"RT 07 / RW 014", status:"JADWAL" },
+  { id:"VP-8B4", sport:"VOLLY PUTRA", round:"BABAK 8 BESAR", date:"2026-08-23", time:"22:00 WIB", a:"RT 06 / RW 021", b:"RT 07 / RW 021", status:"JADWAL" },
   { id:"VW-SF1", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"16:00 WIB", a:"RT 09 / RW 014", b:"RT 08 / RW 014", status:"JADWAL" },
   { id:"VW-SF2", sport:"VOLLY PUTRI", round:"BABAK SEMIFINAL", date:"2026-08-23", time:"16:00 WIB", a:"RT 06 / RW 021", b:"RT 08 / RW 021", status:"JADWAL" },
   { id:"FS-SF1", sport:"FUTSAL", round:"BABAK SEMIFINAL", date:"2026-08-22", time:"20:00 WIB", a:"RT 13 / RW 021", b:"RT 04 / RW 021", status:"JADWAL" },
@@ -1651,6 +1660,12 @@ const SCOREBOARD_LOGO_BASE="https://raw.githubusercontent.com/vindahpulotimahatv
 function getTeamLogo(name){const f=TEAM_LOGOS[normalizeTeamName(name)];return f?SCOREBOARD_LOGO_BASE+f:"";}
 function logoHtml(name){const src=getTeamLogo(name);return src?`<img class="team-logo-img" src="${src}" alt="Logo ${esc(name)}" loading="lazy" onerror="this.style.display='none'">`:"";}
 function renderSchedule(){
+  // Pertandingan VP-8B4 harus selalu tampil dengan pasangan resmi.
+  const vp8b4 = MATCHES.find(m=>String(m.id)==="VP-8B4");
+  if(vp8b4){
+    vp8b4.a = "RT 06 / RW 021";
+    vp8b4.b = "RT 07 / RW 021";
+  }
   const q=document.getElementById("search").value.trim().toLowerCase();
   const data=MATCHES.filter(m=>(activeSport==="SEMUA"||m.sport===activeSport)&&(!q||JSON.stringify(m).toLowerCase().includes(q))).sort(dateSort);
   document.getElementById("count").textContent=data.length+" pertandingan";
