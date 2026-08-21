@@ -25,3 +25,56 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Prepare Capacitor web directory
+        run: |
+          rm -rf www
+          mkdir -p www
+
+          cat > www/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>VIPT CUP IV 2026</title>
+          </head>
+          <body>
+            <p style="font-family:Arial;text-align:center;margin-top:40px">
+              Membuka VIPT CUP IV 2026...
+            </p>
+          </body>
+          </html>
+          EOF
+
+      - name: Check Capacitor
+        run: npx cap --version
+
+      - name: Add Android platform
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          else
+            echo "Android platform sudah ada."
+          fi
+
+      - name: Sync Android
+        run: npx cap sync android
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Prepare APK artifact
+        run: |
+          mkdir -p release
+          cp android/app/build/outputs/apk/debug/app-debug.apk \
+             release/VIPT-CUP-IV-2026.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: VIPT-CUP-IV-2026-APK
+          path: release/VIPT-CUP-IV-2026.apk
