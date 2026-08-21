@@ -1500,6 +1500,151 @@ function applyRemoteBracket(value){
 }
 
 
+
+/* =========================================================
+   BRACKET ENGINE - hasil akhir -> pemenang -> next match
+   Sumber hasil: vipt_scoreboard/history + live/matches
+   Tujuan: vipt_scoreboard/bracket dan vipt_scoreboard/matches
+   ========================================================= */
+const BRACKET_GRAPH = {
+  "VOLLY PUTRA": {
+    next: {
+      "VP-8B1": ["VP-SF1", "A"],
+      "VP-8B2": ["VP-SF1", "B"],
+      "VP-8B3": ["VP-SF2", "A"],
+      "VP-8B4": ["VP-SF2", "B"],
+      "VP-SF1": ["VP-FINAL", "A"],
+      "VP-SF2": ["VP-FINAL", "B"]
+    },
+    third: ["VP-SF1", "VP-SF2"]
+  },
+  "VOLLY PUTRI": {
+    next: {
+      "VW-QF1": ["VW-SF1", "A"],
+      "VW-QF2": ["VW-SF1", "B"],
+      "VW-QF3": ["VW-SF2", "A"],
+      "VW-QF4": ["VW-SF2", "B"],
+      "VW-SF1": ["VW-FINAL", "A"],
+      "VW-SF2": ["VW-FINAL", "B"]
+    },
+    third: ["VW-SF1", "VW-SF2"]
+  },
+  "FUTSAL": {
+    next: {
+      "FS-SF1": ["FS-FINAL", "A"],
+      "FS-SF2": ["FS-FINAL", "B"]
+    },
+    third: ["FS-SF1", "FS-SF2"]
+  }
+};
+
+function resultMap(){
+  return historyState || {};
+}
+
+function findFinishedResult(matchId){
+  const all = Object.values(resultMap());
+  return all.find(r => String(r?.matchId || r?.id || "").trim() === String(matchId).trim()) || null;
+}
+
+function winnerAndLoser(matchId){
+  const r=findFinishedResult(matchId);
+  if(!r) return {winner:null, loser:null};
+  const a=r.teamA||{}, b=r.teamB||{};
+  const sa=Number(r.scoreA ?? a.score ?? 0);
+  const sb=Number(r.scoreB ?? b.score ?? 0);
+  const finished=r.finished===true || String(r.status||"").toUpperCase()==="SELESAI";
+  if(!finished || sa===sb) return {winner:null, loser:null};
+  const an=a.name || r.a || null;
+  const bn=b.name || r.b || null;
+  return sa>sb ? {winner:an, loser:bn} : {winner:bn, loser:an};
+}
+
+function currentMatchRecord(matchId){
+  const local=MATCHES.find(m=>String(m.id)===String(matchId));
+  const remote=remoteMatchesState[String(matchId)];
+  return {...(local||{id:matchId}), ...(remote||{})};
+}
+
+function buildAutoBracket(){
+  const output={};
+  for(const [sport,graph] of Object.entries(BRACKET_GRAPH)){
+    const matches=MATCHES.filter(m=>m.sport===sport);
+    matches.forEach(m=>{
+      const r=currentMatchRecord(m.id);
+      const result=findFinishedResult(m.id);
+      const wl=winnerAndLoser(m.id);
+      output[m.id]={
+        id:m.id,
+        sport,
+        round:r.round || m.round || "",
+        date:r.date || m.date || "TBD",
+        time:r.time || m.time || "TBD",
+        a:r.a || m.a || "TBA",
+        b:r.b || m.b || "TBA",
+        scoreA:r.scoreA ?? result?.scoreA ?? null,
+        scoreB:r.scoreB ?? result?.scoreB ?? null,
+        status:result?.finished===true ? "SELESAI" : (r.status || "JADWAL"),
+        winner:wl.winner || null,
+        loser:wl.loser || null
+      };
+    });
+
+    for(const [source,[target,slot]] of Object.entries(graph.next)){
+      const w=winnerAndLoser(source).winner;
+      if(!output[target]) output[target]={id:target,sport,round:"",date:"TBD",time:"TBD",status:"JADWAL"};
+      output[target][slot==='A'?'a':'b']=w || output[target][slot==='A'?'a':'b'] || `PEMENANG ${source}`;
+    }
+
+    const thirdId=sport==="VOLLY PUTRA"?"VP-3RD":sport==="VOLLY PUTRI"?"VW-3RD":sport==="FUTSAL"?"FS-3RD":null;
+    if(thirdId){
+      const [s1,s2]=graph.third;
+      output[thirdId]={
+        ...(output[thirdId]||{id:thirdId,sport,round:"3RD PLACE",date:"TBD",time:"TBD",status:"JADWAL"}),
+        a:winnerAndLoser(s1).loser || `KALAH ${s1}`,
+        b:winnerAndLoser(s2).loser || `KALAH ${s2}`
+      };
+    }
+  }
+  return output;
+}
+
+let autoWriteTimer=null;
+function scheduleAutoBracketWrite(){
+  clearTimeout(autoWriteTimer);
+  autoWriteTimer=setTimeout(writeAutoBracket,500);
+}
+
+function stableJson(x){ return JSON.stringify(x, Object.keys(x).sort()); }
+
+function writeAutoBracket(){
+  if(!firebase || !firebase.database) return;
+  const data=buildAutoBracket();
+  const ref=firebase.database().ref("vipt_scoreboard/bracket");
+  ref.once("value").then(snap=>{
+    const old=snap.val() || {};
+    if(JSON.stringify(old)===JSON.stringify(data)) return;
+    return ref.set(data);
+  }).catch(err=>console.warn("Bracket write skipped:",err));
+
+  // Keep next-match team names available to Scoreboard via /matches.
+  const mref=firebase.database().ref("vipt_scoreboard/matches");
+  mref.once("value").then(snap=>{
+    const old=snap.val() || {};
+    const next={...old};
+    for(const [id,v] of Object.entries(data)){
+      if(!next[id]) next[id]={id};
+      if(v.a && !String(v.a).startsWith("PEMENANG ") && !String(v.a).startsWith("KALAH ")) next[id].a=v.a;
+      if(v.b && !String(v.b).startsWith("PEMENANG ") && !String(v.b).startsWith("KALAH ")) next[id].b=v.b;
+      if(v.round) next[id].round=v.round;
+      if(v.date) next[id].date=v.date;
+      if(v.time) next[id].time=v.time;
+      next[id].sport=v.sport;
+    }
+    if(JSON.stringify(old)!==JSON.stringify(next)) return mref.set(next);
+  }).catch(err=>console.warn("Next-match write skipped:",err));
+}
+
 function initFirebaseSync(){
   try{
     if(!firebase.apps.length){
@@ -1569,6 +1714,7 @@ function initFirebaseSync(){
       const remote=snap.val();
       remoteMatchesState={};
       if(remote) mergeRemoteMatchData(remote);
+      scheduleAutoBracketWrite();
       else renderAll();
     });
 
