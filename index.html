@@ -1479,9 +1479,13 @@ function mergeRemoteMatchData(remote){
   MATCHES.forEach(local=>{
     const r=remoteMatchesState[local.id];
     if(!r) return;
-    if(local.id==="VP-8B4") { local.a="RT 06 / RW 021"; local.b="RT 07 / RW 021"; }
-    local.a = r.a || r.teamA?.name || local.a;
-    local.b = r.b || r.teamB?.name || local.b;
+    if(local.id!=="VP-8B4") {
+      local.a = r.a || r.teamA?.name || local.a;
+      local.b = r.b || r.teamB?.name || local.b;
+    } else {
+      local.a="RT 06 / RW 021";
+      local.b="RT 07 / RW 021";
+    }
     local.scoreA = r.scoreA ?? r.teamA?.score ?? local.scoreA;
     local.scoreB = r.scoreB ?? r.teamB?.score ?? local.scoreB;
     local.status = r.status || local.status;
@@ -1714,8 +1718,8 @@ function initFirebaseSync(){
       const remote=snap.val();
       remoteMatchesState={};
       if(remote) mergeRemoteMatchData(remote);
-      scheduleAutoBracketWrite();
       else renderAll();
+      scheduleAutoBracketWrite();
     });
 
     /* BRACKET: data opsional dari Firebase. */
@@ -1893,84 +1897,74 @@ function renderSchedule(){
 
 function renderBracket(){
   const sport=activeSport==="SEMUA"?"VOLLY PUTRA":activeSport;
-  const remote=remoteBracketState;
-  document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`
-    <button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>
-  `).join("");
+  const auto=buildAutoBracket();
+  const ids=Object.values(auto).filter(x=>x.sport===sport);
 
-  // Firebase bracket is authoritative when populated.
-  if(remote && typeof remote==="object"){
-    const source=Array.isArray(remote)
-      ? remote
-      : Object.entries(remote).map(([id,v])=>({id,...(v||{})}));
-    const data=source.filter(x=>!x.sport||String(x.sport).toUpperCase()===sport);
-    document.getElementById("bracketGrid").innerHTML=`
-      <div class="col"><h3>DAFTAR MATCH</h3>
-        ${data.length?data.map(g=>{
-          const id=String(g.id||g.matchId||"");
-          const w=winnerForMatch(id);
-          const a=g.a||g.teamA?.name||g.teamA||"-";
-          const b=g.b||g.teamB?.name||g.teamB||"-";
-          return `<div class="game">
-            <div>${esc(a)} <b>${g.scoreA!=null?esc(g.scoreA):"—"}</b></div>
-            <div>${esc(b)} <b>${g.scoreB!=null?esc(g.scoreB):"—"}</b></div>
-            <small>${esc(g.round||"")} ${g.date?`(${esc(prettyDate(g.date))})`:""} ${g.status?`• ${esc(g.status)}`:""}${w?` • PEMENANG: ${esc(w)}`:""}</small>
-          </div>`;
-        }).join(""):`<div class="game"><small>Belum ada data bracket Firebase.</small></div>`}
-      </div>
-      <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Slot berikutnya mengikuti hasil Firebase.</small></div></div>
-      <div class="col final"><h3>FINAL</h3><div class="game"><small>Slot final mengikuti Firebase.</small></div></div>
-      <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`;
-    return;
-  }
-
-  // Fallback bracket graph. Results are resolved from history/live, so a winner
-  // automatically appears in its next match without editing this page.
-  const graph={
-    "VOLLY PUTRA":{
-      q:["VP-8B1","VP-8B2","VP-8B3","VP-8B4"],
-      sf:[["VP-8B1","VP-8B2"],["VP-8B3","VP-8B4"]], final:["VP-SF1","VP-SF2"]
-    },
-    "VOLLY PUTRI":{
-      q:["VW-QF1","VW-QF2","VW-QF3","VW-QF4"],
-      sf:[["VW-QF1","VW-QF2"],["VW-QF3","VW-QF4"]], final:["VW-SF1","VW-SF2"]
-    },
-    "FUTSAL":{
-      q:["FS-SF1","FS-SF2"], sf:[], final:["FS-SF1","FS-SF2"]
-    },
-    "TENIS MEJA":{q:["TM-1","TM-2"],sf:[],final:[]},
-    "BADMINTON":{q:["BD-1","BD-2","BD-3"],sf:[],final:[]}
-  }[sport];
-
-  const findMatch=id=>MATCHES.find(m=>m.id===id);
-  const teamFrom=id=>{
-    const m=findMatch(id); if(!m) return "TBA";
-    return `${m.a} vs ${m.b}`;
+  // Selalu tampilkan bracket lokal. Firebase hanya mengisi/mengoreksi data.
+  const groups={
+    "VOLLY PUTRA":["VP-8B1","VP-8B2","VP-8B3","VP-8B4"],
+    "VOLLY PUTRI":["VW-SF1","VW-SF2"],
+    "FUTSAL":["FS-SF1","FS-SF2"],
+    "TENIS MEJA":["TM-1","TM-2"],
+    "BADMINTON":["BD-1","BD-2","BD-3"]
   };
+  const q=groups[sport]||[];
+  const find=id=>auto[id]||MATCHES.find(m=>m.id===id)||{id,a:"TBA",b:"TBA",round:""};
   const box=id=>{
-    const m=findMatch(id); if(!m) return `<div class="game"><small>${esc(id)}</small></div>`;
-    const r=resultForMatch(id);
-    const wa=winnerForMatch(id);
+    const m=find(id), w=winnerForMatch(id);
     return `<div class="game">
-      <div>${esc(m.a||"TBA")} <b>${r?.scoreA!=null?esc(r.scoreA):"—"}</b></div>
-      <div>${esc(m.b||"TBA")} <b>${r?.scoreB!=null?esc(r.scoreB):"—"}</b></div>
-      <small>${esc(m.round||"")} • ${esc(m.id)}${wa?` • PEMENANG: ${esc(wa)}`:""}</small>
+      <div>${esc(m.a||m.teamA?.name||"TBA")} <b>${m.scoreA!=null?esc(m.scoreA):"—"}</b></div>
+      <div>${esc(m.b||m.teamB?.name||"TBA")} <b>${m.scoreB!=null?esc(m.scoreB):"—"}</b></div>
+      <small>${esc(m.round||"")} • ${esc(id)}${w?` • PEMENANG: ${esc(w)}`:""}</small>
     </div>`;
   };
 
+  const sf1=sport==="VOLLY PUTRA"?["VP-8B1","VP-8B2"]:
+           sport==="VOLLY PUTRI"?["VW-SF1","VW-SF2"]:
+           sport==="FUTSAL"?["FS-SF1","FS-SF2"]:[];
+  const sf2=sport==="VOLLY PUTRA"?["VP-8B3","VP-8B4"]:[];
+  const finalIds=sport==="VOLLY PUTRA"?["VP-SF1","VP-SF2"]:
+                sport==="VOLLY PUTRI"?["VW-FINAL"]:
+                sport==="FUTSAL"?["FS-FINAL"]:[];
+
+  const slotA=sf1.length?winnerForMatch(sf1[0]):null;
+  const slotB=sf1.length?winnerForMatch(sf1[1]):null;
+  const slotC=sf2.length?winnerForMatch(sf2[0]):null;
+  const slotD=sf2.length?winnerForMatch(sf2[1]):null;
+
+  let semifinalHtml='';
+  if(sport==="VOLLY PUTRA"){
+    semifinalHtml=`
+      <div class="game"><div><b>SF1</b></div><div>${esc(slotA||"Pemenang VP-8B1")}</div><div>${esc(slotB||"Pemenang VP-8B2")}</div></div>
+      <div class="game"><div><b>SF2</b></div><div>${esc(slotC||"Pemenang VP-8B3")}</div><div>${esc(slotD||"Pemenang VP-8B4")}</div></div>`;
+  } else if(sport==="VOLLY PUTRI" || sport==="FUTSAL"){
+    const ids2=sf1;
+    semifinalHtml=ids2.length?ids2.map((id,i)=>{
+      const m=find(id); const w=winnerForMatch(id);
+      return `<div class="game"><div><b>SEMIFINAL ${i+1}</b></div><div>${esc(m.a||"TBA")}</div><div>${esc(m.b||"TBA")}</div><small>${w?`PEMENANG: ${esc(w)}`:"Menunggu hasil"}</small></div>`;
+    }).join(''):'<div class="game"><small>Menunggu pertandingan.</small></div>';
+  } else {
+    semifinalHtml=q.map(box).join('')||'<div class="game"><small>Menunggu pertandingan.</small></div>';
+  }
+
+  let finalHtml='<div class="game"><small>Menunggu semifinal.</small></div>';
+  if(finalIds.length){
+    const fa=winnerForMatch(finalIds[0]); const fb=winnerForMatch(finalIds[1]);
+    finalHtml=`<div class="game"><div>${esc(fa||"Pemenang SF1")}</div><div>${esc(fb||"Pemenang SF2")}</div><small>${finalIds.join(' • ')}</small></div>`;
+  }
+
+  document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`
+    <button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>
+  `).join('');
+
   document.getElementById("bracketGrid").innerHTML=`
-    <div class="col"><h3>${graph?.sf?.length?"BABAK AWAL":"DAFTAR MATCH"}</h3>
-      ${(graph?.q||[]).map(box).join("")||'<div class="game"><small>Belum ada data.</small></div>'}
+    <div class="col"><h3>${sport==="VOLLY PUTRA"?"BABAK 8 BESAR":"MATCH"}</h3>
+      ${q.map(box).join('')||'<div class="game"><small>Belum ada pertandingan.</small></div>'}
     </div>
-    <div class="col"><h3>SEMIFINAL</h3>
-      ${(graph?.sf||[]).map((pair,i)=>`<div class="game"><div><b>SF${i+1}</b></div><div>${esc(winnerForMatch(pair[0])||"Pemenang "+pair[0])}</div><div>${esc(winnerForMatch(pair[1])||"Pemenang "+pair[1])}</div></div>`).join("")||'<div class="game"><small>Menunggu hasil.</small></div>'}
-    </div>
-    <div class="col final"><h3>FINAL</h3>
-      ${graph?.final?.length?`<div class="game"><div>${esc(winnerForMatch(graph.final[0])||"Pemenang SF1")}</div><div>${esc(winnerForMatch(graph.final[1])||"Pemenang SF2")}</div></div>`:'<div class="game"><small>Menunggu semifinal.</small></div>'}
-    </div>
+    <div class="col"><h3>SEMIFINAL</h3>${semifinalHtml}</div>
+    <div class="col final"><h3>FINAL</h3>${finalHtml}</div>
     <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`;
 }
-
 function renderAll(){
   renderSchedule();
   renderBracket();
