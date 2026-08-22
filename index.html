@@ -95,6 +95,76 @@ main{padding:0 14px}.hero{text-align:center;padding:24px 14px 14px;margin:0 -14p
 <input class="search" id="search" type="search" placeholder="Cari RT / RW / cabang olahraga...">
 <div id="jadwal"></div>
 
+
+<div class="section">
+  <h2>🏸 Hasil Badminton Beregu</h2>
+</div>
+
+<div class="card badminton-result-card">
+  <div class="round">BADMINTON • HASIL BABAK SEBELUMNYA</div>
+
+  <div class="badminton-team-title">RT 08 / RW 021 — LOLOS</div>
+  <div class="badminton-set-list">
+    <div class="badminton-set">Pemain 1 — Set 1: <b>21 - 18</b></div>
+    <div class="badminton-set">Pemain 1 — Set 2: <b>18 - 21</b></div>
+    <div class="badminton-set">Pemain 1 — Set 3: <b>15 - 13</b> <span style="color:#f5b72b">• RUBBER</span></div>
+  </div>
+
+  <div class="badminton-set-list">
+    <div class="badminton-set">Pemain 2 — Set 1: <b>21 - 16</b></div>
+    <div class="badminton-set">Pemain 2 — Set 2: <b>21 - 17</b></div>
+  </div>
+
+  <span class="status done">RT 08 / RW 021 LOLOS</span>
+</div>
+
+<div class="card badminton-result-card">
+  <div class="round">BADMINTON • HASIL BABAK SEBELUMNYA</div>
+  <div class="badminton-team-title">RT 10 / RW 021 — LOLOS</div>
+  <div class="badminton-set-list">
+    <div class="badminton-set">Pemain 1 — Set 1: <b>21 - 17</b></div>
+    <div class="badminton-set">Pemain 1 — Set 2: <b>21 - 15</b></div>
+  </div>
+  <div class="badminton-set-list">
+    <div class="badminton-set">Pemain 2 — Set 1: <b>21 - 18</b></div>
+    <div class="badminton-set">Pemain 2 — Set 2: <b>21 - 16</b></div>
+  </div>
+  <span class="status done">RT 10 / RW 021 LOLOS • 2–0</span>
+</div>
+
+<div class="card badminton-result-card">
+  <div class="round">BADMINTON • HASIL BABAK SEBELUMNYA</div>
+  <div class="badminton-team-title">RT 11 / RW 021 — LOLOS</div>
+  <div class="badminton-set-list">
+    <div class="badminton-set">Pemain 1 — Set 1: <b>21 - 14</b></div>
+    <div class="badminton-set">Pemain 1 — Set 2: <b>21 - 12</b></div>
+  </div>
+  <div class="badminton-set-list">
+    <div class="badminton-set">Pemain 2 — Set 1: <b>21 - 17</b></div>
+    <div class="badminton-set">Pemain 2 — Set 2: <b>21 - 15</b></div>
+  </div>
+  <span class="status done">RT 11 / RW 021 LOLOS • 2–0</span>
+</div>
+
+<div class="section">
+  <h2>➡️ Babak Berikutnya</h2>
+</div>
+
+<div class="card badminton-next">
+  <div class="round">BADMINTON • MATCH BERIKUTNYA</div>
+  <div class="match-teams">
+    <div class="match-team">
+      <div class="match-team-name">RT 08 / RW 021</div>
+    </div>
+    <span class="vs">VS</span>
+    <div class="match-team">
+      <div class="match-team-name">RT 11 / RW 021</div>
+    </div>
+  </div>
+  <div class="venue">📍 Lapangan Central</div>
+  <span class="status">BABAK BERIKUTNYA</span>
+</div>
+
 <div class="section"><h2>🏆 Bracket</h2></div>
 <div class="card" id="bracket"><div class="filters" id="bracketFilters"></div><div class="bracket-wrap"><div class="bracket" id="bracketGrid"></div></div></div>
 
@@ -180,5 +250,48 @@ function initFirebase(){try{if(!firebase.apps.length)firebase.initializeApp(FIRE
 initFirebase();
 document.addEventListener("DOMContentLoaded",()=>{let a=document.getElementById("vocaAudio");a.volume=1;a.play().catch(()=>document.addEventListener("click",()=>a.play().catch(()=>{}),{once:true}))});
 </script>
+<!-- BADMINTON_RESULT_UPDATE_START -->
+<style>
+.badminton-result-card {
+  margin-bottom:11px;
+}
+.badminton-set-list {
+  margin-top:8px;
+  padding-left:12px;
+  border-left:2px solid #7a5514;
+}
+.badminton-set {
+  display:block;
+  padding:5px 0;
+  font-size:10px;
+  color:#fff;
+}
+.badminton-set b {
+  color:#f5b72b;
+}
+.badminton-team-title {
+  font-size:10px;
+  font-weight:900;
+  color:#f5d36c;
+  margin-top:10px;
+}
+.badminton-next {
+  border-color:#f5b72b!important;
+}
+</style>
+<script>
+window.BADMINTON_UPDATE = {
+  qualified: [
+    "RT 10 / RW 021",
+    "RT 11 / RW 021",
+    "RT 08 / RW 021"
+  ],
+  nextMatch: {
+    a: "RT 08 / RW 021",
+    b: "RT 11 / RW 021"
+  }
+};
+</script>
+<!-- BADMINTON_RESULT_UPDATE_END -->
 </body>
 </html>
