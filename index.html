@@ -6,6 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<meta name="vipt-match-center-build" content="20260823-volly-set-fix-v3">
 <meta name="theme-color" content="#050505">
 <title>VIPT CUP IV 2026 • Official Match Center</title>
 
@@ -253,26 +254,63 @@ function statusForMatch(st){
   return x||"JADWAL";
 }
 function getVollySets(st){
-  // SCOREBOARD menulis hasil VOLLY ke field volleyballSets:
-  // [{a:25,b:17,winner:"A"},{a:25,b:20,winner:"A"},{a:0,b:0,winner:null}]
-  // Baca field ini secara langsung dan jangan campur dengan badmintonSets.
-  let raw=st?.volleyballSets;
-  if(!raw) raw=st?.vollySets;
-  if(!Array.isArray(raw) && raw && typeof raw==="object") raw=Object.keys(raw).sort((a,b)=>Number(a)-Number(b)).map(k=>raw[k]);
-  if(!Array.isArray(raw)) return [];
+  // Sumber utama adalah hasil SET dari SCOREBOARD. Jangan memakai
+  // teamA.score/teamB.score sebagai skor besar pertandingan.
+  // Dukung beberapa bentuk data Firebase agar Match Center tetap kompatibel.
+  let raw=st?.volleyballSets ?? st?.vollySets ?? st?.setScores ?? st?.sets;
+  if(!raw && st) raw=[st.set1,st.set2,st.set3];
+  if(!Array.isArray(raw) && raw && typeof raw==="object") raw=Object.keys(raw)
+    .sort((a,b)=>Number(a)-Number(b)).map(k=>raw[k]);
+  if(!Array.isArray(raw)) raw=[];
   return [0,1,2].map(i=>{
     const x=raw[i]||{};
-    const a=Array.isArray(x) ? x[0] : x.a;
-    const b=Array.isArray(x) ? x[1] : x.b;
-    return {a:Number(a)||0,b:Number(b)||0,winner:x?.winner||""};
+    const a=Array.isArray(x) ? x[0] : (x.a ?? x.scoreA ?? x.teamA ?? x.left ?? 0);
+    const b=Array.isArray(x) ? x[1] : (x.b ?? x.scoreB ?? x.teamB ?? x.right ?? 0);
+    const winner=(x && !Array.isArray(x) ? (x.winner||x.win||x.pemenang||"") : "");
+    return {a:Number(a)||0,b:Number(b)||0,winner:String(winner||"").toUpperCase()};
   });
 }
-function getCurrentVollySets(st){
-  // PENTING: teamA.score/teamB.score pada SCOREBOARD adalah skor poin
-  // set yang sedang dimainkan, bukan jumlah set yang dimenangkan.
-  // Untuk Match Center, skor setiap SET wajib dibaca dari volleyballSets.
-  return getVollySets(st);
+function isFinishedVollySet(x){
+  if(!x) return false;
+  const a=Number(x.a)||0, b=Number(x.b)||0;
+  return !!x.winner || (Math.max(a,b)>=25 && Math.abs(a-b)>=2);
 }
+function sameVollyMatch(a,b){
+  if(!a || !b) return false;
+  const idA=String(a.matchId||""), idB=String(b.matchId||"");
+  if(idA && idB && idA===idB) return true;
+  return sameTeams(a.teamA?.name,a.teamB?.name,b.teamA?.name,b.teamB?.name);
+}
+function getCurrentVollySets(st){
+  // SUMBER UTAMA SET = volleyballSets.
+  // teamA.score/teamB.score BUKAN skor poin set; pada Scoreboard versi
+  // tertentu nilainya dapat menjadi skor kemenangan pertandingan (1-0).
+  const live=getVollySets(st);
+  let hist=[];
+  for(const h of (historyState||[])){
+    if(sameVollyMatch(st,h)){
+      const hs=getVollySets(h);
+      if(hs.some(isFinishedVollySet)) hist=hs;
+    }
+  }
+  const periodText=String(st?.period||"").toUpperCase();
+  const m=periodText.match(/(\d+)/);
+  const currentIndex=Math.max(0,Math.min(2,(parseInt(m?m[1]:1,10)-1)));
+
+  return [0,1,2].map(i=>{
+    const l=live[i]||{a:0,b:0,winner:""};
+    const h=hist[i]||{a:0,b:0,winner:""};
+    // Set yang sudah selesai harus mengambil skor poin asli dari history.
+    if(isFinishedVollySet(h)) return h;
+    // Jika LIVE memiliki skor poin nyata untuk set aktif, pakai LIVE.
+    // 1-0 / 0-1 sengaja dianggap skor besar, bukan skor poin.
+    if(i===currentIndex && (Number(l.a)>1 || Number(l.b)>1) && !isFinishedVollySet(l)) return l;
+    // Set lain yang sudah tersimpan dan valid tetap dipertahankan.
+    if(isFinishedVollySet(l)) return l;
+    return {a:0,b:0,winner:""};
+  });
+}
+
 function getVollySetWins(st){
   const sets=getVollySets(st);
   return {
@@ -332,12 +370,13 @@ function applyFirebaseMatchData(m,st){
   if(st.sport) out.sport=normalizeMatchSport(st.sport,m.sport);
   if(st.status) out.status=statusForMatch(st.status);
   if(isVollySport(out.sport)){
-    const sets=getVollySets(st);
+    const source=getBestVollyState(st);
+    const sets=getVollySets(source);
     if(sets.length){
       out.sets=sets.map((x,i)=>[`SET ${i+1}`,`${x.a} - ${x.b}`]);
       out.volleyballSets=sets;
     }
-    const setWins=getVollySetWins(st);
+    const setWins=getVollySetWins(source);
     // Skor besar VOLLY = jumlah SET dimenangkan (contoh 1-0),
     // bukan skor poin set yang sedang berjalan (contoh 25-17).
     out.teamScoreA=setWins.a;
@@ -362,8 +401,9 @@ function renderLive(){
   const sport=normalizeMatchSport(liveState.sport,"");
   const setBox=document.getElementById("liveSetScores");
   if(isVollySport(sport)){
-    const sets=getCurrentVollySets(liveState);
-    const periodText=String(liveState.period||"").toUpperCase();
+    const displayState=getBestVollyState(liveState);
+    const sets=getCurrentVollySets(displayState);
+    const periodText=String(displayState.period||"").toUpperCase();
     const match=periodText.match(/(\d+)/);
     const currentIndex=Math.max(0,Math.min(2,(parseInt(match?match[1]:1,10)-1)));
     if(setBox){
@@ -375,7 +415,7 @@ function renderLive(){
         return `<div class="live-set${cls}"><span>SET ${i+1}</span><b>${hasScore?`${x.a} - ${x.b}`:"—"}</b></div>`;
       }).join("");
     }
-    document.getElementById("liveRound").textContent=(liveState.period||"VOLLY")+" • "+(liveState.status||"LIVE");
+    document.getElementById("liveRound").textContent=(displayState.period||"VOLLY")+" • "+(displayState.status||"LIVE");
   }else{
     if(setBox)setBox.innerHTML=`<div class="live-set current" style="grid-column:1/-1"><span>SKOR</span><b>${a.score||0} - ${b.score||0}</b></div>`;
     document.getElementById("liveRound").textContent=(liveState.period||"LIVE")+" • LIVE";
