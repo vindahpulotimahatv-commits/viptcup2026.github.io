@@ -268,13 +268,17 @@ function getVollySets(st){
   });
 }
 function getCurrentVollySets(st){
+  // PENTING: teamA.score/teamB.score pada SCOREBOARD adalah skor poin
+  // set yang sedang dimainkan, bukan jumlah set yang dimenangkan.
+  // Untuk Match Center, skor setiap SET wajib dibaca dari volleyballSets.
+  return getVollySets(st);
+}
+function getVollySetWins(st){
   const sets=getVollySets(st);
-  // Jika SCOREBOARD belum mengisi volleyballSets, set yang sedang berjalan
-  // tetap diambil dari teamA/teamB agar Match Center tidak kosong.
-  const idx=Math.max(0,Math.min(2,(Number(st?.periodNumber)||1)-1));
-  const a=Number(st?.teamA?.score)||0,b=Number(st?.teamB?.score)||0;
-  if((!sets[idx] || (sets[idx].a===0 && sets[idx].b===0)) && (a>0 || b>0)) sets[idx]={a,b,winner:""};
-  return sets;
+  return {
+    a:sets.filter(x=>x.winner==="A" || (x.winner!=="B" && x.a>x.b)).length,
+    b:sets.filter(x=>x.winner==="B" || (x.winner!=="A" && x.b>x.a)).length
+  };
 }
 function getVollyWinner(st,m){
   const direct=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;
@@ -333,10 +337,11 @@ function applyFirebaseMatchData(m,st){
       out.sets=sets.map((x,i)=>[`SET ${i+1}`,`${x.a} - ${x.b}`]);
       out.volleyballSets=sets;
     }
-    const setWinsA=sets.filter(x=>x.a>x.b).length;
-    const setWinsB=sets.filter(x=>x.b>x.a).length;
-    out.teamScoreA=Number(a.score??setWinsA)||0;
-    out.teamScoreB=Number(b.score??setWinsB)||0;
+    const setWins=getVollySetWins(st);
+    // Skor besar VOLLY = jumlah SET dimenangkan (contoh 1-0),
+    // bukan skor poin set yang sedang berjalan (contoh 25-17).
+    out.teamScoreA=setWins.a;
+    out.teamScoreB=setWins.b;
     out.winner=getVollyWinner(st,m);
     out.liveStatus=st.status||out.status;
     out.period=st.period||"";
