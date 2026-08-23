@@ -253,13 +253,21 @@ function statusForMatch(st){
   return x||"JADWAL";
 }
 function getVollySets(st){
+  // SCORE BOARD VOLLY saat ini menyimpan skor per set di badmintonSets.
+  // Match Center harus membaca field tersebut juga.
   let raw=st?.volleyballSets;
   if(!Array.isArray(raw)) raw=st?.vollySets;
+  if(!Array.isArray(raw)) raw=st?.badmintonSets;
+  if(!Array.isArray(raw)) raw=st?.sets;
   if(!Array.isArray(raw) && raw && typeof raw==="object") raw=Object.values(raw);
   if(!Array.isArray(raw)) return [];
   return raw.slice(0,3).map((x,i)=>{
     if(Array.isArray(x)) return {a:Number(x[0])||0,b:Number(x[1])||0,winner:""};
-    return {a:Number(x?.a??x?.scoreA??x?.teamA??0)||0,b:Number(x?.b??x?.scoreB??x?.teamB??0)||0,winner:x?.winner||""};
+    return {
+      a:Number(x?.a??x?.scoreA??x?.teamA??x?.teamA?.score??0)||0,
+      b:Number(x?.b??x?.scoreB??x?.teamB??x?.teamB?.score??0)||0,
+      winner:x?.winner||""
+    };
   });
 }
 function getVollyWinner(st,m){
