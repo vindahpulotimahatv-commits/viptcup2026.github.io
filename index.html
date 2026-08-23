@@ -13,13 +13,20 @@ body{margin:0;background:#050505;color:#fff;font-family:Montserrat,Arial}
 header img{width:100%}
 .card{margin:12px;padding:18px;border-radius:20px;background:#111;border:1px solid #8b650f}
 h1,h2{color:#fbbf24;text-align:center;font-weight:900}
-.score{text-align:center;font-size:42px;color:#fbbf24;font-weight:900;white-space:nowrap}
-.team{text-align:center;font-size:16px;font-weight:900}
+.score{text-align:center;font-size:55px;color:#fbbf24;font-weight:900}
+.team{text-align:center;font-size:18px;font-weight:900}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .box{padding:15px;text-align:center;background:#090909;border:1px solid #8b650f;border-radius:15px;font-weight:900}
 .btn{display:block;padding:14px;text-align:center;background:#fbbf24;color:#000;border-radius:15px;text-decoration:none;font-weight:900}
 .bottom{position:fixed;bottom:0;left:0;width:100%;background:#000;padding:15px;display:flex;justify-content:space-around;font-size:12px;font-weight:900}
 .item{border-bottom:1px solid #333;padding:10px}
+.video{width:100%;aspect-ratio:16/9;border:0;border-radius:15px}
+.scoreboard{display:flex;align-items:center;justify-content:center;gap:15px;margin-top:15px}
+.logo-team{width:85px;height:85px;object-fit:contain;background:white;border-radius:15px;padding:5px}
+.team-name{text-align:center;font-size:14px;font-weight:900}
+
+.social a{display:block;margin:8px 0}
+
 </style>
 </head>
 <body>
@@ -39,17 +46,17 @@ h1,h2{color:#fbbf24;text-align:center;font-weight:900}
 <div class="card">
 <h2>🏆 CABOR</h2>
 <div class="grid">
-<div class="box">⚽ FUTSAL</div>
-<div class="box">🏐 VOLLY PUTRA</div>
-<div class="box">🏐 VOLLY PUTRI</div>
-<div class="box">🏸 BADMINTON</div>
-<div class="box">🏓 TENIS MEJA</div>
+<div class="box">⚽ FUTSAL<br><small>Live Score</small></div>
+<div class="box">🏐 VOLLY PUTRA<br><small>Live Score</small></div>
+<div class="box">🏐 VOLLY PUTRI<br><small>Live Score</small></div>
+<div class="box">🏸 BADMINTON<br><small>Live Score</small></div>
+<div class="box">🏓 TENIS MEJA<br><small>Live Score</small></div>
 </div>
 </div>
 
 <div class="card">
 <h2>🎥 LIVE STREAMING</h2>
-<a class="btn" href="#" >▶ BUKA STREAMING</a>
+<iframe class="video" src="https://www.youtube.com/embed/RJGbsrd_dkU?autoplay=1&mute=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <div class="card">
@@ -69,7 +76,12 @@ h1,h2{color:#fbbf24;text-align:center;font-weight:900}
 
 <div class="card">
 <h2>📱 SOSIAL MEDIA</h2>
-<p>TikTok • Instagram • YouTube • Facebook VIPT</p>
+<div class="social">
+<a class="btn" href="#" >🎵 TikTok VIPT</a>
+<a class="btn" href="#" >📸 Instagram VIPT</a>
+<a class="btn" href="#" >▶ YouTube VIPT</a>
+<a class="btn" href="#" >📘 Facebook VIPT</a>
+</div>
 </div>
 
 </div>
@@ -88,12 +100,37 @@ projectId:"scorebordviptcup"
 firebase.initializeApp(config);
 const db=firebase.database();
 
+
+const TEAM_LOGOS={
+"RT 02/RW 021":"assets/logos/RT_02-RW_021.png",
+"RT 04/RW 021":"assets/logos/RT_04-RW_021.png",
+"RT 06/RW 021":"assets/logos/RT_06-RW_021.png",
+"RT 07/RW 021":"assets/logos/RT_07-RW_021.png",
+"RT 08/RW 021":"assets/logos/RT_08-RW_021.png",
+"RT 09/RW 014":"assets/logos/RT_09-RW_014.png",
+"RT 10/RW 021":"assets/logos/RT_10-RW_021.png",
+"RT 11/RW 021":"assets/logos/RT_11-RW_021.png",
+"RT 13/RW 021":"assets/logos/RT_13-RW_021.png"
+};
+function getLogo(n){
+return TEAM_LOGOS[String(n||"").toUpperCase().replace(/\s+/g," ").trim()]||"";
+}
+
 db.ref("vipt_scoreboard/live").on("value",s=>{
 let d=s.val();
 live.innerHTML=d?`
 <div class="team">${d.teamA?.name||"-"}</div>
+<div class="scoreboard">
+<div class="team">
+<img id="logoA" class="logo-team">
+<div class="team-name">${d.teamA?.name||"-"}</div>
+</div>
 <div class="score">${d.teamA?.score||0} - ${d.teamB?.score||0}</div>
-<div class="team">${d.teamB?.name||"-"}</div>
+<div class="team">
+<img id="logoB" class="logo-team">
+<div class="team-name">${d.teamB?.name||"-"}</div>
+</div>
+</div>
 <p>${d.status||"LIVE"}</p>`:"Belum ada pertandingan";
 });
 
