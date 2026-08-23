@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1.0'><title>VIPT CUP IV 2026 Match Center</title>
+<style>
+body{margin:0;background:#050505;color:white;font-family:Arial}
+.card{margin:15px;padding:18px;background:#111;border:1px solid #b8861b;border-radius:20px}
+.title{text-align:center;color:#fbbf24;font-size:22px;font-weight:bold}
+img{max-width:100%}.video{width:100%;aspect-ratio:16/9;border-radius:15px}
+.match{display:flex;align-items:center;justify-content:center;gap:15px;text-align:center}
+.team{width:35%;font-weight:bold}.team img{width:80px;height:80px;background:white;border-radius:15px;object-fit:contain}
+.score{font-size:40px;color:#fbbf24;font-weight:bold}
+.status{color:#22c55e;text-align:center}
+</style></head>
+<body>
+<div class='card'><img src='assets/header-vipt-web.png'></div>
+<div class='card'><div class='title'>🎥 LIVE STREAMING</div><iframe class='video' src='https://www.youtube.com/embed/RJGbsrd_dkU?autoplay=1&mute=1'></iframe></div>
+<div class='card'><div class='title'>🔴 LIVE MATCH</div><div class='match'><div class='team'><img id='logoA'><br><span id='teamA'>TIM A</span></div><div class='score'><span id='scoreA'>0</span>-<span id='scoreB'>0</span></div><div class='team'><img id='logoB'><br><span id='teamB'>TIM B</span></div></div><p id='sport' class='title'>VOLLY PUTRA</p><p id='status' class='status'>LIVE SEKARANG</p></div>
+<script src='https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js'></script>
+<script src='https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js'></script>
+<script>
+firebase.initializeApp({databaseURL:'https://scorebordviptcup-default-rtdb.asia-southeast1.firebasedatabase.app'});
+firebase.database().ref('vipt_scoreboard/live').on('value',s=>{let d=s.val();if(!d)return;teamA.innerText=d.teamA?.name||'TIM A';teamB.innerText=d.teamB?.name||'TIM B';scoreA.innerText=d.teamA?.score||0;scoreB.innerText=d.teamB?.score||0;sport.innerText=d.sport||'';status.innerText=d.status||''});
+</script>
+</body></html>
