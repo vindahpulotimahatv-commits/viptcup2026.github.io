@@ -279,10 +279,26 @@ function getVollyWinner(st,m){
   return "";
 }
 function getStateForMatch(m){
-  const candidates=[];
-  if(liveState && liveState.matchId===m.id) candidates.push(liveState);
-  for(const h of historyState){if(h && h.matchId===m.id) candidates.push(h)}
-  return candidates.length?candidates[candidates.length-1]:null;
+  // Jika pertandingan sedang aktif, DATA LIVE harus menjadi sumber utama.
+  // History hanya dipakai sebagai cadangan agar record lama tidak menimpa
+  // volleyballSets terbaru dari Score Board.
+  const live = (liveState && String(liveState.matchId||'') === String(m.id)) ? liveState : null;
+  let hist = null;
+  for(const h of historyState){
+    if(h && String(h.matchId||'') === String(m.id)) hist = h;
+  }
+  if(live && hist){
+    const merged = {...hist, ...live};
+    // Pertahankan hasil per-set dari LIVE bila tersedia.
+    for(const key of ['volleyballSets','vollySets','badmintonSets','sets']){
+      if(Array.isArray(live[key]) || (live[key] && typeof live[key]==='object')) merged[key]=live[key];
+      else if(hist[key]!==undefined) merged[key]=hist[key];
+    }
+    if(live.teamA) merged.teamA={...(hist.teamA||{}),...live.teamA};
+    if(live.teamB) merged.teamB={...(hist.teamB||{}),...live.teamB};
+    return merged;
+  }
+  return live || hist || null;
 }
 function applyFirebaseMatchData(m,st){
   if(!st) return {...m};
