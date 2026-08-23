@@ -270,10 +270,8 @@ function getVollySets(st){
     return {a:Number(a)||0,b:Number(b)||0,winner:String(winner||"").toUpperCase()};
   });
 }
-function isFinishedVollySet(x){
-  if(!x) return false;
-  const a=Number(x.a)||0, b=Number(x.b)||0;
-  return !!x.winner || (Math.max(a,b)>=25 && Math.abs(a-b)>=2);
+function hasRealVollySetScores(st){
+  return getVollySets(st).some(x=>Number(x.a)>0 || Number(x.b)>0);
 }
 function sameVollyMatch(a,b){
   if(!a || !b) return false;
@@ -281,36 +279,32 @@ function sameVollyMatch(a,b){
   if(idA && idB && idA===idB) return true;
   return sameTeams(a.teamA?.name,a.teamB?.name,b.teamA?.name,b.teamB?.name);
 }
-function getCurrentVollySets(st){
-  // SUMBER UTAMA SET = volleyballSets.
-  // teamA.score/teamB.score BUKAN skor poin set; pada Scoreboard versi
-  // tertentu nilainya dapat menjadi skor kemenangan pertandingan (1-0).
-  const live=getVollySets(st);
-  let hist=[];
+function getBestVollyState(st){
+  // Bila node LIVE berisi skor besar 1-0 tetapi array SET kosong/0-0,
+  // ambil hasil SET terakhir dari history untuk pertandingan yang sama.
+  if(hasRealVollySetScores(st)) return st;
+  let best=st;
   for(const h of (historyState||[])){
-    if(sameVollyMatch(st,h)){
-      const hs=getVollySets(h);
-      if(hs.some(isFinishedVollySet)) hist=hs;
-    }
+    if(sameVollyMatch(st,h) && hasRealVollySetScores(h)) best={...h,...st,volleyballSets:getVollySets(h)};
   }
+  return best;
+}
+function getCurrentVollySets(st){
+  const source=getBestVollyState(st);
+  const sets=getVollySets(source);
+  // Untuk SET yang sedang berjalan, gunakan skor poin saat ini bila
+  // array SET belum tersimpan oleh sumber lama.
   const periodText=String(st?.period||"").toUpperCase();
   const m=periodText.match(/(\d+)/);
-  const currentIndex=Math.max(0,Math.min(2,(parseInt(m?m[1]:1,10)-1)));
-
-  return [0,1,2].map(i=>{
-    const l=live[i]||{a:0,b:0,winner:""};
-    const h=hist[i]||{a:0,b:0,winner:""};
-    // Set yang sudah selesai harus mengambil skor poin asli dari history.
-    if(isFinishedVollySet(h)) return h;
-    // Jika LIVE memiliki skor poin nyata untuk set aktif, pakai LIVE.
-    // 1-0 / 0-1 sengaja dianggap skor besar, bukan skor poin.
-    if(i===currentIndex && (Number(l.a)>1 || Number(l.b)>1) && !isFinishedVollySet(l)) return l;
-    // Set lain yang sudah tersimpan dan valid tetap dipertahankan.
-    if(isFinishedVollySet(l)) return l;
-    return {a:0,b:0,winner:""};
-  });
+  const idx=Math.max(0,Math.min(2,(parseInt(m?m[1]:1,10)-1)));
+  if(st?.teamA?.score!=null && st?.teamB?.score!=null &&
+     Number(st.teamA.score)>0+0 || Number(st.teamB?.score)>0+0){
+    if((sets[idx].a===0 && sets[idx].b===0) && (Number(st.teamA.score)>0 || Number(st.teamB.score)>0)){
+      sets[idx]={...sets[idx],a:Number(st.teamA.score)||0,b:Number(st.teamB.score)||0};
+    }
+  }
+  return sets;
 }
-
 function getVollySetWins(st){
   const sets=getVollySets(st);
   return {
