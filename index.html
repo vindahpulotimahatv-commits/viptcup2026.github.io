@@ -253,22 +253,28 @@ function statusForMatch(st){
   return x||"JADWAL";
 }
 function getVollySets(st){
-  // SCORE BOARD VOLLY saat ini menyimpan skor per set di badmintonSets.
-  // Match Center harus membaca field tersebut juga.
+  // SCOREBOARD menulis hasil VOLLY ke field volleyballSets:
+  // [{a:25,b:17,winner:"A"},{a:25,b:20,winner:"A"},{a:0,b:0,winner:null}]
+  // Baca field ini secara langsung dan jangan campur dengan badmintonSets.
   let raw=st?.volleyballSets;
-  if(!Array.isArray(raw)) raw=st?.vollySets;
-  if(!Array.isArray(raw)) raw=st?.badmintonSets;
-  if(!Array.isArray(raw)) raw=st?.sets;
-  if(!Array.isArray(raw) && raw && typeof raw==="object") raw=Object.values(raw);
+  if(!raw) raw=st?.vollySets;
+  if(!Array.isArray(raw) && raw && typeof raw==="object") raw=Object.keys(raw).sort((a,b)=>Number(a)-Number(b)).map(k=>raw[k]);
   if(!Array.isArray(raw)) return [];
-  return raw.slice(0,3).map((x,i)=>{
-    if(Array.isArray(x)) return {a:Number(x[0])||0,b:Number(x[1])||0,winner:""};
-    return {
-      a:Number(x?.a??x?.scoreA??x?.teamA??x?.teamA?.score??0)||0,
-      b:Number(x?.b??x?.scoreB??x?.teamB??x?.teamB?.score??0)||0,
-      winner:x?.winner||""
-    };
+  return [0,1,2].map(i=>{
+    const x=raw[i]||{};
+    const a=Array.isArray(x) ? x[0] : x.a;
+    const b=Array.isArray(x) ? x[1] : x.b;
+    return {a:Number(a)||0,b:Number(b)||0,winner:x?.winner||""};
   });
+}
+function getCurrentVollySets(st){
+  const sets=getVollySets(st);
+  // Jika SCOREBOARD belum mengisi volleyballSets, set yang sedang berjalan
+  // tetap diambil dari teamA/teamB agar Match Center tidak kosong.
+  const idx=Math.max(0,Math.min(2,(Number(st?.periodNumber)||1)-1));
+  const a=Number(st?.teamA?.score)||0,b=Number(st?.teamB?.score)||0;
+  if((!sets[idx] || (sets[idx].a===0 && sets[idx].b===0)) && (a>0 || b>0)) sets[idx]={a,b,winner:""};
+  return sets;
 }
 function getVollyWinner(st,m){
   const direct=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;
@@ -351,7 +357,7 @@ function renderLive(){
   const sport=normalizeMatchSport(liveState.sport,"");
   const setBox=document.getElementById("liveSetScores");
   if(isVollySport(sport)){
-    const sets=getVollySets(liveState);
+    const sets=getCurrentVollySets(liveState);
     const periodText=String(liveState.period||"").toUpperCase();
     const match=periodText.match(/(\d+)/);
     const currentIndex=Math.max(0,Math.min(2,(parseInt(match?match[1]:1,10)-1)));
