@@ -146,7 +146,39 @@ function setLiveOffline(msg){document.getElementById("liveSport").textContent=ms
 function isVollySport(s){return /VOLLY/i.test(String(s||""))}
 function cleanStatus(s){return String(s||"").toUpperCase().trim()}
 function statusForMatch(st){const x=cleanStatus(st);if(x.includes("PERTANDINGAN SELESAI")||x==="SELESAI")return"SELESAI";if(x.includes("SET 1 SELESAI"))return"SET 1 SELESAI";if(x.includes("SET 2 SELESAI"))return"SET 2 SELESAI";if(x.includes("SET 3 SELESAI"))return"SET 3 SELESAI";if(x.includes("LIVE"))return"LIVE";return x||"JADWAL"}
-function getVollySets(st){let raw=st?.volleyballSets;if(!Array.isArray(raw))raw=st?.vollySets;if(!Array.isArray(raw)&&raw&&typeof raw==="object")raw=Object.values(raw);if(!Array.isArray(raw))return[];return raw.slice(0,3).map(x=>Array.isArray(x)?{a:Number(x[0])||0,b:Number(x[1])||0,winner:""}:{a:Number(x?.a??x?.scoreA??x?.teamA??0)||0,b:Number(x?.b??x?.scoreB??x?.teamB??0)||0,winner:x?.winner||""})}
+function getVollySets(st){
+  let raw=st?.volleyballSets;
+  if(!Array.isArray(raw)) raw=st?.vollySets;
+  if(!Array.isArray(raw)) raw=st?.sets;
+  if(!Array.isArray(raw)) raw=st?.setScores;
+  if(!Array.isArray(raw)) raw=st?.setHistory;
+
+  if(!Array.isArray(raw) && raw && typeof raw==="object"){
+    raw=Object.entries(raw)
+      .sort((a,b)=>String(a[0]).localeCompare(String(b[0]),undefined,{numeric:true}))
+      .map(([key,x])=>({key,...(x||{})}));
+  }
+
+  if(Array.isArray(raw) && raw.length){
+    return raw.slice(0,3).map((x,i)=>{
+      if(Array.isArray(x)) return {a:Number(x[0])||0,b:Number(x[1])||0,winner:"",setNumber:i+1};
+      return {
+        a:Number(x?.a ?? x?.scoreA ?? x?.teamA ?? x?.pointsA ?? x?.A ?? 0)||0,
+        b:Number(x?.b ?? x?.scoreB ?? x?.teamB ?? x?.pointsB ?? x?.B ?? 0)||0,
+        winner:x?.winner||"",
+        setNumber:Number(x?.setNumber ?? x?.number ?? i+1)||i+1
+      };
+    });
+  }
+
+  const currentA=Number(st?.currentSetScoreA ?? st?.currentSetA ?? st?.setScoreA ?? st?.currentPointsA ?? st?.pointsA ?? st?.setA);
+  const currentB=Number(st?.currentSetScoreB ?? st?.currentSetB ?? st?.setScoreB ?? st?.currentPointsB ?? st?.pointsB ?? st?.setB);
+  if(Number.isFinite(currentA) && Number.isFinite(currentB)){
+    const n=Number(st?.currentSet ?? st?.setNumber ?? st?.periodNumber ?? 1)||1;
+    return [{a:currentA,b:currentB,winner:"",setNumber:n}];
+  }
+  return [];
+}
 function getVollyWinner(st,m){const direct=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;if(direct)return direct;const sets=getVollySets(st),winsA=sets.filter(x=>x.a>x.b).length,winsB=sets.filter(x=>x.b>x.a).length;if(winsA>winsB)return st?.teamA?.name||m?.a||"";if(winsB>winsA)return st?.teamB?.name||m?.b||"";return""}
 function getStateForMatch(m){const candidates=[];if(liveState&&liveState.matchId===m.id)candidates.push(liveState);for(const h of historyState){if(h&&h.matchId===m.id)candidates.push(h)}return candidates.length?candidates[candidates.length-1]:null}
 function normalizeMatchSport(s,fallback){const x=String(s||fallback||"").toUpperCase();if(x.includes("VOLLY"))return x.includes("PUTRI")?"VOLLY PUTRI":"VOLLY PUTRA";if(x.includes("BADMINTON"))return"BADMINTON";if(x.includes("FUTSAL"))return"FUTSAL";if(x.includes("TENIS MEJA")||x.includes("PINGPONG"))return"TENIS MEJA";return fallback||x}
@@ -159,25 +191,47 @@ function renderLive(){
  document.getElementById("liveSport").textContent=liveState.sport||"LIVE SCORE";
  document.getElementById("liveA").textContent=a.name||"-";
  document.getElementById("liveB").textContent=b.name||"-";
+
  const sport=normalizeMatchSport(liveState.sport,"");
  if(isVollySport(sport)){
    const sets=getVollySets(liveState);
-   // Angka besar = poin set yang sedang berjalan.
-   const current=sets.length?sets[sets.length-1]:null;
-   const pointA=current?current.a:Number(a.score||0);
-   const pointB=current?current.b:Number(b.score||0);
-   // Angka kecil = jumlah set yang sudah dimenangkan.
-   const setWinA=sets.filter(x=>Number(x.a)>Number(x.b)).length;
-   const setWinB=sets.filter(x=>Number(x.b)>Number(x.a)).length;
+   let current=sets.length ? sets[sets.length-1] : null;
+
+   // VOLLY: angka BESAR = poin set berjalan.
+   // Angka KECIL = jumlah set yang dimenangkan.
+   let pointA=current ? Number(current.a) : NaN;
+   let pointB=current ? Number(current.b) : NaN;
+
+   if(!Number.isFinite(pointA) || !Number.isFinite(pointB)){
+     pointA=Number(liveState.currentSetScoreA ?? liveState.currentSetA ?? liveState.setScoreA ?? liveState.pointsA);
+     pointB=Number(liveState.currentSetScoreB ?? liveState.currentSetB ?? liveState.setScoreB ?? liveState.pointsB);
+   }
+
+   if(!Number.isFinite(pointA)) pointA=0;
+   if(!Number.isFinite(pointB)) pointB=0;
+
+   let setWinA=sets.filter(x=>Number(x.a)>Number(x.b)).length;
+   let setWinB=sets.filter(x=>Number(x.b)>Number(x.a)).length;
+
+   if(Number.isFinite(Number(a.score))) setWinA=Number(a.score);
+   if(Number.isFinite(Number(b.score))) setWinB=Number(b.score);
+
+   const setNo=Number(current?.setNumber ?? liveState.currentSet ?? liveState.setNumber ?? liveState.periodNumber) || Math.max(sets.length,1);
+
    document.getElementById("liveScore").firstChild.textContent=`${pointA} - ${pointB}`;
-   document.getElementById("liveRound").textContent=`SET ${Math.min(sets.length||1,3)} • ${setWinA} - ${setWinB} • ${liveState.status||"LIVE"}`;
+   document.getElementById("liveRound").textContent=`SET ${Math.min(setNo,3)} • ${setWinA} - ${setWinB} • ${liveState.status||"LIVE"}`;
  }else{
    document.getElementById("liveScore").firstChild.textContent=(a.score||0)+" - "+(b.score||0);
    document.getElementById("liveRound").textContent=(liveState.period||"LIVE")+" • LIVE";
  }
- const la=document.getElementById("liveLogoA"),lb=document.getElementById("liveLogoB"),fa=document.getElementById("liveLogoFallbackA"),fb=document.getElementById("liveLogoFallbackB");
+
+ const la=document.getElementById("liveLogoA"),lb=document.getElementById("liveLogoB");
+ const fa=document.getElementById("liveLogoFallbackA"),fb=document.getElementById("liveLogoFallbackB");
  const sa=getTeamLogo(a.name),sb=getTeamLogo(b.name);
- la.src=sa;la.hidden=!sa;fa.style.display=sa?"none":"grid";lb.src=sb;lb.hidden=!sb;fb.style.display=sb?"none":"grid";
+ if(la){la.src=sa;la.hidden=!sa}
+ if(fa)fa.style.display=sa?"none":"grid";
+ if(lb){lb.src=sb;lb.hidden=!sb}
+ if(fb)fb.style.display=sb?"none":"grid";
 }
 function renderSchedule(){
  let q=document.getElementById("search").value.toLowerCase().trim(),all=buildMergedMatches();
