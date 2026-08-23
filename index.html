@@ -3,368 +3,273 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="theme-color" content="#050505">
 <title>VIPT CUP IV 2026 • Official Match Center</title>
-
-<link rel="stylesheet" href="assets/css/style.css">
-
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-
+<style>
+:root{--bg:#050505;--panel:#0b0b0b;--line:#7a5514;--text:#fff;--muted:#c7c0b2;--gold:#f5b72b;--green:#1ed393}
+*{box-sizing:border-box}html{scroll-behavior:smooth;min-height:100%}
+body{margin:0;background:radial-gradient(circle at 50% 0%,rgba(245,183,43,.12),transparent 28%),linear-gradient(180deg,#030303,#080705 45%,#030303);color:var(--text);font-family:Arial,Helvetica,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+button,input{font:inherit}.app{max-width:620px;margin:auto;min-height:100vh;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:50;padding:0;background:#050505;border-bottom:1px solid #8a6118;overflow:hidden}
+header:before{content:"";display:block;width:100%;aspect-ratio:1805/184;background:url('assets/header-vipt-web.png') center/100% 100% no-repeat}
+main{padding:0 14px}.hero{text-align:center;padding:24px 14px 14px;margin:0 -14px 14px;background:radial-gradient(circle at 50% 0%,rgba(245,183,43,.1),transparent 45%),linear-gradient(#0c0a07,#050505);border-bottom:1px solid var(--line)}
+.eyebrow{font-size:10px;letter-spacing:2px;color:#f5c451;font-weight:900}.hero-logo{width:120px;height:120px;object-fit:contain;margin:12px auto 6px;display:block;border-radius:12px}.hero h1{font-size:32px;margin:4px 0 2px;font-weight:900}.hero h2{font-size:24px;margin:0 0 8px;color:var(--gold)}.hero p{margin:0;color:var(--muted);font-size:11px;font-weight:bold}.location{display:flex;gap:8px;align-items:center;margin-top:13px;padding:10px 12px;border:1px solid #8a6118;border-radius:13px;background:linear-gradient(135deg,rgba(245,183,43,.12),rgba(20,14,6,.55));font-size:11px;font-weight:900;text-align:left}.location span{color:#ffd45f}
+.section{display:flex;justify-content:space-between;align-items:center;margin:19px 2px 9px}.section h2{font-size:15px;margin:0}.section a{font-size:10px;color:#f5c451;text-decoration:none}
+.card{background:linear-gradient(145deg,#11100d,#050505);border:1px solid #6f4d13;border-radius:17px;padding:14px;margin-bottom:11px;box-shadow:0 8px 24px rgba(0,0,0,.35)}.live{border-color:#a87518}
+.livebar{display:flex;justify-content:space-between;font-size:9px;font-weight:900;margin-bottom:10px}.livebar .on{color:var(--green)}.sportname{color:#f5d36c}
+.teams{display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;gap:7px;text-align:center}.team-logo-img{width:46px;height:46px;object-fit:contain;margin:auto;border-radius:10px;background:#fff;padding:3px}.teamlogo{height:46px;width:46px;margin:auto;border-radius:14px;background:#0b0b0b;border:1px solid var(--line);display:grid;place-items:center;color:#f5c451;font-weight:900}.team b{font-size:10px;display:block;margin-top:6px}
+.score{font-size:31px;font-weight:900;line-height:1}.score small{display:block;color:#bdb5a7;font-size:9px;margin-top:7px;font-weight:900;line-height:1.3}
+.btn{display:block;text-align:center;text-decoration:none;color:#090705;background:linear-gradient(135deg,#f5b72b,#9a650b);border-radius:12px;padding:11px;margin-top:12px;font-size:10px;font-weight:900}
+.filters{display:flex;gap:7px;overflow:auto;padding:2px 1px 6px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.pill{white-space:nowrap;background:#0c0b09;border:1px solid #6f4d13;color:#c7c0b2;border-radius:99px;padding:9px 11px;font-size:10px;cursor:pointer}.pill.active{background:linear-gradient(135deg,#8d6116,#4f3509);border-color:#f0b52a;color:#fff}
+.search{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:10px 12px;outline:none;margin-bottom:10px}
+.match{position:relative;overflow:hidden}.match:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#d49a22}.match[data-status=LIVE]:before{background:var(--green)}.match[data-status=SELESAI]:before{background:#777}.round{font-size:9px;color:#e8c65f;font-weight:900;letter-spacing:1px}.date{color:var(--gold);font-weight:900;font-size:10px;margin-top:4px}.venue{color:#bdb5a7;font-size:9px;margin-top:6px}
+.match-teams{display:grid;grid-template-columns:1fr 70px 1fr;align-items:center;gap:6px;margin-top:9px}.match-team{text-align:center;font-size:10px;line-height:1.25}.match-team-name{font-weight:900}.vs{text-align:center;font-size:13px;color:#f2e5c7;font-weight:900}.status{display:inline-block;margin-top:9px;padding:5px 7px;border-radius:7px;background:#3a2a0d;color:#f4d77d;font-size:8px;font-weight:900}.status.live{background:rgba(30,211,147,.18);color:var(--green)}.status.done{background:#222;color:#aaa}.empty{padding:20px;text-align:center;color:var(--muted);font-size:10px}
+.bracket-wrap{overflow-x:auto;padding-bottom:4px}.bracket{min-width:880px;display:grid;grid-template-columns:repeat(4,205px);gap:14px}.col h3{font-size:9px;text-align:center;color:#f5d36c;margin:0 0 10px}.game{background:#0b0b09;border:1px solid #6f4d13;border-radius:12px;padding:9px;margin-bottom:16px}.game div{display:flex;justify-content:space-between;font-size:9px;padding:6px 0;border-bottom:1px solid #3b2b10}.game div:last-of-type{border:0}.game small{display:block;color:#a89e8d;font-size:8px;margin-top:4px}.final .game{border-color:#f5b72b}
+.team-details{margin-top:10px;border-top:1px solid #3b2b10;padding-top:8px}.team-detail{padding:8px 0;border-bottom:1px solid #2b210e}.team-detail:last-child{border-bottom:0}.team-detail-head{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:900;color:#f5d36c}.team-detail-score{color:#f5b72b;font-size:10px}.team-detail-sets{margin-top:4px;padding-left:8px}.team-detail-set{display:flex;justify-content:space-between;padding:2px 0;font-size:8px;color:#aaa}.team-detail-set b{color:#fff}.sets{margin-top:10px;border-top:1px solid #3b2b10;padding-top:8px}.set-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:9px;color:#ddd}.set-row span:first-child{color:#f5c451;font-weight:900}
+.result-card .match-teams{margin-top:10px}.result-score{font-size:14px;color:#f5b72b;font-weight:900}.result-meta{font-size:8px;color:#aaa;margin-top:6px}
+.news{display:flex;gap:11px}.thumb{width:72px;height:60px;flex:none;border-radius:11px;background:linear-gradient(135deg,#4b3208,#0a0907);display:grid;place-items:center;font-size:9px;font-weight:900}.news b{font-size:10px;line-height:1.35}.news small{display:block;color:var(--muted);font-size:8px;margin-top:6px}
+.topskor-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}.stat-box{background:rgba(70,47,8,.28);border:1px solid #6f4d13;border-radius:12px;padding:10px;text-align:center}.stat-box small{display:block;font-size:8px;color:var(--muted);text-transform:uppercase}.stat-box b{font-size:16px;color:var(--gold)}
+.topskor-table{width:100%;border-collapse:collapse;font-size:10px}.topskor-table th{background:#201708;color:#f5b72b;padding:10px 8px;border-bottom:2px solid #6f4d13;text-align:left}.topskor-table td{padding:9px 8px;border-bottom:1px solid #3b2b10;font-weight:bold}.rank-badge{display:inline-grid;place-items:center;width:20px;height:20px;background:#4a330b;border-radius:50%;font-size:9px;color:#f5c451}.goal-badge{background:rgba(212,154,34,.2);color:#f5d36c;padding:3px 8px;border-radius:6px;font-weight:900}
+.sosmed-container{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.sosmed-btn{display:flex;align-items:center;gap:6px;background:#17120a;border:1px solid #6f4d13;padding:8px 12px;border-radius:12px;color:#fff;text-decoration:none;font-size:10px;font-weight:900}.informasi-slides-wrap{width:100%;aspect-ratio:16/9;overflow:hidden;background:#050505}.informasi-slides{width:100%;height:100%;border:0}
+.footer{text-align:center;color:#6d6659;font-size:8px;padding:20px 0 30px}.footer a{color:#f5c451;text-decoration:none}.hidden{display:none!important}
+.bottom{position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);width:min(620px,100%);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 8px 11px;background:rgba(5,5,5,.98);border-top:1px solid #7a5514;backdrop-filter:blur(12px)}.nav{text-decoration:none;text-align:center;color:#9f957f;font-size:8px;cursor:pointer;padding:2px 0;min-height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center}.nav span{font-size:17px;line-height:20px;margin-bottom:3px}.nav.active{color:#f5c451}
+.badminton-result-card{margin-bottom:11px}.badminton-set-list{margin-top:8px;padding-left:12px;border-left:2px solid #7a5514}.badminton-set{display:block;padding:5px 0;font-size:10px;color:#fff}.badminton-set b{color:#f5b72b}.badminton-team-title{font-size:10px;font-weight:900;color:#f5d36c;margin-top:10px}.badminton-next{border-color:#f5b72b!important}
+@media(max-width:380px){.hero h1{font-size:28px}.hero h2{font-size:22px}}
+</style>
 </head>
-
 <body>
-
+<audio id="vocaAudio" autoplay loop><source src="https://media1.vocaroo.com/mp3/1oVLhmdzAasW" type="audio/mpeg"></audio>
 <div class="app">
-
 <header></header>
-
 <main>
-
 <section class="hero">
-
-<div class="eyebrow">
-OFFICIAL MATCH CENTER • 2026
-</div>
-
-<img 
-src="https://i.ibb.co.com/1V2zk03/logo.jpg"
-class="hero-logo"
-alt="VIPT CUP IV 2026">
-
-<h1>VIPT CUP - IV</h1>
-
-<h2>2026</h2>
-
-<p>
-MEDIA VILLA INDAH PULO TIMAHA
-</p>
-
-
-<div class="location">
-📍 <span>LOKASI UTAMA</span>
-Lapangan Central Villa Indah Pulo Timaha
-</div>
-
+<div class="eyebrow">OFFICIAL MATCH CENTER • 2026</div>
+<img src="https://i.ibb.co.com/1V2zk03/logo.jpg" alt="VIPT CUP IV 2026" class="hero-logo" onerror="this.src='https://i.ibb.co.com/6c6C1s25/logo-vipt.jpg'">
+<h1>VIPT CUP - IV</h1><h2>2026</h2>
+<p>MEDIA VILLA INDAH PULO TIMAHA</p>
+<div class="location">📍 <span>LOKASI UTAMA</span> Lapangan Central Villa Indah Pulo Timaha</div>
 </section>
 
-
-<!-- LIVE SCORE -->
-
-<div class="section">
-<h2>🔴 Live Score</h2>
-<a href="hasil.html">Lihat Detail</a>
-</div>
-
-
+<div id="tab-beranda">
+<div class="section"><h2>🔴 Live Score</h2><a href="#jadwal">Lihat Jadwal</a></div>
 <div class="card live">
-
-<div class="livebar">
-
-<span class="on">
-● LIVE SEKARANG
-</span>
-
-<span class="sportname" id="liveSport">
-BELUM ADA PERTANDINGAN LIVE
-</span>
-
-</div>
-
-
+<div class="livebar"><span class="on">● LIVE SEKARANG</span><span class="sportname" id="liveSport">BELUM ADA PERTANDINGAN LIVE</span></div>
 <div class="teams">
-
-
-<div class="team">
-
-<img id="liveLogoA" class="team-logo-img" hidden>
-
-<div id="liveLogoFallbackA" class="teamlogo">
-A
+<div class="team"><img id="liveLogoA" class="team-logo-img" hidden><div id="liveLogoFallbackA" class="teamlogo">A</div><b id="liveA">-</b></div>
+<div class="score" id="liveScore">-<small id="liveRound">MENUNGGU DATA LIVE</small></div>
+<div class="team"><img id="liveLogoB" class="team-logo-img" hidden><div id="liveLogoFallbackB" class="teamlogo">B</div><b id="liveB">-</b></div>
+</div><a class="btn" href="#hasil">DETAIL HASIL</a>
 </div>
 
-<b id="liveA">
--
-</b>
+<div class="section"><h2>🎥 Live Streaming</h2></div>
+<div class="card" id="ytContainer"><iframe id="youtubeFrame" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px" src="https://www.youtube.com/embed/RJGbsrd_dkU" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><a class="btn" href="https://www.youtube.com/live/RJGbsrd_dkU?si=P9PvIJZmiFHfHYx0" target="_blank">BUKA DI YOUTUBE</a></div>
 
-</div>
+<div class="section"><h2>🤝 Support VIPT 2026</h2></div>
+<div class="card" style="text-align:center"><b style="font-size:12px;color:var(--gold)">🔥 Bikin VIPT CUP IV 2026 Makin Meriah!</b><p style="color:var(--muted);font-size:10px;line-height:1.4">Yuk, dukung kelancaran dan kemeriahan turnamen kita lewat Saweria agar fasilitas dan hadiah makin mantap!</p><a class="btn" href="https://saweria.co/VIPTSPORT" target="_blank">☕ DUKUNG VIA SAWERIA</a></div>
 
-
-<div class="score" id="liveScore">
-
--
-
-<small id="liveRound">
-MENUNGGU DATA LIVE
-</small>
-
-</div>
-
-
-<div class="team">
-
-<img id="liveLogoB" class="team-logo-img" hidden>
-
-<div id="liveLogoFallbackB" class="teamlogo">
-B
-</div>
-
-<b id="liveB">
--
-</b>
-
-</div>
-
-
-</div>
-
-
-<a href="hasil.html" class="btn">
-DETAIL HASIL
-</a>
-
-
-</div>
-
-<!-- LIVE STREAMING -->
-
-<div class="section">
-<h2>🎥 Live Streaming</h2>
-</div>
-
-
-<div class="card">
-
-<iframe 
-id="youtubeFrame"
-style="
-width:100%;
-aspect-ratio:16/9;
-border:0;
-border-radius:12px"
-src="https://www.youtube.com/embed/RJGbsrd_dkU"
-allowfullscreen>
-</iframe>
-
-
-<a 
-class="btn"
-href="https://www.youtube.com/live/RJGbsrd_dkU"
-target="_blank">
-
-▶ BUKA DI YOUTUBE
-
-</a>
-
-</div>
-
-
-
-<!-- SUPPORT -->
-
-<div class="section">
-<h2>🤝 Support VIPT 2026</h2>
-</div>
-
-
-<div class="card" style="text-align:center">
-
-
-<b style="
-font-size:12px;
-color:var(--gold)">
-
-🔥 Bikin VIPT CUP IV 2026 Makin Meriah!
-
-</b>
-
-
-<p style="
-color:var(--muted);
-font-size:10px;
-line-height:1.5">
-
-Dukung kelancaran turnamen kita lewat Saweria
-agar fasilitas dan hadiah semakin mantap.
-
-</p>
-
-
-<a 
-class="btn"
-href="https://saweria.co/VIPTSPORT"
-target="_blank">
-
-☕ DUKUNG VIA SAWERIA
-
-</a>
-
-
-</div>
-
-
-
-<!-- SOSMED -->
-
-<div class="section">
-
-<h2>
-📱 Ikuti Keseruan Kami
-</h2>
-
-</div>
-
-
-<div class="card" style="text-align:center">
-
-
-<p style="
-font-size:10px;
-color:var(--muted)">
-
-Jangan ketinggalan update skor,
-cuplikan pertandingan, dan keseruan lapangan!
-
-</p>
-
-
-
+<div class="section"><h2>📱 Ikuti Keseruan Kami</h2></div>
+<div class="card" style="text-align:center"><p style="font-size:10px;color:var(--muted)">Jangan ketinggalan update skor, cuplikan pertandingan, dan keseruan lapangan! Yuk follow semua sosial media resmi <b>VIPT</b>:</p>
 <div class="sosmed-container">
+<a href="https://www.tiktok.com/@vipt_sport" class="sosmed-btn" target="_blank">🎵 TikTok</a><a href="https://www.instagram.com/vipt_sport" class="sosmed-btn" target="_blank">📸 Instagram</a><a href="https://youtube.com/@villaindahpulotimaha" class="sosmed-btn" target="_blank">▶️ YouTube</a><a href="https://www.facebook.com/share/1FEvZ9XKSq/" class="sosmed-btn" target="_blank">👥 Facebook</a>
+</div></div>
 
+<div class="section"><h2>🏆 Cabang Olahraga</h2></div>
+<div class="filters" id="sportFilters">
+<button class="pill active" data-sport="SEMUA">Semua</button><button class="pill" data-sport="VOLLY PUTRA">Volly Putra</button><button class="pill" data-sport="VOLLY PUTRI">Volly Putri</button><button class="pill" data-sport="FUTSAL">FUTSAL</button><button class="pill" data-sport="TENIS MEJA">Tenis Meja</button><button class="pill" data-sport="BADMINTON">Badminton</button>
+</div>
+<div class="section"><h2>📅 Semua Pertandingan Terbaru</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
+<input class="search" id="search" type="search" placeholder="Cari RT / RW / cabang olahraga...">
+<div id="jadwal"></div>
 
-<a 
-class="sosmed-btn"
-href="https://www.tiktok.com/@vipt_sport"
-target="_blank">
+<div class="section"><h2>🏸 Hasil Badminton Beregu</h2></div>
+<div class="card badminton-result-card"><div class="round">BADMINTON • HASIL BABAK SEBELUMNYA</div><div class="badminton-team-title">RT 08 / RW 021 — LOLOS</div><div class="match-opponent">VS RT 06 / RW 021</div><div class="badminton-set-list"><div class="badminton-set">Pemain 1 — Set 1: <b>21 - 18</b></div><div class="badminton-set">Pemain 1 — Set 2: <b>18 - 21</b></div><div class="badminton-set">Pemain 1 — Set 3: <b>15 - 13</b> <span style="color:#f5b72b">• RUBBER</span></div></div><div class="badminton-set-list"><div class="badminton-set">Pemain 2 — Set 1: <b>21 - 16</b></div><div class="badminton-set">Pemain 2 — Set 2: <b>21 - 17</b></div></div><span class="status done">RT 08 / RW 021 LOLOS</span></div>
+<div class="card badminton-result-card"><div class="round">BADMINTON • HASIL BABAK SEBELUMNYA</div><div class="badminton-team-title">RT 10 / RW 021 — LOLOS</div><div class="badminton-set-list"><div class="badminton-set">Pemain 1 — Set 1: <b>21 - 17</b></div><div class="badminton-set">Pemain 1 — Set 2: <b>21 - 15</b></div></div><div class="badminton-set-list"><div class="badminton-set">Pemain 2 — Set 1: <b>21 - 18</b></div><div class="badminton-set">Pemain 2 — Set 2: <b>21 - 16</b></div></div><span class="status done">RT 10 / RW 021 LOLOS • 2–0</span></div>
+<div class="card badminton-result-card"><div class="round">BADMINTON • HASIL BABAK SEBELUMNYA</div><div class="badminton-team-title">RT 11 / RW 021 — LOLOS</div><div class="match-opponent">VS RT 08 / RW 014</div><div class="badminton-set-list"><div class="badminton-set">Pemain 1 — Set 1: <b>21 - 14</b></div><div class="badminton-set">Pemain 1 — Set 2: <b>21 - 12</b></div></div><div class="badminton-set-list"><div class="badminton-set">Pemain 2 — Set 1: <b>21 - 17</b></div><div class="badminton-set">Pemain 2 — Set 2: <b>21 - 15</b></div></div><span class="status done">RT 11 / RW 021 LOLOS • 2–0</span></div>
+<div class="section"><h2>➡️ Babak Berikutnya</h2></div>
+<div class="card badminton-next"><div class="round">BADMINTON • MATCH BERIKUTNYA</div><div class="match-teams"><div class="match-team"><div class="match-team-name">RT 08 / RW 021</div></div><span class="vs">VS</span><div class="match-team"><div class="match-team-name">RT 11 / RW 021</div></div></div><div class="venue">📍 Lapangan Central</div><span class="status">BABAK BERIKUTNYA</span></div>
 
-🎵 TikTok
-
-</a>
-
-
-
-<a 
-class="sosmed-btn"
-href="https://www.instagram.com/vipt_sport"
-target="_blank">
-
-📸 Instagram
-
-</a>
-
-
-
-<a 
-class="sosmed-btn"
-href="https://youtube.com/@villaindahpulotimaha"
-target="_blank">
-
-▶️ YouTube
-
-</a>
-
-
-
-<a 
-class="sosmed-btn"
-href="https://www.facebook.com/share/1FEvZ9XKSq/"
-target="_blank">
-
-👥 Facebook
-
-</a>
-
-
+<div class="section"><h2>🏆 Bracket</h2></div>
+<div class="card" id="bracket"><div class="filters" id="bracketFilters"></div><div class="bracket-wrap"><div class="bracket" id="bracketGrid"></div></div></div>
+<div class="section" id="hasil"><h2>📋 Hasil Pertandingan</h2></div><div id="results"></div>
+<div class="section"><h2>📰 Update VIPT CUP</h2></div>
+<div class="card news"><div class="thumb">VIPT CUP</div><div><b>Semalam pertandingan badminton sudah berjalan.</b><small>RT 10 / RW 021, RT 11 / RW 021 dan RT 08 / RW 021 dinyatakan LOLOS.</small></div></div>
+<section class="informasi-section" id="informasi"><div class="section"><h2>ℹ️ INFORMASI</h2></div><div class="informasi-slides-wrap"><iframe class="informasi-slides" src="https://docs.google.com/presentation/d/1XGhqW8y5ZLJSM-eXKN7SSEHUPW79gl76JG-pZxzXnn0/embed?start=true&loop=true&delayms=5000" allow="autoplay; fullscreen" allowfullscreen></iframe></div></section>
 </div>
 
-</div>
-
-<!-- FOOTER -->
-
-<div class="footer">
-
-© 2026 VIPT CUP IV • Sportivitas • Fairplay • Solidaritas • Prestasi
-
-<br>
-
-<span style="display:block;margin-top:6px">
-
-Design By 
-<a href="#">
-Uda_RnL
-</a>
-
-</span>
-
-</div>
-
-
+<div id="tab-topskor" class="hidden"><div class="section"><h2>⚡ Top Skor Futsal VIPT CUP IV</h2></div><div class="card"><div style="text-align:center"><b style="font-size:13px;color:var(--gold)">DAFTAR PENCETAK GOL TERBANYAK</b><p style="font-size:9px;color:var(--muted)">Update resmi perolehan gol cabang olahraga Futsal</p></div><div class="topskor-stats"><div class="stat-box"><small>Total Gol Tercatat</small><b id="totalGolDisplay">0</b></div><div class="stat-box"><small>Top Gol Sementara</small><b id="topScorerDisplay">-</b></div></div><table class="topskor-table"><thead><tr><th>NO</th><th>NAMA PEMAIN</th><th>ASAL TIM</th><th>GOL</th></tr></thead><tbody id="topSkorBody"></tbody></table></div></div>
+<div class="footer">© 2026 VIPT CUP IV • Sportivitas • Fairplay • Solidaritas • Prestasi<br><span style="display:block;margin-top:6px">Design By <a href="#">Uda_RnL</a></span></div>
 </main>
-
-
-
-<!-- BOTTOM NAVIGATION -->
-
-<nav class="bottom">
-
-
-<a class="nav active" href="index.html">
-
-<span>🏠</span>
-
-Beranda
-
-</a>
-
-
-<a class="nav" href="jadwal.html">
-
-<span>📅</span>
-
-Jadwal
-
-</a>
-
-
-<a class="nav" href="topskor.html">
-
-<span>⚡</span>
-
-Top Skor
-
-</a>
-
-
-<a class="nav" href="bracket.html">
-
-<span>🏆</span>
-
-Bracket
-
-</a>
-
-
-<a class="nav" href="hasil.html">
-
-<span>☰</span>
-
-Hasil
-
-</a>
-
-
-</nav>
-
-
+<nav class="bottom"><a class="nav active" onclick="switchTab('beranda',this)"><span>🏠</span>Beranda</a><a class="nav" onclick="switchTab('beranda');location.hash='#jadwal'"><span>📅</span>Jadwal</a><a class="nav" onclick="switchTab('topskor',this)"><span>⚡</span>Top Skor</a><a class="nav" onclick="switchTab('beranda');location.hash='#bracket'"><span>🏆</span>Bracket</a><a class="nav" onclick="switchTab('beranda');location.hash='#hasil'"><span>☰</span>Hasil</a></nav>
 </div>
 
+<script>
+const TOPSCOR_FUTSAL=[
+{no:1,name:"ARIFIN",team:"RT 13 / 021",goals:7},{no:2,name:"TOTO",team:"RT 11 / 021",goals:6},
+{no:3,name:"SATRIA",team:"RT 10 / 014",goals:5},{no:4,name:"SYARIF",team:"RT 08 / 014",goals:5},
+{no:4,name:"RIO",team:"RT 02 / 021",goals:4},{no:5,name:"MOZA",team:"RT 11 / 021",goals:4},{no:6,name:"FAJAR",team:"RT 02 / 021",goals:3}];
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function renderTopSkor(){document.getElementById("topSkorBody").innerHTML=TOPSCOR_FUTSAL.map(p=>`<tr><td><span class="rank-badge">${p.no}</span></td><td>${esc(p.name)}</td><td style="color:var(--muted)">${esc(p.team)}</td><td><span class="goal-badge">${p.goals}</span></td></tr>`).join("");let t=TOPSCOR_FUTSAL.reduce((a,b)=>a+b.goals,0);document.getElementById("totalGolDisplay").textContent=t+" Gol";document.getElementById("topScorerDisplay").textContent=TOPSCOR_FUTSAL[0].name+" ("+TOPSCOR_FUTSAL[0].goals+" Gol)"}
+function switchTab(t,e){document.getElementById("tab-beranda").classList.toggle("hidden",t!=="beranda");document.getElementById("tab-topskor").classList.toggle("hidden",t!=="topskor");if(e){document.querySelectorAll(".bottom .nav").forEach(n=>n.classList.remove("active"));e.classList.add("active")}window.scrollTo({top:0,behavior:"smooth"})}renderTopSkor();
 
+window.VENUE="Lapangan Central";
+const MATCHES=[
+{id:"VP-8B1",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR",date:"2026-08-22",time:"21:30 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 014",status:"JADWAL"},
+{id:"VP-8B2",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR",date:"2026-08-23",time:"20:00 WIB",a:"RT 02 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
+{id:"VP-8B3",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR",date:"2026-08-23",time:"21:00 WIB",a:"RT 10 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
+{id:"VP-8B4",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR",date:"2026-08-23",time:"22:00 WIB",a:"RT 06 / RW 021",b:"RT 07 / RW 021",status:"JADWAL"},
+{id:"VW-SF1",sport:"VOLLY PUTRI",round:"BABAK SEMIFINAL",date:"2026-08-22",time:"16:00 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 014",status:"JADWAL"},
+{id:"VW-SF2",sport:"VOLLY PUTRI",round:"BABAK SEMIFINAL",date:"2026-08-23",time:"16:00 WIB",a:"RT 06 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
+{id:"FS-SF1",sport:"FUTSAL",round:"BABAK SEMIFINAL",date:"2026-08-22",time:"20:00 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
+{id:"FS-SF2",sport:"FUTSAL",round:"BABAK SEMIFINAL",date:"2026-08-22",time:"20:45 WIB",a:"RT 11 / RW 021",b:"RT 02 / RW 021",status:"JADWAL"},
+{id:"TM-1",sport:"TENIS MEJA",round:"BABAK 8 BESAR",date:"2026-08-23",time:"20:00 WIB",a:"RT 08 / RW 014",b:"RT 10 / RW 014",status:"JADWAL"},
+{id:"TM-2",sport:"TENIS MEJA",round:"BABAK 8 BESAR",date:"2026-08-23",time:"21:30 WIB",a:"RT 11 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
+{id:"BD-1",sport:"BADMINTON",round:"HASIL • REGU PUTRI",date:"2026-08-21",time:"20:15 WIB",a:"RT 10 / RW 021",b:"RT 13 / RW 021",status:"SELESAI",winner:"RT 10 / RW 021",teamScoreA:2,teamScoreB:0,teamDetails:[{name:"TEAM 1",score:"2 - 0",sets:[["SET 1","21 - 17"],["SET 2","21 - 18"]]},{name:"TEAM 2",score:"2 - 0",sets:[["SET 1","21 - 15"],["SET 2","21 - 16"]]}],sets:[["SET 1","21 - 17"],["SET 2","21 - 18"]]},
+{id:"BD-2",sport:"BADMINTON",round:"HASIL • REGU PUTRA",date:"2026-08-21",time:"21:30 WIB",a:"RT 11 / RW 021",b:"RT 08 / RW 014",status:"SELESAI",winner:"RT 11 / RW 021",teamScoreA:2,teamScoreB:0,teamDetails:[{name:"TEAM 1",score:"2 - 0",sets:[["SET 1","21 - 14"],["SET 2","21 - 12"]]},{name:"TEAM 2",score:"2 - 0",sets:[["SET 1","21 - 17"],["SET 2","21 - 15"]]}],sets:[["SET 1","21 - 14"],["SET 2","21 - 12"]]},
+{id:"BD-3",sport:"BADMINTON",round:"HASIL • REGU PUTRA",date:"2026-08-21",time:"22:30 WIB",a:"RT 08 / RW 021",b:"RT 06 / RW 021",status:"SELESAI",winner:"RT 08 / RW 021",teamScoreA:2,teamScoreB:1,teamDetails:[{name:"TEAM 1 • RUBBER",score:"2 - 1",sets:[["SET 1","21 - 18"],["SET 2","18 - 21"],["SET 3","15 - 13"]]},{name:"TEAM 2",score:"2 - 0",sets:[["SET 1","21 - 16"],["SET 2","21 - 19"]]}],sets:[["SET 1","21 - 18"],["SET 2","18 - 21"],["SET 3","15 - 13"]]}
+];
+const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];let activeSport="SEMUA";
+function prettyDate(d){if(!d)return"TBD";let x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric"})}
+const TEAM_LOGOS={"RT 02/RW 021":"RT_02-RW_021.png","RT 04/RW 021":"RT_04-RW_021.png","RT 06/RW 021":"RT_06-RW_021.png","RT 07/RW 021":"RT_07-RW_021.png","RT 08/RW 014":"RT_08-RW_014.png","RT 08/RW 021":"RT_08-RW_021.png","RT 09/RW 014":"RT_09-RW_014.png","RT 10/RW 014":"RT_10-RW_014.png","RT 10/RW 021":"RT_10-RW_021.png","RT 11/RW 021":"RT_11-RW_021.png","RT 13/RW 021":"RT_13-RW_021.png"};
+const SCOREBOARD_LOGO_BASE="https://raw.githubusercontent.com/vindahpulotimahatv-commits/Scoreboard.github.io/main/assets/logos/";
+function norm(n){return String(n||"").toUpperCase().replace(/[.]/g,"").replace(/\s*\/\s*/g,"/").replace(/\s+/g," ").trim()}
+function getTeamLogo(n){let f=TEAM_LOGOS[norm(n)];return f?SCOREBOARD_LOGO_BASE+f:""}
+function logoHtml(n){let s=getTeamLogo(n);return s?`<img class="team-logo-img" src="${s}" alt="Logo ${esc(n)}" loading="lazy" onerror="this.style.display='none'">`:""}
+let liveState=null,historyState=[];
+const FIREBASE_CONFIG={apiKey:"AIzaSyBIww6sg-mRtUUx3rIylnu6qfYG6Ahfih8",authDomain:"scorebordviptcup.firebaseapp.com",databaseURL:"https://scorebordviptcup-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"scorebordviptcup",storageBucket:"scorebordviptcup.firebasestorage.app",messagingSenderId:"1001557073666",appId:"1:1001557073666:web:10999e31e2b0c9add4ec1b"};
 
-<script src="assets/js/firebase.js"></script>
+function setLiveOffline(msg){document.getElementById("liveSport").textContent=msg;document.getElementById("liveA").textContent="-";document.getElementById("liveB").textContent="-";document.getElementById("liveScore").firstChild.textContent="-";document.getElementById("liveRound").textContent="MENUNGGU DATA"}
+function isVollySport(s){return /VOLLY/i.test(String(s||""))}
+function cleanStatus(s){return String(s||"").toUpperCase().trim()}
+function statusForMatch(st){const x=cleanStatus(st);if(x.includes("PERTANDINGAN SELESAI")||x==="SELESAI")return"SELESAI";if(x.includes("SET 1 SELESAI"))return"SET 1 SELESAI";if(x.includes("SET 2 SELESAI"))return"SET 2 SELESAI";if(x.includes("SET 3 SELESAI"))return"SET 3 SELESAI";if(x.includes("LIVE"))return"LIVE";return x||"JADWAL"}
+function getVollySets(st){
+  let raw=st?.volleyballSets;
+  if(!Array.isArray(raw)) raw=st?.vollySets;
+  if(!Array.isArray(raw)) raw=st?.sets;
+  if(!Array.isArray(raw)) raw=st?.setScores;
+  if(!Array.isArray(raw)) raw=st?.setHistory;
 
-<script src="assets/js/app.js"></script>
+  if(!Array.isArray(raw) && raw && typeof raw==="object"){
+    raw=Object.entries(raw)
+      .sort((a,b)=>String(a[0]).localeCompare(String(b[0]),undefined,{numeric:true}))
+      .map(([key,x])=>({key,...(x||{})}));
+  }
 
+  if(Array.isArray(raw) && raw.length){
+    return raw.slice(0,3).map((x,i)=>{
+      if(Array.isArray(x)) return {a:Number(x[0])||0,b:Number(x[1])||0,winner:"",setNumber:i+1};
+      return {
+        a:Number(x?.a ?? x?.scoreA ?? x?.teamA ?? x?.pointsA ?? x?.A ?? 0)||0,
+        b:Number(x?.b ?? x?.scoreB ?? x?.teamB ?? x?.pointsB ?? x?.B ?? 0)||0,
+        winner:x?.winner||"",
+        setNumber:Number(x?.setNumber ?? x?.number ?? i+1)||i+1
+      };
+    });
+  }
 
+  const currentA=Number(st?.currentSetScoreA ?? st?.currentSetA ?? st?.setScoreA ?? st?.currentPointsA ?? st?.pointsA ?? st?.setA);
+  const currentB=Number(st?.currentSetScoreB ?? st?.currentSetB ?? st?.setScoreB ?? st?.currentPointsB ?? st?.pointsB ?? st?.setB);
+  if(Number.isFinite(currentA) && Number.isFinite(currentB)){
+    const n=Number(st?.currentSet ?? st?.setNumber ?? st?.periodNumber ?? 1)||1;
+    return [{a:currentA,b:currentB,winner:"",setNumber:n}];
+  }
+  return [];
+}
+function getVollyWinner(st,m){const direct=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;if(direct)return direct;const sets=getVollySets(st),winsA=sets.filter(x=>x.a>x.b).length,winsB=sets.filter(x=>x.b>x.a).length;if(winsA>winsB)return st?.teamA?.name||m?.a||"";if(winsB>winsA)return st?.teamB?.name||m?.b||"";return""}
+function getStateForMatch(m){const candidates=[];if(liveState&&liveState.matchId===m.id)candidates.push(liveState);for(const h of historyState){if(h&&h.matchId===m.id)candidates.push(h)}return candidates.length?candidates[candidates.length-1]:null}
+function normalizeMatchSport(s,fallback){const x=String(s||fallback||"").toUpperCase();if(x.includes("VOLLY"))return x.includes("PUTRI")?"VOLLY PUTRI":"VOLLY PUTRA";if(x.includes("BADMINTON"))return"BADMINTON";if(x.includes("FUTSAL"))return"FUTSAL";if(x.includes("TENIS MEJA")||x.includes("PINGPONG"))return"TENIS MEJA";return fallback||x}
+function applyFirebaseMatchData(m,st){if(!st)return{...m};const out={...m},a=st.teamA||{},b=st.teamB||{};if(a.name)out.a=a.name;if(b.name)out.b=b.name;if(st.sport)out.sport=normalizeMatchSport(st.sport,m.sport);if(st.status)out.status=statusForMatch(st.status);if(isVollySport(out.sport)){const sets=getVollySets(st);if(sets.length){out.sets=sets.map((x,i)=>[`SET ${i+1}`,`${x.a} - ${x.b}`]);out.volleyballSets=sets}const setWinsA=sets.filter(x=>x.a>x.b).length,setWinsB=sets.filter(x=>x.b>x.a).length;out.teamScoreA=Number(a.score??setWinsA)||0;out.teamScoreB=Number(b.score??setWinsB)||0;out.winner=getVollyWinner(st,m);out.period=st.period||"";out.isFirebaseVolly=true;if(cleanStatus(st.status).includes("PERTANDINGAN SELESAI"))out.status="SELESAI"}return out}
+function buildMergedMatches(){return MATCHES.map(m=>applyFirebaseMatchData(m,getStateForMatch(m)))}
+
+function renderLive(){
+ if(!liveState)return;
+ const a=liveState.teamA||{},b=liveState.teamB||{};
+ document.getElementById("liveSport").textContent=liveState.sport||"LIVE SCORE";
+ document.getElementById("liveA").textContent=a.name||"-";
+ document.getElementById("liveB").textContent=b.name||"-";
+
+ const sport=normalizeMatchSport(liveState.sport,"");
+ if(isVollySport(sport)){
+   const sets=getVollySets(liveState);
+   let current=sets.length ? sets[sets.length-1] : null;
+
+   // VOLLY: angka BESAR = poin set berjalan.
+   // Angka KECIL = jumlah set yang dimenangkan.
+   let pointA=current ? Number(current.a) : NaN;
+   let pointB=current ? Number(current.b) : NaN;
+
+   if(!Number.isFinite(pointA) || !Number.isFinite(pointB)){
+     pointA=Number(liveState.currentSetScoreA ?? liveState.currentSetA ?? liveState.setScoreA ?? liveState.pointsA);
+     pointB=Number(liveState.currentSetScoreB ?? liveState.currentSetB ?? liveState.setScoreB ?? liveState.pointsB);
+   }
+
+   if(!Number.isFinite(pointA)) pointA=0;
+   if(!Number.isFinite(pointB)) pointB=0;
+
+   let setWinA=sets.filter(x=>Number(x.a)>Number(x.b)).length;
+   let setWinB=sets.filter(x=>Number(x.b)>Number(x.a)).length;
+
+   if(Number.isFinite(Number(a.score))) setWinA=Number(a.score);
+   if(Number.isFinite(Number(b.score))) setWinB=Number(b.score);
+
+   const setNo=Number(current?.setNumber ?? liveState.currentSet ?? liveState.setNumber ?? liveState.periodNumber) || Math.max(sets.length,1);
+
+   document.getElementById("liveScore").firstChild.textContent=`${pointA} - ${pointB}`;
+   document.getElementById("liveRound").textContent=`SET ${Math.min(setNo,3)} • ${setWinA} - ${setWinB} • ${liveState.status||"LIVE"}`;
+ }else{
+   document.getElementById("liveScore").firstChild.textContent=(a.score||0)+" - "+(b.score||0);
+   document.getElementById("liveRound").textContent=(liveState.period||"LIVE")+" • LIVE";
+ }
+
+ const la=document.getElementById("liveLogoA"),lb=document.getElementById("liveLogoB");
+ const fa=document.getElementById("liveLogoFallbackA"),fb=document.getElementById("liveLogoFallbackB");
+ const sa=getTeamLogo(a.name),sb=getTeamLogo(b.name);
+ if(la){la.src=sa;la.hidden=!sa}
+ if(fa)fa.style.display=sa?"none":"grid";
+ if(lb){lb.src=sb;lb.hidden=!sb}
+ if(fb)fb.style.display=sb?"none":"grid";
+}
+function renderSchedule(){
+ let q=document.getElementById("search").value.toLowerCase().trim(),all=buildMergedMatches();
+ let data=all.filter(m=>(activeSport==="SEMUA"||m.sport===activeSport)&&(!q||JSON.stringify(m).toLowerCase().includes(q)));
+ data.sort((a,b)=>(a.date+b.time).localeCompare(b.date+b.time));
+ document.getElementById("count").textContent=data.length+" pertandingan";
+ document.getElementById("jadwal").innerHTML=data.length?data.map(m=>{
+  const statusClass=m.status==="SELESAI"?"done":m.status==="LIVE"?"live":"";
+  const score=m.teamScoreA!=null?m.teamScoreA+" - "+m.teamScoreB:"VS";
+  const setsHtml=m.sets?.length?`<div class="sets">${m.sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:"";
+  return `<div class="card match" data-status="${esc(m.status)}"><div class="round">${esc(m.sport)} • ${esc(m.round)}</div><div class="date">${esc(prettyDate(m.date))} • ${esc(m.time)}</div><div class="match-teams"><div class="match-team">${logoHtml(m.a)}<div class="match-team-name">${esc(m.a)}</div></div><span class="vs">${score}</span><div class="match-team">${logoHtml(m.b)}<div class="match-team-name">${esc(m.b)}</div></div></div>${setsHtml}<div class="venue">📍 ${esc(VENUE)}</div>${m.winner?`<div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">🏆 PEMENANG: ${esc(m.winner)}</div>`:""}${m.period&&m.status!=="SELESAI"?`<div style="margin-top:5px;color:#aaa;font-size:8px">Periode: ${esc(m.period)}</div>`:""}<span class="status ${statusClass}">${esc(m.status)}</span></div>`;
+ }).join(""):`<div class="card empty">Pertandingan tidak ditemukan.</div>`;
+}
+function renderBracket(){
+ let sport=activeSport==="SEMUA"?"BADMINTON":activeSport,data=buildMergedMatches().filter(m=>m.sport===sport);
+ document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`<button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>`).join("");
+ let badminton=sport==="BADMINTON";
+ document.getElementById("bracketGrid").innerHTML=`<div class="col"><h3>${badminton?"HASIL BABAK":"DAFTAR MATCH"}</h3>${data.map(g=>`<div class="game"><div>${esc(g.a)} <b>${g.teamScoreA!=null?g.teamScoreA:"—"}</b></div><div>${esc(g.b)} <b>${g.teamScoreB!=null?g.teamScoreB:"—"}</b></div><small>${esc(g.round)}${g.winner?" • LOLOS: "+esc(g.winner):""}</small>${g.sets?`<div class="sets">${g.sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:""}</div>`).join("")||`<div class="game"><small>Belum ada data</small></div>`}</div><div class="col"><h3>SEMIFINAL</h3><div class="game">${badminton?`<div>RT 10 / RW 021</div><div>RT 11 / RW 021</div><small>LOLOS</small>`:"<small>Menunggu babak berjalan</small>"}</div></div><div class="col final"><h3>FINAL</h3><div class="game">${badminton?`<div>RT 08 / RW 021</div><div>Menunggu lawan</div><small>LOLOS</small>`:"<small>Menunggu semifinal</small>"}</div></div><div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`
+}
+function renderResults(){
+ const d=buildMergedMatches().filter(m=>m.status==="SELESAI"&&(m.sport==="BADMINTON"||isVollySport(m.sport)));
+ document.getElementById("results").innerHTML=d.length?d.map(m=>{const isV=isVollySport(m.sport),sets=m.sets||[];return `<div class="card result-card"><div class="round">${esc(m.sport)} • ${esc(m.round)}</div><div class="match-teams"><div class="match-team">${logoHtml(m.a)}<div class="match-team-name">${esc(m.a)}</div></div><div class="result-score">${m.teamScoreA??0}-${m.teamScoreB??0}</div><div class="match-team">${logoHtml(m.b)}<div class="match-team-name">${esc(m.b)}</div></div></div>${sets.length?`<div class="sets">${sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:""}${m.teamDetails&&!isV?`<div class="team-details">${m.teamDetails.map(t=>`<div class="team-detail"><div class="team-detail-head"><span>${esc(t.name)}</span><span class="team-detail-score">${esc(t.score)}</span></div><div class="team-detail-sets">${t.sets.map(s=>`<div class="team-detail-set"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div></div>`).join("")}</div>`:""}<div class="result-meta">🏆 PEMENANG: <b style="color:#f5c451">${esc(m.winner||"-")}</b>${isV?" • HASIL OTOMATIS DARI SCORE BOARD":" • 1 RT = 3 TEAM • MENANG 2 POINT BESAR"}</div></div>`}).join(""):`<div class="card empty">Belum ada hasil pertandingan Volly.</div>`;
+}
+function renderAll(){renderSchedule();renderBracket();renderResults()}
+document.getElementById("sportFilters").onclick=e=>{let b=e.target.closest("[data-sport]");if(!b)return;activeSport=b.dataset.sport;document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x===b));renderAll()}
+document.getElementById("bracketFilters").onclick=e=>{let b=e.target.closest("[data-bracket]");if(!b)return;activeSport=b.dataset.bracket;document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x.dataset.sport===activeSport));renderAll()}
+document.getElementById("search").oninput=renderSchedule;
+
+function initFirebase(){
+ try{
+  if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+  const liveRef=firebase.database().ref("vipt_scoreboard/live");
+  liveRef.on("value",s=>{liveState=s.val();if(!liveState){setLiveOffline("BELUM ADA DATA LIVE");renderAll();return}renderLive();renderAll()});
+  firebase.database().ref("vipt_scoreboard/history").on("value",s=>{const v=s.val()||{};historyState=Object.values(v).filter(Boolean);renderAll()});
+ }catch(e){console.log(e);setLiveOffline("FIREBASE TIDAK AKTIF")}
+}
+initFirebase();renderAll();
+document.addEventListener("DOMContentLoaded",()=>{let a=document.getElementById("vocaAudio");a.volume=1;a.play().catch(()=>document.addEventListener("click",()=>a.play().catch(()=>{}),{once:true}))});
+</script>
 </body>
-
 </html>
