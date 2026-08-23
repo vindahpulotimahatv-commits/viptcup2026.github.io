@@ -1,38 +1,72 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>VIPT CUP IV 2026 Match Center</title>
+<title>
+VIPT CUP IV 2026 MATCH CENTER
+</title>
+
 
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
 
+
 *{
 box-sizing:border-box;
 }
 
+
 body{
+
 margin:0;
-background:#050505;
+
+background:
+radial-gradient(circle at top,#3a2500,#050505 55%);
+
+font-family:
+'Montserrat',
+Arial,
+sans-serif;
+
 color:white;
-font-family:Montserrat,Arial;
+
 }
 
+
+
 .container{
-max-width:700px;
+
+max-width:720px;
+
 margin:auto;
-padding-bottom:40px;
+
+padding-bottom:50px;
+
 }
+
 
 
 /* HEADER */
 
+.header{
+
+padding:15px;
+
+}
+
+
 .header img{
+
 width:100%;
-display:block;
+
+border-radius:20px;
+
 }
 
 
@@ -46,16 +80,28 @@ margin:15px;
 padding:18px;
 
 background:
-linear-gradient(145deg,#17120a,#050505);
 
-border:1px solid #b8861b;
+linear-gradient(
+145deg,
+#18120a,
+#050505
+);
 
-border-radius:22px;
+
+border:
+
+1px solid #b8861b;
+
+
+border-radius:24px;
+
 
 box-shadow:
-0 10px 30px rgba(0,0,0,.6);
+
+0 10px 35px rgba(0,0,0,.7);
 
 }
+
 
 
 .title{
@@ -72,9 +118,11 @@ color:#fbbf24;
 
 
 
-/* LIVE YOUTUBE */
 
-.youtube{
+
+/* VIDEO */
+
+.video{
 
 width:100%;
 
@@ -88,9 +136,11 @@ border-radius:18px;
 
 
 
-/* MATCH */
 
-.match{
+
+/* LIVE MATCH */
+
+.live-match{
 
 text-align:center;
 
@@ -102,9 +152,9 @@ text-align:center;
 
 display:flex;
 
-align-items:center;
-
 justify-content:space-around;
+
+align-items:center;
 
 margin-top:20px;
 
@@ -114,11 +164,11 @@ margin-top:20px;
 
 .team{
 
-width:40%;
-
-font-weight:900;
+width:35%;
 
 font-size:14px;
+
+font-weight:900;
 
 }
 
@@ -126,9 +176,9 @@ font-size:14px;
 
 .team img{
 
-width:95px;
+width:90px;
 
-height:95px;
+height:90px;
 
 object-fit:contain;
 
@@ -138,17 +188,40 @@ border-radius:18px;
 
 padding:5px;
 
+box-shadow:
+
+0 5px 15px rgba(0,0,0,.5);
+
 }
+
 
 
 
 .score{
 
-font-size:55px;
+font-size:38px;
 
 font-weight:900;
 
 color:#fbbf24;
+
+letter-spacing:4px;
+
+}
+
+
+
+.center-info{
+
+margin-top:15px;
+
+font-size:14px;
+
+font-weight:900;
+
+color:#fbbf24;
+
+line-height:1.8;
 
 }
 
@@ -156,13 +229,17 @@ color:#fbbf24;
 
 .status{
 
-margin-top:15px;
+margin-top:10px;
 
-color:#22c55e;
+font-size:17px;
 
 font-weight:900;
 
+color:#22c55e;
+
 }
+
+
 
 
 
@@ -182,24 +259,65 @@ gap:12px;
 
 .menu{
 
-background:#111;
+background:#0c0c0c;
 
-border:1px solid #8b650f;
+border:
+
+1px solid #8b650f;
 
 padding:16px;
 
-border-radius:16px;
+border-radius:18px;
 
 text-align:center;
 
 font-weight:900;
 
-font-size:13px;
+}
+
+
+
+
+
+/* BUTTON */
+
+.btn{
+
+display:block;
+
+background:#fbbf24;
+
+color:#000;
+
+text-decoration:none;
+
+padding:15px;
+
+border-radius:18px;
+
+font-weight:900;
+
+text-align:center;
 
 }
 
 
+
+
+.info{
+
+text-align:center;
+
+font-size:14px;
+
+line-height:1.7;
+
+}
+
+
+
 </style>
+
 
 </head>
 
@@ -210,7 +328,8 @@ font-size:13px;
 <div class="container">
 
 
-<!-- HEADER -->
+
+<!-- HEADER VIPT -->
 
 <div class="header">
 
@@ -221,7 +340,9 @@ font-size:13px;
 
 
 
-<!-- JUDUL -->
+
+<!-- TITLE -->
+
 
 <div class="card">
 
@@ -231,11 +352,13 @@ font-size:13px;
 
 </div>
 
-<p style="text-align:center;color:#fbbf24">
+
+<p style="text-align:center">
 
 OFFICIAL MATCH CENTER
 
 </p>
+
 
 </div>
 
@@ -243,7 +366,9 @@ OFFICIAL MATCH CENTER
 
 
 
-<!-- STREAMING -->
+
+<!-- YOUTUBE LIVE -->
+
 
 <div class="card">
 
@@ -260,7 +385,7 @@ OFFICIAL MATCH CENTER
 
 <iframe
 
-class="youtube"
+class="video"
 
 src="https://www.youtube.com/embed/RJGbsrd_dkU?autoplay=1&mute=1"
 
@@ -277,9 +402,11 @@ allowfullscreen>
 
 
 
+
 <!-- LIVE SCORE -->
 
-<div class="card">
+
+<div class="card live-match">
 
 
 <div class="title">
@@ -295,33 +422,97 @@ allowfullscreen>
 
 <div class="team">
 
-<img src="assets/logos/RT_11-RW_021.png">
+
+<img id="logoA" src="">
+
 
 <br>
 
-RT 11 / RW 021
+
+<span id="teamA">
+
+TIM A
+
+</span>
+
 
 </div>
 
+
+
+
+
+<div>
 
 
 <div class="score">
 
-0 - 0
+
+<span id="scoreA">
+0
+</span>
+
+
+-
+
+<span id="scoreB">
+0
+</span>
+
 
 </div>
+
+
+</div>
+
+
 
 
 
 <div class="team">
 
-<img src="assets/logos/RT_02-RW_021.png">
+
+<img id="logoB" src="">
+
 
 <br>
 
-RT 02 / RW 021
+
+<span id="teamB">
+
+TIM B
+
+</span>
+
 
 </div>
+
+
+
+</div>
+
+
+
+
+
+<div class="center-info">
+
+
+<span id="sport">
+
+VOLLY PUTRA
+
+</span>
+
+
+<br>
+
+
+<span id="period">
+
+SET 1
+
+</span>
 
 
 </div>
@@ -330,73 +521,14 @@ RT 02 / RW 021
 
 <div class="status">
 
+
+🟢
+
+<span id="status">
+
 LIVE SEKARANG
 
-</div>
-
-
-
-</div>
-
-
-
-
-
-<!-- CABOR -->
-
-<div class="card">
-
-
-<div class="title">
-
-🏆 CABANG OLAHRAGA
-
-</div>
-
-
-<br>
-
-
-<div class="grid">
-
-
-<div class="menu">
-
-⚽ FUTSAL
-
-</div>
-
-
-<div class="menu">
-
-🏐 VOLLY PUTRA
-
-</div>
-
-
-<div class="menu">
-
-🏐 VOLLY PUTRI
-
-</div>
-
-
-<div class="menu">
-
-🏸 BADMINTON
-
-</div>
-
-
-<div class="menu">
-
-🏓 TENIS MEJA
-
-</div>
-
-
-
-</div>
+</span>
 
 
 </div>
@@ -404,7 +536,3 @@ LIVE SEKARANG
 
 
 </div>
-
-
-</body>
-</html>
