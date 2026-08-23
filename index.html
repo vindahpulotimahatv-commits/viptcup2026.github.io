@@ -24,7 +24,7 @@ main{padding:0 14px}.hero{text-align:center;padding:24px 14px 14px;margin:0 -14p
 .section{display:flex;justify-content:space-between;align-items:center;margin:19px 2px 9px}.section h2{font-size:15px;margin:0}.section a{font-size:10px;color:#f5c451;text-decoration:none}
 .card{background:linear-gradient(145deg,#11100d,#050505);border:1px solid #6f4d13;border-radius:17px;padding:14px;margin-bottom:11px;box-shadow:0 8px 24px rgba(0,0,0,.35)}.live{border-color:#a87518}
 .livebar{display:flex;justify-content:space-between;font-size:9px;font-weight:900;margin-bottom:10px}.livebar .on{color:var(--green)}.sportname{color:#f5d36c}
-.teams{display:grid;grid-template-columns:1fr 64px 1fr;align-items:center;gap:7px;text-align:center}.team-logo-img{width:46px;height:46px;object-fit:contain;margin:auto;border-radius:10px;background:#fff;padding:3px}.teamlogo{height:46px;width:46px;margin:auto;border-radius:14px;background:#0b0b0b;border:1px solid var(--line);display:grid;place-items:center;color:#f5c451;font-weight:900}.team b{font-size:10px;display:block;margin-top:6px}.score{font-size:25px;font-weight:900}.score small{display:block;color:#bdb5a7;font-size:8px;margin-top:3px}
+.teams{display:grid;grid-template-columns:1fr 64px 1fr;align-items:center;gap:7px;text-align:center}.team-logo-img{width:46px;height:46px;object-fit:contain;margin:auto;border-radius:10px;background:#fff;padding:3px}.teamlogo{height:46px;width:46px;margin:auto;border-radius:14px;background:#0b0b0b;border:1px solid var(--line);display:grid;place-items:center;color:#f5c451;font-weight:900}.team b{font-size:10px;display:block;margin-top:6px}.score{font-size:25px;font-weight:900}.score small{display:block;color:#bdb5a7;font-size:8px;margin-top:3px}.live-set-scores{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:100%;margin:auto}.live-set{border:1px solid #6f4d13;border-radius:8px;background:#0b0b0b;padding:5px 3px}.live-set span{display:block;color:#f5c451;font-size:7px;font-weight:900;margin-bottom:2px}.live-set b{display:block;color:#fff;font-size:12px;font-weight:900}.live-set.current{border-color:#f5b72b;background:rgba(245,183,43,.10);box-shadow:0 0 0 1px rgba(245,183,43,.12) inset}.live-set.current b{color:#f5b72b}.live-set.done{border-color:#1d8b65}.live-set.done b{color:#1ed393}@media(max-width:420px){.teams{grid-template-columns:1fr 160px 1fr}.live-set b{font-size:11px}}
 .btn{display:block;text-align:center;text-decoration:none;color:#090705;background:linear-gradient(135deg,#f5b72b,#9a650b);border-radius:12px;padding:11px;margin-top:12px;font-size:10px;font-weight:900}
 .filters{display:flex;gap:7px;overflow:auto;padding:2px 1px 6px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.pill{white-space:nowrap;background:#0c0b09;border:1px solid #6f4d13;color:#c7c0b2;border-radius:99px;padding:9px 11px;font-size:10px;cursor:pointer}.pill.active{background:linear-gradient(135deg,#8d6116,#4f3509);border-color:#f0b52a;color:#fff}
 .search{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:10px 12px;outline:none;margin-bottom:10px}
@@ -63,7 +63,7 @@ main{padding:0 14px}.hero{text-align:center;padding:24px 14px 14px;margin:0 -14p
 <div class="livebar"><span class="on">● LIVE SEKARANG</span><span class="sportname" id="liveSport">BELUM ADA PERTANDINGAN LIVE</span></div>
 <div class="teams">
 <div class="team"><img id="liveLogoA" class="team-logo-img" hidden><div id="liveLogoFallbackA" class="teamlogo">A</div><b id="liveA">-</b></div>
-<div class="score" id="liveScore">-<small id="liveRound">MENUNGGU DATA LIVE</small></div>
+<div class="score" id="liveScore"><div id="liveSetScores" class="live-set-scores"><div class="live-set"><span>SET 1</span><b>—</b></div><div class="live-set"><span>SET 2</span><b>—</b></div><div class="live-set"><span>SET 3</span><b>—</b></div></div><small id="liveRound">MENUNGGU DATA LIVE</small></div>
 <div class="team"><img id="liveLogoB" class="team-logo-img" hidden><div id="liveLogoFallbackB" class="teamlogo">B</div><b id="liveB">-</b></div>
 </div><a class="btn" href="#hasil">DETAIL HASIL</a>
 </div>
@@ -239,7 +239,7 @@ let historyState=[];
 const FIREBASE_CONFIG={apiKey:"AIzaSyBIww6sg-mRtUUx3rIylnu6qfYG6Ahfih8",authDomain:"scorebordviptcup.firebaseapp.com",databaseURL:"https://scorebordviptcup-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"scorebordviptcup",storageBucket:"scorebordviptcup.firebasestorage.app",messagingSenderId:"1001557073666",appId:"1:1001557073666:web:10999e31e2b0c9add4ec1b"};
 
 function yt(v){if(!v)return"";let s=String(v).trim(),m=s.match(/(?:youtube\\.com\/(?:live\/|watch\\?v=|embed\/)|youtu\\.be\/)([A-Za-z0-9_-]{6,})/i);return m?m[1]:s.replace(/[^A-Za-z0-9_-]/g,"")}
-function setLiveOffline(msg){document.getElementById("liveSport").textContent=msg;document.getElementById("liveA").textContent="-";document.getElementById("liveB").textContent="-";document.getElementById("liveScore").firstChild.textContent="-";document.getElementById("liveRound").textContent="MENUNGGU DATA"}
+function setLiveOffline(msg){document.getElementById("liveSport").textContent=msg;document.getElementById("liveA").textContent="-";document.getElementById("liveB").textContent="-";document.getElementById("liveRound").textContent="MENUNGGU DATA"}
 
 function isVollySport(s){return /VOLLY/i.test(String(s||""))}
 function cleanStatus(s){return String(s||"").toUpperCase().trim()}
@@ -278,21 +278,34 @@ function getVollyWinner(st,m){
   if(winsB>winsA) return st?.teamB?.name||m?.b||"";
   return "";
 }
+function normTeamName(v){
+  return String(v||'').toUpperCase().replace(/\s+/g,' ').trim();
+}
+function sameTeams(a,b,c,d){
+  const x=normTeamName(a), y=normTeamName(b), z=normTeamName(c), w=normTeamName(d);
+  return (x===z && y===w) || (x===w && y===z);
+}
 function getStateForMatch(m){
-  // Jika pertandingan sedang aktif, DATA LIVE harus menjadi sumber utama.
-  // History hanya dipakai sebagai cadangan agar record lama tidak menimpa
-  // volleyballSets terbaru dari Score Board.
-  const live = (liveState && String(liveState.matchId||'') === String(m.id)) ? liveState : null;
+  // SCORE BOARD LIVE adalah sumber utama. History hanya cadangan.
+  // Selain matchId, cocokkan pasangan tim supaya sinkron tetap bekerja
+  // walaupun ID di Score Board berbeda dari ID di Match Center.
+  const live = liveState && (
+    String(liveState.matchId||'') === String(m.id) ||
+    sameTeams(liveState.teamA?.name, liveState.teamB?.name, m.a, m.b)
+  ) ? liveState : null;
+
   let hist = null;
   for(const h of historyState){
-    if(h && String(h.matchId||'') === String(m.id)) hist = h;
+    if(!h) continue;
+    if(String(h.matchId||'') === String(m.id) ||
+       sameTeams(h.teamA?.name, h.teamB?.name, m.a, m.b)) hist = h;
   }
+
   if(live && hist){
     const merged = {...hist, ...live};
-    // Pertahankan hasil per-set dari LIVE bila tersedia.
+    // Selalu pertahankan per-set dari LIVE bila ada.
     for(const key of ['volleyballSets','vollySets','badmintonSets','sets']){
       if(Array.isArray(live[key]) || (live[key] && typeof live[key]==='object')) merged[key]=live[key];
-      else if(hist[key]!==undefined) merged[key]=hist[key];
     }
     if(live.teamA) merged.teamA={...(hist.teamA||{}),...live.teamA};
     if(live.teamB) merged.teamB={...(hist.teamB||{}),...live.teamB};
@@ -336,14 +349,24 @@ function renderLive(){
   document.getElementById("liveA").textContent=a.name||"-";
   document.getElementById("liveB").textContent=b.name||"-";
   const sport=normalizeMatchSport(liveState.sport,"");
+  const setBox=document.getElementById("liveSetScores");
   if(isVollySport(sport)){
     const sets=getVollySets(liveState);
-    const current=sets.length?sets[sets.length-1]:null;
-    const score=(current && (current.a||current.b)) ? `${current.a} - ${current.b}` : `${a.score||0} - ${b.score||0}`;
-    document.getElementById("liveScore").firstChild.textContent=score;
+    const periodText=String(liveState.period||"").toUpperCase();
+    const match=periodText.match(/(\d+)/);
+    const currentIndex=Math.max(0,Math.min(2,(parseInt(match?match[1]:1,10)-1)));
+    if(setBox){
+      setBox.innerHTML=[0,1,2].map(i=>{
+        const x=sets[i]||{a:0,b:0};
+        const hasScore=!!sets[i] && (Number(x.a)>0 || Number(x.b)>0);
+        const done=hasScore && (Number(x.a)>=25 || Number(x.b)>=25) && Math.abs(Number(x.a)-Number(x.b))>=2;
+        const cls=(i===currentIndex?" current":"")+(done?" done":"");
+        return `<div class="live-set${cls}"><span>SET ${i+1}</span><b>${hasScore?`${x.a} - ${x.b}`:"—"}</b></div>`;
+      }).join("");
+    }
     document.getElementById("liveRound").textContent=(liveState.period||"VOLLY")+" • "+(liveState.status||"LIVE");
   }else{
-    document.getElementById("liveScore").firstChild.textContent=(a.score||0)+" - "+(b.score||0);
+    if(setBox)setBox.innerHTML=`<div class="live-set current" style="grid-column:1/-1"><span>SKOR</span><b>${a.score||0} - ${b.score||0}</b></div>`;
     document.getElementById("liveRound").textContent=(liveState.period||"LIVE")+" • LIVE";
   }
   const la=document.getElementById("liveLogoA"),lb=document.getElementById("liveLogoB"),fa=document.getElementById("liveLogoFallbackA"),fb=document.getElementById("liveLogoFallbackB");
