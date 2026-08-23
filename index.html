@@ -203,30 +203,11 @@ const TOPSCOR_FUTSAL=[
 {no:1,name:"ARIFIN",team:"RT 13 / 021",goals:7},{no:2,name:"TOTO",team:"RT 11 / 021",goals:6},
 {no:3,name:"SATRIA",team:"RT 10 / 014",goals:5},{no:4,name:"SYARIF",team:"RT 08 / 014",goals:5},
 {no:4,name:"RIO",team:"RT 02 / 021",goals:4},{no:5,name:"MOZA",team:"RT 11 / 021",goals:4},{no:6,name:"FAJAR",team:"RT 02 / 021",goals:3}];
-
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-
-function renderTopSkor(){
-document.getElementById("topSkorBody").innerHTML=TOPSCOR_FUTSAL.map(p=>`<tr><td><span class="rank-badge">${p.no}</span></td><td>${esc(p.name)}</td><td style="color:var(--muted)">${esc(p.team)}</td><td><span class="goal-badge">${p.goals}</span></td></tr>`).join("");
-let t=TOPSCOR_FUTSAL.reduce((a,b)=>a+b.goals,0);
-document.getElementById("totalGolDisplay").textContent=t+" Gol";
-document.getElementById("topScorerDisplay").textContent=TOPSCOR_FUTSAL[0].name+" ("+TOPSCOR_FUTSAL[0].goals+" Gol)"
-}
-
-function switchTab(t,e){
-document.getElementById("tab-beranda").classList.toggle("hidden",t!=="beranda");
-document.getElementById("tab-topskor").classList.toggle("hidden",t!=="topskor");
-if(e){
-document.querySelectorAll(".bottom .nav").forEach(n=>n.classList.remove("active"));
-e.classList.add("active")
-}
-window.scrollTo({top:0,behavior:"smooth"})
-}
-
-renderTopSkor();
+function renderTopSkor(){document.getElementById("topSkorBody").innerHTML=TOPSCOR_FUTSAL.map(p=>`<tr><td><span class="rank-badge">${p.no}</span></td><td>${esc(p.name)}</td><td style="color:var(--muted)">${esc(p.team)}</td><td><span class="goal-badge">${p.goals}</span></td></tr>`).join("");let t=TOPSCOR_FUTSAL.reduce((a,b)=>a+b.goals,0);document.getElementById("totalGolDisplay").textContent=t+" Gol";document.getElementById("topScorerDisplay").textContent=TOPSCOR_FUTSAL[0].name+" ("+TOPSCOR_FUTSAL[0].goals+" Gol)"}
+function switchTab(t,e){document.getElementById("tab-beranda").classList.toggle("hidden",t!=="beranda");document.getElementById("tab-topskor").classList.toggle("hidden",t!=="topskor");if(e){document.querySelectorAll(".bottom .nav").forEach(n=>n.classList.remove("active"));e.classList.add("active")}window.scrollTo({top:0,behavior:"smooth"})}renderTopSkor();
 
 window.VENUE="Lapangan Central";
-
 const MATCHES=[
 {id:"VP-8B1",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR",date:"2026-08-22",time:"21:30 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 014",status:"JADWAL"},
 {id:"VP-8B2",sport:"VOLLY PUTRA",round:"BABAK 8 BESAR",date:"2026-08-23",time:"20:00 WIB",a:"RT 02 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
@@ -239,711 +220,220 @@ const MATCHES=[
 {id:"TM-1",sport:"TENIS MEJA",round:"BABAK 8 BESAR",date:"2026-08-23",time:"20:00 WIB",a:"RT 08 / RW 014",b:"RT 10 / RW 014",status:"JADWAL"},
 {id:"TM-2",sport:"TENIS MEJA",round:"BABAK 8 BESAR",date:"2026-08-23",time:"21:30 WIB",a:"RT 11 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
 
+/* BADMINTON — HASIL SEMALAM. 1 RT = 3 TEAM; MENANG 2 POINT BESAR. */
 {id:"BD-1",sport:"BADMINTON",round:"HASIL • REGU PUTRI",date:"2026-08-21",time:"20:15 WIB",a:"RT 10 / RW 021",b:"RT 13 / RW 021",status:"SELESAI",winner:"RT 10 / RW 021",teamScoreA:2,teamScoreB:0,teamDetails:[{name:"TEAM 1",score:"2 - 0",sets:[["SET 1","21 - 17"],["SET 2","21 - 18"]]},{name:"TEAM 2",score:"2 - 0",sets:[["SET 1","21 - 15"],["SET 2","21 - 16"]]}],sets:[["SET 1","21 - 17"],["SET 2","21 - 18"]]},
 {id:"BD-2",sport:"BADMINTON",round:"HASIL • REGU PUTRA",date:"2026-08-21",time:"21:30 WIB",a:"RT 11 / RW 021",b:"RT 08 / RW 014",status:"SELESAI",winner:"RT 11 / RW 021",teamScoreA:2,teamScoreB:0,teamDetails:[{name:"TEAM 1",score:"2 - 0",sets:[["SET 1","21 - 14"],["SET 2","21 - 12"]]},{name:"TEAM 2",score:"2 - 0",sets:[["SET 1","21 - 17"],["SET 2","21 - 15"]]}],sets:[["SET 1","21 - 14"],["SET 2","21 - 12"]]},
 {id:"BD-3",sport:"BADMINTON",round:"HASIL • REGU PUTRA",date:"2026-08-21",time:"22:30 WIB",a:"RT 08 / RW 021",b:"RT 06 / RW 021",status:"SELESAI",winner:"RT 08 / RW 021",teamScoreA:2,teamScoreB:1,teamDetails:[{name:"TEAM 1 • RUBBER",score:"2 - 1",sets:[["SET 1","21 - 18"],["SET 2","18 - 21"],["SET 3","15 - 13"]]},{name:"TEAM 2",score:"2 - 0",sets:[["SET 1","21 - 16"],["SET 2","21 - 19"]]}],sets:[["SET 1","21 - 18"],["SET 2","18 - 21"],["SET 3","15 - 13"]]}
 ];
-
-const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];
-let activeSport="SEMUA";
-
-function prettyDate(d){
-if(!d)return"TBD";
-let x=new Date(d+"T12:00:00");
-return isNaN(x) ? d:x.toLocaleDateString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric"})
-}
-
-const TEAM_LOGOS={
-"RT 02/RW 021":"RT_02-RW_021.png",
-"RT 04/RW 021":"RT_04-RW_021.png",
-"RT 06/RW 021":"RT_06-RW_021.png",
-"RT 07/RW 021":"RT_07-RW_021.png",
-"RT 08/RW 014":"RT_08-RW_014.png",
-"RT 08/RW 021":"RT_08-RW_021.png",
-"RT 09/RW 014":"RT_09-RW_014.png",
-"RT 10/RW 014":"RT_10-RW_014.png",
-"RT 10/RW 021":"RT_10-RW_021.png",
-"RT 11/RW 021":"RT_11-RW_021.png",
-"RT 13/RW 021":"RT_13-RW_021.png"
-};
-
+const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];let activeSport="SEMUA";
+function prettyDate(d){if(!d)return"TBD";let x=new Date(d+"T12:00:00");return isNaN(x) ? d:x.toLocaleDateString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric"})}
+const TEAM_LOGOS={"RT 02/RW 021":"RT_02-RW_021.png","RT 04/RW 021":"RT_04-RW_021.png","RT 06/RW 021":"RT_06-RW_021.png","RT 07/RW 021":"RT_07-RW_021.png","RT 08/RW 014":"RT_08-RW_014.png","RT 08/RW 021":"RT_08-RW_021.png","RT 09/RW 014":"RT_09-RW_014.png","RT 10/RW 014":"RT_10-RW_014.png","RT 10/RW 021":"RT_10-RW_021.png","RT 11/RW 021":"RT_11-RW_021.png","RT 13/RW 021":"RT_13-RW_021.png"};
 const SCOREBOARD_LOGO_BASE="https://raw.githubusercontent.com/vindahpulotimahatv-commits/Scoreboard.github.io/main/assets/logos/";
-
-function norm(n){
-return String(n||"").toUpperCase().replace(/[.]/g,"").replace(/\s*\/\s*/g,"/").replace(/\s+/g," ").trim()
-}
-
-function getTeamLogo(n){
-let f=TEAM_LOGOS[norm(n)];
-return f?SCOREBOARD_LOGO_BASE+f:""
-}
-
-function logoHtml(n){
-let s=getTeamLogo(n);
-return s?`<img class="team-logo-img" src="${s}" alt="Logo ${esc(n)}" loading="lazy" onerror="this.style.display='none'">`:""
-}
-
+function norm(n){return String(n||"").toUpperCase().replace(/[.]/g,"").replace(/\s*\/\s*/g,"/").replace(/\s+/g," ").trim()}
+function getTeamLogo(n){let f=TEAM_LOGOS[norm(n)];return f?SCOREBOARD_LOGO_BASE+f:""}
+function logoHtml(n){let s=getTeamLogo(n);return s?`<img class="team-logo-img" src="${s}" alt="Logo ${esc(n)}" loading="lazy" onerror="this.style.display='none'">`:""}
 let liveState=null,liveTimerBase=0,liveTimerRunning=false,liveTimerStartedAt=0,currentYoutubeId="";
 let historyState=[];
 
-const FIREBASE_CONFIG={
-apiKey:"AIzaSyBIww6sg-mRtUUx3rIylnu6qfYG6Ahfih8",
-authDomain:"scorebordviptcup.firebaseapp.com",
-databaseURL:"https://scorebordviptcup-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"scorebordviptcup",
-storageBucket:"scorebordviptcup.firebasestorage.app",
-messagingSenderId:"1001557073666",
-appId:"1:1001557073666:web:10999e31e2b0c9add4ec1b"
-};
+const FIREBASE_CONFIG={apiKey:"AIzaSyBIww6sg-mRtUUx3rIylnu6qfYG6Ahfih8",authDomain:"scorebordviptcup.firebaseapp.com",databaseURL:"https://scorebordviptcup-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"scorebordviptcup",storageBucket:"scorebordviptcup.firebasestorage.app",messagingSenderId:"1001557073666",appId:"1:1001557073666:web:10999e31e2b0c9add4ec1b"};
 
-function yt(v){
-if(!v)return"";
-let s=String(v).trim(),m=s.match(/(?:youtube\\.com\/(?:live\/|watch\?v=|embed\/)|youtu\\.be\/)([A-Za-z0-9_-]{6,})/i);
-return m?m[1]:s.replace(/[^A-Za-z0-9_-]/g,"")
-}
+function yt(v){if(!v)return"";let s=String(v).trim(),m=s.match(/(?:youtube\\.com\/(?:live\/|watch\\?v=|embed\/)|youtu\\.be\/)([A-Za-z0-9_-]{6,})/i);return m?m[1]:s.replace(/[^A-Za-z0-9_-]/g,"")}
+function setLiveOffline(msg){document.getElementById("liveSport").textContent=msg;document.getElementById("liveA").textContent="-";document.getElementById("liveB").textContent="-";document.getElementById("liveScore").firstChild.textContent="-";document.getElementById("liveRound").textContent="MENUNGGU DATA"}
 
-function setLiveOffline(msg){
-document.getElementById("liveSport").textContent=msg;
-document.getElementById("liveA").textContent="-";
-document.getElementById("liveB").textContent="-";
-document.getElementById("liveScore").firstChild.textContent="-";
-document.getElementById("liveRound").textContent="MENUNGGU DATA"
-}
-
-function isVollySport(s){
-return /VOLLY/i.test(String(s||""))
-}
-
-function cleanStatus(s){
-return String(s||"").toUpperCase().trim()
-}
-
+function isVollySport(s){return /VOLLY/i.test(String(s||""))}
+function cleanStatus(s){return String(s||"").toUpperCase().trim()}
 function statusForMatch(st){
-const x=cleanStatus(st);
-if(x.includes("PERTANDINGAN SELESAI")||x==="SELESAI") return "SELESAI";
-if(x.includes("SET 1 SELESAI")) return "SET 1 SELESAI";
-if(x.includes("SET 2 SELESAI")) return "SET 2 SELESAI";
-if(x.includes("SET 3 SELESAI")) return "SET 3 SELESAI";
-if(x.includes("LIVE")) return "LIVE";
-return x||"JADWAL";
+  const x=cleanStatus(st);
+  if(x.includes("PERTANDINGAN SELESAI")||x==="SELESAI") return "SELESAI";
+  if(x.includes("SET 1 SELESAI")) return "SET 1 SELESAI";
+  if(x.includes("SET 2 SELESAI")) return "SET 2 SELESAI";
+  if(x.includes("SET 3 SELESAI")) return "SET 3 SELESAI";
+  if(x.includes("LIVE")) return "LIVE";
+  return x||"JADWAL";
 }
-
 function getVollySets(st){
-let raw=st?.volleyballSets;
-if(!Array.isArray(raw)) raw=st?.vollySets;
-if(!Array.isArray(raw) && raw && typeof raw==="object") raw=Object.values(raw);
-if(!Array.isArray(raw)) return [];
-
-return raw.slice(0,3).map((x,i)=>{
-if(Array.isArray(x)) return {
-a:Number(x[0])||0,
-b:Number(x[1])||0,
-winner:""
-};
-
-return {
-a:Number(x?.a??x?.scoreA??x?.teamA??0)||0,
-b:Number(x?.b??x?.scoreB??x?.teamB??0)||0,
-winner:x?.winner||""
-};
-});
+  let raw=st?.volleyballSets;
+  if(!Array.isArray(raw)) raw=st?.vollySets;
+  if(!Array.isArray(raw) && raw && typeof raw==="object") raw=Object.values(raw);
+  if(!Array.isArray(raw)) return [];
+  return raw.slice(0,3).map((x,i)=>{
+    if(Array.isArray(x)) return {a:Number(x[0])||0,b:Number(x[1])||0,winner:""};
+    return {a:Number(x?.a??x?.scoreA??x?.teamA??0)||0,b:Number(x?.b??x?.scoreB??x?.teamB??0)||0,winner:x?.winner||""};
+  });
 }
-
 function getVollyWinner(st,m){
-const direct=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;
-if(direct) return direct;
-
-const sets=getVollySets(st),
-winsA=sets.filter(x=>x.a>x.b).length,
-winsB=sets.filter(x=>x.b>x.a).length;
-
-if(winsA>winsB) return st?.teamA?.name||m?.a||"";
-if(winsB>winsA) return st?.teamB?.name||m?.b||"";
-
-return "";
+  const direct=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;
+  if(direct) return direct;
+  const sets=getVollySets(st), winsA=sets.filter(x=>x.a>x.b).length, winsB=sets.filter(x=>x.b>x.a).length;
+  if(winsA>winsB) return st?.teamA?.name||m?.a||"";
+  if(winsB>winsA) return st?.teamB?.name||m?.b||"";
+  return "";
 }
-
 function getStateForMatch(m){
-const candidates=[];
-
-if(liveState && liveState.matchId===m.id)
-candidates.push(liveState);
-
-for(const h of historyState){
-if(h && h.matchId===m.id)
-candidates.push(h)
+  const candidates=[];
+  if(liveState && liveState.matchId===m.id) candidates.push(liveState);
+  for(const h of historyState){if(h && h.matchId===m.id) candidates.push(h)}
+  return candidates.length?candidates[candidates.length-1]:null;
 }
-
-return candidates.length?candidates[candidates.length-1]:null;
-}
-
 function applyFirebaseMatchData(m,st){
-if(!st) return {...m};
-
-const out={...m};
-const a=st.teamA||{},b=st.teamB||{};
-
-if(a.name) out.a=a.name;
-if(b.name) out.b=b.name;
-if(st.sport) out.sport=normalizeMatchSport(st.sport,m.sport);
-if(st.status) out.status=statusForMatch(st.status);
-
-if(isVollySport(out.sport)){
-const sets=getVollySets(st);
-
-if(sets.length){
-out.sets=sets.map((x,i)=>[`SET ${i+1}`,`${x.a} - ${x.b}`]);
-out.volleyballSets=sets;
+  if(!st) return {...m};
+  const out={...m};
+  const a=st.teamA||{},b=st.teamB||{};
+  if(a.name) out.a=a.name;
+  if(b.name) out.b=b.name;
+  if(st.sport) out.sport=normalizeMatchSport(st.sport,m.sport);
+  if(st.status) out.status=statusForMatch(st.status);
+  if(isVollySport(out.sport)){
+    const sets=getVollySets(st);
+    if(sets.length){
+      out.sets=sets.map((x,i)=>[`SET ${i+1}`,`${x.a} - ${x.b}`]);
+      out.volleyballSets=sets;
+    }
+    const setWinsA=sets.filter(x=>x.a>x.b).length;
+    const setWinsB=sets.filter(x=>x.b>x.a).length;
+    out.teamScoreA=Number(a.score??setWinsA)||0;
+    out.teamScoreB=Number(b.score??setWinsB)||0;
+    out.winner=getVollyWinner(st,m);
+    out.liveStatus=st.status||out.status;
+    out.period=st.period||"";
+    out.isFirebaseVolly=true;
+    if(cleanStatus(st.status).includes("PERTANDINGAN SELESAI")) out.status="SELESAI";
+  }
+  return out;
 }
-
-const setWinsA=sets.filter(x=>x.a>x.b).length;
-const setWinsB=sets.filter(x=>x.b>x.a).length;
-
-out.teamScoreA=Number(a.score??setWinsA)||0;
-out.teamScoreB=Number(b.score??setWinsB)||0;
-out.winner=getVollyWinner(st,m);
-out.liveStatus=st.status||out.status;
-out.period=st.period||"";
-out.isFirebaseVolly=true;
-
-if(cleanStatus(st.status).includes("PERTANDINGAN SELESAI"))
-out.status="SELESAI";
-}
-
-return out;
-}
-
 function buildMergedMatches(){
-return MATCHES.map(m=>applyFirebaseMatchData(m,getStateForMatch(m)));
+  return MATCHES.map(m=>applyFirebaseMatchData(m,getStateForMatch(m)));
 }
-
-
-/* =========================================================
-   LIVE SCORE
-   KHUSUS VOLLY:
-   ANGKA BESAR = POIN SET YANG SEDANG BERJALAN
-   ANGKA KECIL = JUMLAH SET MENANG
-   CONTOH:
-   BESAR 21 - 20
-   KECIL 2 - 1
-========================================================= */
-
 function renderLive(){
-if(!liveState)return;
-
-let a=liveState.teamA||{},
-    b=liveState.teamB||{};
-
-document.getElementById("liveSport").textContent=liveState.sport||"LIVE SCORE";
-document.getElementById("liveA").textContent=a.name||"-";
-document.getElementById("liveB").textContent=b.name||"-";
-
-const sport=normalizeMatchSport(liveState.sport,"");
-
-if(isVollySport(sport)){
-
-  const sets=getVollySets(liveState);
-
-  /* HITUNG JUMLAH SET YANG SUDAH DIMENANGKAN */
-  const winsA=sets.filter(x=>x.a>x.b).length;
-  const winsB=sets.filter(x=>x.b>x.a).length;
-
-  /* AMBIL SKOR SET YANG SEDANG BERJALAN */
-  const current=sets.length ? sets[sets.length-1] : null;
-
-  const currentA=current ? current.a : (a.score||0);
-  const currentB=current ? current.b : (b.score||0);
-
-  /* ANGKA BESAR = POINT SAAT INI */
-  document.getElementById("liveScore").firstChild.textContent =
-    `${currentA} - ${currentB}`;
-
-  /* ANGKA KECIL = SET MENANG */
-  document.getElementById("liveRound").textContent =
-    `${winsA} - ${winsB} • SET`;
-
-}else{
-
-  /* CABANG SELAIN VOLLY TETAP SEPERTI SEBELUMNYA */
-  document.getElementById("liveScore").firstChild.textContent =
-    (a.score||0)+" - "+(b.score||0);
-
-  document.getElementById("liveRound").textContent =
-    (liveState.period||"LIVE")+" • LIVE";
+  if(!liveState)return;
+  let a=liveState.teamA||{},b=liveState.teamB||{};
+  document.getElementById("liveSport").textContent=liveState.sport||"LIVE SCORE";
+  document.getElementById("liveA").textContent=a.name||"-";
+  document.getElementById("liveB").textContent=b.name||"-";
+  const sport=normalizeMatchSport(liveState.sport,"");
+  if(isVollySport(sport)){
+    const sets=getVollySets(liveState);
+    const current=sets.length?sets[sets.length-1]:null;
+    const score=(current && (current.a||current.b)) ? `${current.a} - ${current.b}` : `${a.score||0} - ${b.score||0}`;
+    document.getElementById("liveScore").firstChild.textContent=score;
+    document.getElementById("liveRound").textContent=(liveState.period||"VOLLY")+" • "+(liveState.status||"LIVE");
+  }else{
+    document.getElementById("liveScore").firstChild.textContent=(a.score||0)+" - "+(b.score||0);
+    document.getElementById("liveRound").textContent=(liveState.period||"LIVE")+" • LIVE";
+  }
+  const la=document.getElementById("liveLogoA"),lb=document.getElementById("liveLogoB"),fa=document.getElementById("liveLogoFallbackA"),fb=document.getElementById("liveLogoFallbackB");
+  const sa=getTeamLogo(a.name),sb=getTeamLogo(b.name);
+  if(la){la.src=sa;la.hidden=!sa} if(fa)fa.style.display=sa?"none":"grid";
+  if(lb){lb.src=sb;lb.hidden=!sb} if(fb)fb.style.display=sb?"none":"grid";
 }
-
-const la=document.getElementById("liveLogoA"),
-      lb=document.getElementById("liveLogoB"),
-      fa=document.getElementById("liveLogoFallbackA"),
-      fb=document.getElementById("liveLogoFallbackB");
-
-const sa=getTeamLogo(a.name),
-      sb=getTeamLogo(b.name);
-
-if(la){
-la.src=sa;
-la.hidden=!sa
-}
-
-if(fa)
-fa.style.display=sa?"none":"grid";
-
-if(lb){
-lb.src=sb;
-lb.hidden=!sb
-}
-
-if(fb)
-fb.style.display=sb?"none":"grid";
-}
-
-
 const FIXED_YOUTUBE_ID="FRj680DUjYY";
 const FIXED_YOUTUBE_URL="https://www.youtube.com/live/FRj680DUjYY?si=1eiDGIvgqjexWI-N";
-
-function setYoutubeLink(){
-currentYoutubeId=FIXED_YOUTUBE_ID;
-
-document.getElementById("ytContainer").innerHTML=
-`<iframe id="youtubeFrame" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px" src="https://www.youtube.com/embed/${FIXED_YOUTUBE_ID}?autoplay=1&rel=0&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><a class="btn" href="${FIXED_YOUTUBE_URL}" target="_blank">BUKA DI YOUTUBE</a>`
-}
+function setYoutubeLink(){currentYoutubeId=FIXED_YOUTUBE_ID;document.getElementById("ytContainer").innerHTML=`<iframe id="youtubeFrame" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px" src="https://www.youtube.com/embed/${FIXED_YOUTUBE_ID}?autoplay=1&rel=0&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><a class="btn" href="${FIXED_YOUTUBE_URL}" target="_blank">BUKA DI YOUTUBE</a>`}
 
 function normalizeMatchSport(s,fallback){
-const x=String(s||fallback||"").toUpperCase();
-
-if(x.includes("VOLLY"))
-return x.includes("PUTRI")?"VOLLY PUTRI":"VOLLY PUTRA";
-
-if(x.includes("BADMINTON"))
-return "BADMINTON";
-
-if(x.includes("FUTSAL"))
-return "FUTSAL";
-
-if(x.includes("TENIS MEJA")||x.includes("PINGPONG"))
-return "TENIS MEJA";
-
-return fallback||x;
+  const x=String(s||fallback||"").toUpperCase();
+  if(x.includes("VOLLY")) return x.includes("PUTRI")?"VOLLY PUTRI":"VOLLY PUTRA";
+  if(x.includes("BADMINTON")) return "BADMINTON";
+  if(x.includes("FUTSAL")) return "FUTSAL";
+  if(x.includes("TENIS MEJA")||x.includes("PINGPONG")) return "TENIS MEJA";
+  return fallback||x;
 }
 
 function renderSchedule(){
-let q=document.getElementById("search").value.toLowerCase().trim();
-
-let all=buildMergedMatches();
-
-let data=all.filter(m=>
-(activeSport==="SEMUA"||m.sport===activeSport)&&
-(!q||JSON.stringify(m).toLowerCase().includes(q))
-);
-
-data.sort((a,b)=>(a.date+b.time).localeCompare(b.date+b.time));
-
-document.getElementById("count").textContent=data.length+" pertandingan";
-
-document.getElementById("jadwal").innerHTML=data.length?
-data.map(m=>{
-
-const statusClass=m.status==="SELESAI"?"done":m.status==="LIVE"?"live":"";
-const score=m.teamScoreA!=null?m.teamScoreA+" - "+m.teamScoreB:"VS";
-
-const setsHtml=m.sets?.length?
-`<div class="sets">${m.sets.map(s=>
-`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`
-).join("")}</div>`:"";
-
-return `<div class="card match" data-status="${m.status}">
-<div class="round">${esc(m.sport)} • ${esc(m.round)}</div>
-<div class="date">${esc(prettyDate(m.date))} • ${esc(m.time)}</div>
-
-<div class="match-teams">
-
-<div class="match-team">
-${logoHtml(m.a)}
-<div class="match-team-name">${esc(m.a)}</div>
-</div>
-
-<span class="vs">${score}</span>
-
-<div class="match-team">
-${logoHtml(m.b)}
-<div class="match-team-name">${esc(m.b)}</div>
-</div>
-
-</div>
-
-${setsHtml}
-
-<div class="venue">📍 ${esc(VENUE)}</div>
-
-${m.winner?
-`<div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">🏆 PEMENANG: ${esc(m.winner)}</div>`
-:""}
-
-${m.period&&m.status!=="SELESAI"?
-`<div style="margin-top:5px;color:#aaa;font-size:8px">Periode: ${esc(m.period)}</div>`
-:""}
-
-<span class="status ${statusClass}">${esc(m.status)}</span>
-
-</div>`
-
-}).join("")
-:
-`<div class="card empty">Pertandingan tidak ditemukan.</div>`;
+  let q=document.getElementById("search").value.toLowerCase().trim();
+  let all=buildMergedMatches();
+  let data=all.filter(m=>(activeSport==="SEMUA"||m.sport===activeSport)&&(!q||JSON.stringify(m).toLowerCase().includes(q)));
+  data.sort((a,b)=>(a.date+b.time).localeCompare(b.date+b.time));
+  document.getElementById("count").textContent=data.length+" pertandingan";
+  document.getElementById("jadwal").innerHTML=data.length?data.map(m=>{
+    const statusClass=m.status==="SELESAI"?"done":m.status==="LIVE"?"live":"";
+    const score=m.teamScoreA!=null?m.teamScoreA+" - "+m.teamScoreB:"VS";
+    const setsHtml=m.sets?.length?`<div class="sets">${m.sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:"";
+    return `<div class="card match" data-status="${m.status}"><div class="round">${esc(m.sport)} • ${esc(m.round)}</div><div class="date">${esc(prettyDate(m.date))} • ${esc(m.time)}</div><div class="match-teams"><div class="match-team">${logoHtml(m.a)}<div class="match-team-name">${esc(m.a)}</div></div><span class="vs">${score}</span><div class="match-team">${logoHtml(m.b)}<div class="match-team-name">${esc(m.b)}</div></div></div>${setsHtml}<div class="venue">📍 ${esc(VENUE)}</div>${m.winner?`<div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">🏆 PEMENANG: ${esc(m.winner)}</div>`:""}${m.period&&m.status!=="SELESAI"?`<div style="margin-top:5px;color:#aaa;font-size:8px">Periode: ${esc(m.period)}</div>`:""}<span class="status ${statusClass}">${esc(m.status)}</span></div>`;
+  }).join(""): `<div class="card empty">Pertandingan tidak ditemukan.</div>`;
 }
-
-function renderBracket(){
-
-let sport=activeSport==="SEMUA"?"BADMINTON":activeSport,
-data=buildMergedMatches().filter(m=>m.sport===sport);
-
-document.getElementById("bracketFilters").innerHTML=
-SPORT_ORDER.map(s=>
-`<button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>`
-).join("");
-
-let badminton=sport==="BADMINTON";
-
-document.getElementById("bracketGrid").innerHTML=
-`<div class="col">
-
-<h3>${badminton?"HASIL BABAK":"DAFTAR MATCH"}</h3>
-
-${data.map(g=>
-`<div class="game">
-
-<div>${esc(g.a)} <b>${g.teamScoreA!=null?g.teamScoreA:"—"}</b></div>
-
-<div>${esc(g.b)} <b>${g.teamScoreB!=null?g.teamScoreB:"—"}</b></div>
-
-<small>
-${esc(g.round)}
-${g.winner?" • LOLOS: "+esc(g.winner):""}
-</small>
-
-${g.sets?
-`<div class="sets">
-${g.sets.map(s=>
-`<div class="set-row">
-<span>${esc(s[0])}</span>
-<b>${esc(s[1])}</b>
-</div>`
-).join("")}
-</div>`:""}
-
-</div>`
-).join("")||
-
-`<div class="game"><small>Belum ada data</small></div>`}
-
-</div>
-
-<div class="col">
-
-<h3>SEMIFINAL</h3>
-
-<div class="game">
-
-${badminton?
-`<div>RT 10 / RW 021</div>
-<div>RT 11 / RW 021</div>
-<small>LOLOS</small>`
-:
-"<small>Menunggu babak berjalan</small>"}
-
-</div>
-
-</div>
-
-<div class="col final">
-
-<h3>FINAL</h3>
-
-<div class="game">
-
-${badminton?
-`<div>RT 08 / RW 021</div>
-<div>Menunggu lawan</div>
-<small>LOLOS</small>`
-:
-"<small>Menunggu semifinal</small>"}
-
-</div>
-
-</div>
-
-<div class="col">
-
-<h3>JUARA</h3>
-
-<div class="game" style="text-align:center">
-
-<div style="justify-content:center;border:0">🏆</div>
-
-<div style="justify-content:center;border:0">
-JUARA ${esc(sport)}
-</div>
-
-</div>
-
-</div>`;
-}
-
+function renderBracket(){let sport=activeSport==="SEMUA"?"BADMINTON":activeSport,data=buildMergedMatches().filter(m=>m.sport===sport);document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`<button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>`).join("");let badminton=sport==="BADMINTON";document.getElementById("bracketGrid").innerHTML=`<div class="col"><h3>${badminton?"HASIL BABAK":"DAFTAR MATCH"}</h3>${data.map(g=>`<div class="game"><div>${esc(g.a)} <b>${g.teamScoreA!=null?g.teamScoreA:"—"}</b></div><div>${esc(g.b)} <b>${g.teamScoreB!=null?g.teamScoreB:"—"}</b></div><small>${esc(g.round)}${g.winner?" • LOLOS: "+esc(g.winner):""}</small>${g.sets?`<div class="sets">${g.sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:""}</div>`).join("")||`<div class="game"><small>Belum ada data</small></div>`}</div><div class="col"><h3>SEMIFINAL</h3><div class="game">${badminton?`<div>RT 10 / RW 021</div><div>RT 11 / RW 021</div><small>LOLOS</small>`:"<small>Menunggu babak berjalan</small>"}</div></div><div class="col final"><h3>FINAL</h3><div class="game">${badminton?`<div>RT 08 / RW 021</div><div>Menunggu lawan</div><small>LOLOS</small>`:"<small>Menunggu semifinal</small>"}</div></div><div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`}
 function renderResults(){
-
-const d=buildMergedMatches().filter(
-m=>m.status==="SELESAI"&&(m.sport==="BADMINTON"||isVollySport(m.sport))
-);
-
-document.getElementById("results").innerHTML=d.length?
-
-d.map(m=>{
-
-const isV=isVollySport(m.sport);
-const sets=m.sets||[];
-
-return `<div class="card result-card">
-
-<div class="round">${esc(m.sport)} • ${esc(m.round)}</div>
-
-<div class="match-teams">
-
-<div class="match-team">
-${logoHtml(m.a)}
-<div class="match-team-name">${esc(m.a)}</div>
-</div>
-
-<div class="result-score">
-${m.teamScoreA??0}-${m.teamScoreB??0}
-</div>
-
-<div class="match-team">
-${logoHtml(m.b)}
-<div class="match-team-name">${esc(m.b)}</div>
-</div>
-
-</div>
-
-${sets.length?
-`<div class="sets">
-${sets.map(s=>
-`<div class="set-row">
-<span>${esc(s[0])}</span>
-<b>${esc(s[1])}</b>
-</div>`
-).join("")}
-</div>`:""}
-
-${m.teamDetails&&!isV?
-`<div class="team-details">
-
-${m.teamDetails.map(t=>
-`<div class="team-detail">
-
-<div class="team-detail-head">
-<span>${esc(t.name)}</span>
-<span class="team-detail-score">${esc(t.score)}</span>
-</div>
-
-<div class="team-detail-sets">
-
-${t.sets.map(s=>
-`<div class="team-detail-set">
-<span>${esc(s[0])}</span>
-<b>${esc(s[1])}</b>
-</div>`
-).join("")}
-
-</div>
-
-</div>`
-).join("")}
-
-</div>`:""}
-
-<div class="result-meta">
-
-🏆 PEMENANG:
-<b style="color:#f5c451">${esc(m.winner||"-")}</b>
-
-${isV?
-" • HASIL OTOMATIS DARI SCORE BOARD":
-" • 1 RT = 3 TEAM • MENANG 2 POINT BESAR"}
-
-</div>
-
-</div>`
-
-}).join("")
-
-:
-
-`<div class="card empty">Belum ada hasil pertandingan Volly.</div>`;
+  const d=buildMergedMatches().filter(m=>m.status==="SELESAI"&&(m.sport==="BADMINTON"||isVollySport(m.sport)));
+  document.getElementById("results").innerHTML=d.length?d.map(m=>{
+    const isV=isVollySport(m.sport);
+    const sets=m.sets||[];
+    return `<div class="card result-card"><div class="round">${esc(m.sport)} • ${esc(m.round)}</div><div class="match-teams"><div class="match-team">${logoHtml(m.a)}<div class="match-team-name">${esc(m.a)}</div></div><div class="result-score">${m.teamScoreA??0}-${m.teamScoreB??0}</div><div class="match-team">${logoHtml(m.b)}<div class="match-team-name">${esc(m.b)}</div></div></div>${sets.length?`<div class="sets">${sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:""}${m.teamDetails&&!isV?`<div class="team-details">${m.teamDetails.map(t=>`<div class="team-detail"><div class="team-detail-head"><span>${esc(t.name)}</span><span class="team-detail-score">${esc(t.score)}</span></div><div class="team-detail-sets">${t.sets.map(s=>`<div class="team-detail-set"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div></div>`).join("")}</div>`:""}<div class="result-meta">🏆 PEMENANG: <b style="color:#f5c451">${esc(m.winner||"-")}</b>${isV?" • HASIL OTOMATIS DARI SCORE BOARD":" • 1 RT = 3 TEAM • MENANG 2 POINT BESAR"}</div></div>`;
+  }).join(""): `<div class="card empty">Belum ada hasil pertandingan Volly.</div>`;
 }
-
-function renderAll(){
-renderSchedule();
-renderBracket();
-renderResults();
-}
-
-document.getElementById("sportFilters").onclick=e=>{
-
-let b=e.target.closest("[data-sport]");
-
-if(!b)return;
-
-activeSport=b.dataset.sport;
-
-document.querySelectorAll("#sportFilters .pill")
-.forEach(x=>x.classList.toggle("active",x===b));
-
-renderAll()
-}
-
-document.getElementById("bracketFilters").onclick=e=>{
-
-let b=e.target.closest("[data-bracket]");
-
-if(!b)return;
-
-activeSport=b.dataset.bracket;
-
-document.querySelectorAll("#sportFilters .pill")
-.forEach(x=>x.classList.toggle("active",x.dataset.sport===activeSport));
-
-renderAll()
-}
-
+function renderAll(){renderSchedule();renderBracket();renderResults()}
+document.getElementById("sportFilters").onclick=e=>{let b=e.target.closest("[data-sport]");if(!b)return;activeSport=b.dataset.sport;document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x===b));renderAll()}
+document.getElementById("bracketFilters").onclick=e=>{let b=e.target.closest("[data-bracket]");if(!b)return;activeSport=b.dataset.bracket;document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x.dataset.sport===activeSport));renderAll()}
 document.getElementById("search").oninput=renderSchedule;
 
-
 function initFirebase(){
-
-try{
-
-if(!firebase.apps.length)
-firebase.initializeApp(FIREBASE_CONFIG);
-
-setYoutubeLink();
-
-const liveRef=firebase.database().ref("vipt_scoreboard/live");
-
-liveRef.on("value",s=>{
-
-liveState=s.val();
-
-if(!liveState){
-
-setLiveOffline("BELUM ADA DATA LIVE");
-renderAll();
-return;
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+    setYoutubeLink();
+    const liveRef=firebase.database().ref("vipt_scoreboard/live");
+    liveRef.on("value",s=>{
+      liveState=s.val();
+      if(!liveState){setLiveOffline("BELUM ADA DATA LIVE");renderAll();return}
+      renderLive();
+      renderAll();
+    });
+    firebase.database().ref("vipt_scoreboard/history").on("value",s=>{
+      const v=s.val()||{};
+      historyState=Object.values(v).filter(Boolean);
+      renderAll();
+    });
+  }catch(e){console.log(e);setYoutubeLink();setLiveOffline("FIREBASE TIDAK AKTIF")}
 }
-
-renderLive();
-renderAll();
-
-});
-
-firebase.database().ref("vipt_scoreboard/history").on("value",s=>{
-
-const v=s.val()||{};
-
-historyState=Object.values(v).filter(Boolean);
-
-renderAll();
-
-});
-
-}catch(e){
-
-console.log(e);
-
-setYoutubeLink();
-
-setLiveOffline("FIREBASE TIDAK AKTIF");
-
-}
-
-}
-
 initFirebase();
 renderAll();
 
-document.addEventListener("DOMContentLoaded",()=>{
-
-let a=document.getElementById("vocaAudio");
-
-a.volume=1;
-
-a.play().catch(()=>
-document.addEventListener("click",()=>
-a.play().catch(()=>{}),
-{once:true}
-)
-
-});
-
+document.addEventListener("DOMContentLoaded",()=>{let a=document.getElementById("vocaAudio");a.volume=1;a.play().catch(()=>document.addEventListener("click",()=>a.play().catch(()=>{}),{once:true}))});
 </script>
-
 <!-- BADMINTON_RESULT_UPDATE_START -->
-
 <style>
-
 .badminton-result-card {
   margin-bottom:11px;
 }
-
 .badminton-set-list {
   margin-top:8px;
   padding-left:12px;
   border-left:2px solid #7a5514;
 }
-
 .badminton-set {
   display:block;
   padding:5px 0;
   font-size:10px;
   color:#fff;
 }
-
 .badminton-set b {
   color:#f5b72b;
 }
-
 .badminton-team-title {
   font-size:10px;
   font-weight:900;
   color:#f5d36c;
   margin-top:10px;
 }
-
 .badminton-next {
   border-color:#f5b72b!important;
 }
-
 </style>
-
 <script>
-
 window.BADMINTON_UPDATE = {
-
   qualified: [
     "RT 10 / RW 021",
     "RT 11 / RW 021",
     "RT 08 / RW 021"
   ],
-
   nextMatch: {
     a: "RT 08 / RW 021",
     b: "RT 11 / RW 021"
   }
-
 };
-
 </script>
-
 <!-- BADMINTON_RESULT_UPDATE_END -->
-
 </body>
 </html>
+
+Buat yang di tampikan Di live score 
+Itu score /set (khusus Volly)
