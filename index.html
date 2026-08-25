@@ -128,8 +128,8 @@ const MATCHES=[
 {id:"VW-1",sport:"VOLLY PUTRI",round:"PERTANDINGAN",date:"2026-08-30",time:"15:45 WIB",a:"RT 06 / RW 021",b:"RT 08 / RW 014",status:"JADWAL"},
 {id:"TM-SF1",sport:"TENIS MEJA",round:"SEMIFINAL",date:"2026-08-30",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 10 / RW 014",status:"JADWAL"},
 {id:"TM-SF2",sport:"TENIS MEJA",round:"SEMIFINAL",date:"2026-08-30",time:"20:15 WIB",a:"RT 11 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
-{id:"BD-W-F",sport:"BADMINTON",round:"FINAL • REGU PUTRI",date:"2026-08-30",time:"21:00 WIB",a:"RT 10 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
-{id:"BD-M-F",sport:"BADMINTON",round:"FINAL • REGU PUTRA",date:"2026-08-30",time:"22:15 WIB",a:"RT 08 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
+{id:"BD-W-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRI",date:"2026-08-30",time:"21:00 WIB",a:"RT 10 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
+{id:"BD-M-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRA",date:"2026-08-30",time:"22:15 WIB",a:"RT 08 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
 ];
 const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];let activeSport="SEMUA";
 function prettyDate(d){if(!d)return"TBD";let x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric"})}
