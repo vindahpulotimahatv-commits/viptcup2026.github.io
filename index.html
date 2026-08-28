@@ -236,7 +236,6 @@ main{padding:0 14px}
 
 <div id="tab-beranda">
 
-<!-- NOTIFIKASI PERTANDINGAN -->
 <div class="section"><h2>🔔 Notifikasi Pertandingan</h2></div>
 <div class="card notify-card">
   <div class="notify-top">
@@ -279,11 +278,14 @@ main{padding:0 14px}
 
 <div class="section"><h2>🎥 Live Streaming</h2></div>
 <div class="card" id="ytContainer">
-  <iframe id="youtubeFrame" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"
-          src="https://www.youtube.com/live/7smsPsQFKy0?si=nRu1I7KLMISkX44-"
+  <iframe id="youtubeFrame"
+          style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#000"
+          src="https://www.youtube.com/embed/7smsPsQFKy0?autoplay=1&mute=0&playsinline=1&rel=0&controls=1&enablejsapi=1"
+          title="VIPT CUP IV 2026 Live Streaming"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen></iframe>
-  <a class="btn" href="https://www.youtube.com/live/RJGbsrd_dkU?si=P9PvIJZmiFHfHYx0" target="_blank">BUKA DI YOUTUBE</a>
+  <a class="btn" href="https://www.youtube.com/live/7smsPsQFKy0?si=toTN9smcU2r4oxY1" target="_blank" rel="noopener noreferrer">▶️ BUKA DI YOUTUBE</a>
 </div>
 
 <div class="section"><h2>🤝 Support VIPT 2026</h2></div>
@@ -525,7 +527,6 @@ function prettyDate(d){
   return isNaN(x)?d:x.toLocaleDateString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric",timeZone:"Asia/Jakarta"})
 }
 
-/* FIX: RT 07 / RW 014 ditambahkan */
 const TEAM_LOGOS={
   "RT 02/RW 021":"RT_02-RW_021.png",
   "RT 04/RW 021":"RT_04-RW_021.png",
@@ -808,12 +809,6 @@ document.getElementById("bracketFilters").onclick=e=>{
 }
 document.getElementById("search").oninput=renderSchedule;
 
-/* ==========================================================
-   NOTIFIKASI PERTANDINGAN
-   - 15 menit sebelum kick-off / mulai pertandingan
-   - WIB dipaksa dengan offset +07:00
-   - notifikasi tidak dikirim berulang pada device yang sama
-   ========================================================== */
 const NOTIFY_MINUTES_BEFORE=15;
 const NOTIFY_PREF_KEY="VIPT_MATCH_NOTIFICATIONS_ENABLED";
 
@@ -861,9 +856,7 @@ function renderNextMatch(){
   cd.textContent=formatCountdown(next.start.getTime()-Date.now())
 }
 
-function notificationSupported(){
-  return "Notification" in window
-}
+function notificationSupported(){return "Notification" in window}
 
 function refreshNotifyButton(){
   const btn=document.getElementById("notifyBtn");
@@ -955,12 +948,10 @@ function checkMatchNotifications(force=false){
         `${m.sport}: ${m.a} vs ${m.b} • ${m.time} • sekitar ${minutes} menit lagi.`
       )
     }else if(force && diff>triggerMs){
-      // force hanya untuk segera memperbarui kartu, tidak mengirim notifikasi terlalu awal
     }
   }
 }
 
-/* Firebase */
 function initFirebase(){
   try{
     if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
@@ -997,11 +988,46 @@ document.addEventListener("visibilitychange",()=>{
   if(!document.hidden)checkMatchNotifications()
 });
 
+/* Audio Vocaroo */
 document.addEventListener("DOMContentLoaded",()=>{
   let a=document.getElementById("vocaAudio");
   a.volume=1;
   a.play().catch(()=>document.addEventListener("click",()=>a.play().catch(()=>{}),{once:true}))
 });
+
+/* YouTube autoplay + unmute after first user interaction */
+(function(){
+  const frame=document.getElementById("youtubeFrame");
+  if(!frame)return;
+
+  function activateYoutubeSound(){
+    try{
+      frame.contentWindow.postMessage(JSON.stringify({
+        event:"command",
+        func:"unMute",
+        args:[]
+      }),"*");
+
+      frame.contentWindow.postMessage(JSON.stringify({
+        event:"command",
+        func:"setVolume",
+        args:[100]
+      }),"*");
+
+      frame.contentWindow.postMessage(JSON.stringify({
+        event:"command",
+        func:"playVideo",
+        args:[]
+      }),"*");
+    }catch(e){
+      console.log("YouTube autoplay:",e);
+    }
+  }
+
+  ["click","touchstart","pointerdown"].forEach(evt=>{
+    document.addEventListener(evt,activateYoutubeSound,{once:true,passive:true});
+  });
+})();
 </script>
 </body>
 </html>
