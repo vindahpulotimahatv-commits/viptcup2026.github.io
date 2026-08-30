@@ -727,6 +727,7 @@ function renderResults(){
 }
 
 
+
 function parseAnyTimestamp(v){
   if(v==null||v==="")return 0;
   if(typeof v==="number"){
@@ -741,16 +742,51 @@ function parseAnyTimestamp(v){
   return Number.isFinite(d)?d:0;
 }
 
+function flattenHistoryData(value,keyHint=""){
+  const out=[];
+
+  function walk(node,key){
+    if(!node||typeof node!=="object")return;
+
+    const looksLikeMatch =
+      node.teamA || node.teamB ||
+      node.a || node.b ||
+      node.teamAName || node.teamBName ||
+      node.matchId || node.sport || node.cabang;
+
+    if(looksLikeMatch){
+      const copy={...node};
+      copy._historyKey=key||copy._historyKey||"";
+      out.push(copy);
+      return;
+    }
+
+    if(Array.isArray(node)){
+      node.forEach((child,i)=>walk(child,String(i)));
+    }else{
+      Object.entries(node).forEach(([k,child])=>walk(child,k));
+    }
+  }
+
+  walk(value,keyHint);
+  return out;
+}
+
 function historyTimestamp(st){
   if(!st)return 0;
   const candidates=[
     st.endedAt,st.finishedAt,st.completedAt,st.updatedAt,st.timestamp,
-    st.createdAt,st.dateTime,st.datetime,st.timeStamp
+    st.createdAt,st.dateTime,st.datetime,st.timeStamp,
+    st.savedAt,st.saved_at,st.finished_at
   ];
+
   for(const v of candidates){
     const t=parseAnyTimestamp(v);
     if(t)return t;
   }
+
+  const keyTime=parseAnyTimestamp(st._historyKey);
+  if(keyTime)return keyTime;
 
   if(st.date){
     const rawTime=String(st.time||"00:00").match(/(\d{1,2}):(\d{2})/);
@@ -759,110 +795,248 @@ function historyTimestamp(st){
     const t=Date.parse(`${st.date}T${hh}:${mm}:00+07:00`);
     if(Number.isFinite(t))return t;
   }
+
   return 0;
 }
 
 function formatHistoryDate(st){
   const t=historyTimestamp(st);
+
   if(t){
     try{
       return new Date(t).toLocaleString("id-ID",{
-        weekday:"long",day:"2-digit",month:"long",year:"numeric",
-        hour:"2-digit",minute:"2-digit",timeZone:"Asia/Jakarta"
+        weekday:"long",
+        day:"2-digit",
+        month:"long",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit",
+        timeZone:"Asia/Jakarta"
       }).replace(" pukul "," • ")+" WIB";
     }catch(e){}
   }
-  if(st?.date)return `${prettyDate(st.date)}${st.time?" • "+st.time:""}`;
+
+  if(st?.date){
+    return `${prettyDate(st.date)}${st.time?" • "+st.time:""}`;
+  }
+
   return st?.time||"Waktu pertandingan tidak tersedia";
 }
 
 function historyTeamName(st,side){
   const obj=side==="A"?st?.teamA:st?.teamB;
-  return obj?.name || st?.[side==="A"?"a":"b"] || st?.[side==="A"?"teamAName":"teamBName"] || "-";
+
+  return obj?.name ||
+         obj?.teamName ||
+         st?.[side==="A"?"a":"b"] ||
+         st?.[side==="A"?"teamAName":"teamBName"] ||
+         st?.[side==="A"?"namaTimA":"namaTimB"] ||
+         "-";
 }
 
 function historyTeamScore(st,side){
   const obj=side==="A"?st?.teamA:st?.teamB;
-  const direct=obj?.score ?? st?.[side==="A"?"scoreA":"scoreB"] ?? st?.[side==="A"?"teamScoreA":"teamScoreB"];
+
+  const direct=
+    obj?.score ??
+    obj?.goals ??
+    obj?.point ??
+    obj?.points ??
+    st?.[side==="A"?"scoreA":"scoreB"] ??
+    st?.[side==="A"?"teamScoreA":"teamScoreB"] ??
+    st?.[side==="A"?"golA":"golB"] ??
+    st?.[side==="A"?"pointA":"pointB"];
+
   const n=Number(direct);
   if(Number.isFinite(n))return n;
 
-  const sport=normalizeMatchSport(st?.sport,"");
+  const sport=normalizeMatchSport(st?.sport||st?.cabang,"");
+
   if(isVollySport(sport)){
     const sets=getVollySets(st);
-    return sets.filter(x=>side==="A"?Number(x.a)>Number(x.b):Number(x.b)>Number(x.a)).length;
+    return sets.filter(x=>
+      side==="A"
+        ? Number(x.a)>Number(x.b)
+        : Number(x.b)>Number(x.a)
+    ).length;
   }
+
   return 0;
 }
 
 function historyWinner(st){
-  const direct=st?.winner || st?.winnerTeam || st?.matchWinner || st?.pemenang;
-  if(direct)return typeof direct==="string"?direct:(direct?.name||"-");
+  const direct=
+    st?.winner ||
+    st?.winnerTeam ||
+    st?.matchWinner ||
+    st?.pemenang ||
+    st?.winningTeam;
 
-  const a=historyTeamName(st,"A"),b=historyTeamName(st,"B");
-  const sa=historyTeamScore(st,"A"),sb=historyTeamScore(st,"B");
+  if(direct){
+    return typeof direct==="string"
+      ? direct
+      : (direct?.name||direct?.teamName||"-");
+  }
+
+  const a=historyTeamName(st,"A");
+  const b=historyTeamName(st,"B");
+  const sa=historyTeamScore(st,"A");
+  const sb=historyTeamScore(st,"B");
+
   if(sa>sb)return a;
   if(sb>sa)return b;
-  return "-";
+  return "SERI / BELUM DITENTUKAN";
 }
 
-function isFinishedHistory(st){
-  const status=statusForMatch(st?.status);
-  return status==="SELESAI" || cleanStatus(st?.status).includes("SELESAI") ||
-         cleanStatus(st?.status).includes("FINISH") || cleanStatus(st?.status).includes("COMPLETED");
+function isFinishedLive(st){
+  if(!st)return false;
+  const status=cleanStatus(st.status);
+
+  return status.includes("SELESAI") ||
+         status.includes("FINISH") ||
+         status.includes("COMPLETED") ||
+         status.includes("FULL TIME") ||
+         status==="FT";
+}
+
+function uniqueResultKey(st){
+  const a=norm(historyTeamName(st,"A"));
+  const b=norm(historyTeamName(st,"B"));
+  const sport=normalizeMatchSport(st?.sport||st?.cabang,"");
+  return st?.matchId || `${sport}|${a}|${b}|${st?.date||""}`;
 }
 
 function renderLatestResultsArchive(){
   const box=document.getElementById("latestResultsArchive");
   if(!box)return;
 
-  const rows=(historyState||[])
-    .filter(Boolean)
-    .filter(isFinishedHistory)
-    .sort((a,b)=>historyTimestamp(b)-historyTimestamp(a))
+  let rows=[...(historyState||[])];
+
+  if(liveState && isFinishedLive(liveState)){
+    rows.push({...liveState,_fromLive:true});
+  }
+
+  rows=rows.filter(st=>{
+    const a=historyTeamName(st,"A");
+    const b=historyTeamName(st,"B");
+    return a!=="-" && b!=="-";
+  });
+
+  const byKey=new Map();
+  for(const st of rows){
+    const key=uniqueResultKey(st);
+    const old=byKey.get(key);
+
+    if(!old || historyTimestamp(st)>=historyTimestamp(old)){
+      byKey.set(key,st);
+    }
+  }
+
+  rows=[...byKey.values()]
+    .sort((a,b)=>{
+      const ta=historyTimestamp(a);
+      const tb=historyTimestamp(b);
+      if(tb!==ta)return tb-ta;
+      return String(b._historyKey||"").localeCompare(
+        String(a._historyKey||""),
+        undefined,
+        {numeric:true}
+      );
+    })
     .slice(0,10);
 
   if(!rows.length){
-    box.innerHTML='<div class="card empty">Belum ada hasil pertandingan selesai di Firebase.</div>';
+    box.innerHTML=`
+      <div class="card empty">
+        Belum ada hasil pertandingan yang terbaca dari Firebase history.
+      </div>`;
     return;
   }
 
   box.innerHTML=rows.map(st=>{
-    const sport=normalizeMatchSport(st.sport,st.cabang||"PERTANDINGAN");
-    const round=st.round||st.babak||st.category||st.kategori||"HASIL PERTANDINGAN";
+    const sport=normalizeMatchSport(
+      st.sport||st.cabang||st.olahraga,
+      "PERTANDINGAN"
+    );
+
+    const round=
+      st.round ||
+      st.babak ||
+      st.category ||
+      st.kategori ||
+      st.stage ||
+      "HASIL PERTANDINGAN";
+
     const a=historyTeamName(st,"A");
     const b=historyTeamName(st,"B");
     const scoreA=historyTeamScore(st,"A");
     const scoreB=historyTeamScore(st,"B");
     const winner=historyWinner(st);
-    const sets=getVollySets(st);
 
-    let setHtml="";
-    if(sets.length){
-      setHtml=`<div class="badminton-set-list">${
-        sets.map((x,i)=>`<div class="badminton-set">SET ${x.setNumber||i+1}: <b>${Number(x.a)||0} - ${Number(x.b)||0}</b></div>`).join("")
-      }</div>`;
+    let sets=getVollySets(st);
+
+    if(!sets.length && Array.isArray(st.setScores)){
+      sets=st.setScores.map((x,i)=>({
+        a:Number(x?.a ?? x?.scoreA ?? x?.teamA ?? 0)||0,
+        b:Number(x?.b ?? x?.scoreB ?? x?.teamB ?? 0)||0,
+        setNumber:i+1
+      }));
     }
 
-    return `<div class="card badminton-result-card">
-      <div class="round">${esc(sport)} • ${esc(round)}</div>
-      <div class="date">${esc(formatHistoryDate(st))}</div>
-      <div class="match-teams">
-        <div class="match-team">
-          ${logoHtml(a)}
-          <div class="match-team-name">${esc(a)}</div>
+    const setHtml=sets.length
+      ? `<div class="badminton-set-list">${
+          sets.map((x,i)=>`
+            <div class="badminton-set">
+              SET ${x.setNumber||i+1}:
+              <b>${Number(x.a)||0} - ${Number(x.b)||0}</b>
+            </div>`
+          ).join("")
+        }</div>`
+      : "";
+
+    return `
+      <div class="card badminton-result-card">
+        <div class="round">${esc(sport)} • ${esc(round)}</div>
+
+        <div class="date">
+          ${esc(formatHistoryDate(st))}
         </div>
-        <div class="result-score">${scoreA} - ${scoreB}</div>
-        <div class="match-team">
-          ${logoHtml(b)}
-          <div class="match-team-name">${esc(b)}</div>
+
+        <div class="match-teams">
+
+          <div class="match-team">
+            ${logoHtml(a)}
+            <div class="match-team-name">${esc(a)}</div>
+          </div>
+
+          <div class="result-score">
+            ${scoreA} - ${scoreB}
+          </div>
+
+          <div class="match-team">
+            ${logoHtml(b)}
+            <div class="match-team-name">${esc(b)}</div>
+          </div>
+
         </div>
-      </div>
-      ${setHtml}
-      <div class="venue">📍 ${esc(st.venue||st.location||VENUE)}</div>
-      <div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">🏆 PEMENANG: ${esc(winner)}</div>
-      <span class="status done">SELESAI</span>
-    </div>`;
+
+        ${setHtml}
+
+        <div class="venue">
+          📍 ${esc(st.venue||st.location||st.lokasi||VENUE)}
+        </div>
+
+        <div style="
+          margin-top:8px;
+          color:#f5c451;
+          font-size:9px;
+          font-weight:900
+        ">
+          🏆 PEMENANG: ${esc(winner)}
+        </div>
+
+        <span class="status done">SELESAI</span>
+      </div>`;
   }).join("");
 }
 
@@ -1047,8 +1221,15 @@ function initFirebase(){
     });
     firebase.database().ref("vipt_scoreboard/history").on("value",s=>{
       const v=s.val()||{};
-      historyState=Object.values(v).filter(Boolean);
+      historyState=flattenHistoryData(v);
+      console.log("[VIPT] History terbaca:",historyState.length,"pertandingan");
       renderAll()
+    },err=>{
+      console.error("[VIPT] Gagal membaca history Firebase:",err);
+      const box=document.getElementById("latestResultsArchive");
+      if(box){
+        box.innerHTML='<div class="card empty">Gagal membaca hasil dari Firebase. Periksa permission/rules database.</div>';
+      }
     })
   }catch(e){
     console.log(e);
