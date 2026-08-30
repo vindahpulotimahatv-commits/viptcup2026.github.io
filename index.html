@@ -267,7 +267,7 @@ main{padding:0 14px}
   <a class="btn" href="https://www.youtube.com/live/ZG0K0NGUG8Q?si=6coN42w2PFSb7QKR" target="_blank" rel="noopener noreferrer">▶️ BUKA DI YOUTUBE</a>
 </div>
 
-<div class="section" id="jadwal"><h2>⏱️ Akan Bertanding Berikutnya</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
+<div class="section" id="jadwal"><h2>📅 Jadwal Pertandingan</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
 <div class="card notify-card">
   <div class="next-match">
     <div class="next-label">PERTANDINGAN TERDEKAT</div>
@@ -594,41 +594,84 @@ function renderSchedule(){
   const searchEl=document.getElementById("search");
   const q=(searchEl?.value||"").toLowerCase().trim();
   const now=Date.now();
+
+  // Waktu lokal VIPT / WIB (+07)
+  const nowWIB=new Date(now);
+  const y=nowWIB.toLocaleDateString("en-CA",{timeZone:"Asia/Jakarta"});
+
   let all=buildMergedMatches();
 
-  // Halaman utama hanya menampilkan LIVE dan jadwal yang belum lewat.
-  let data=all.filter(m=>{
+  // Tampilkan seluruh jadwal HARI INI + pertandingan berikutnya.
+  // Jadi jadwal yang sudah lewat hari ini tidak langsung hilang.
+  let today=all.filter(m=>{
+    const relevantDate=m.date===y;
+    return relevantDate && (!q || JSON.stringify(m).toLowerCase().includes(q));
+  });
+
+  // Jika jadwal hari ini kosong, tampilkan maksimal 5 jadwal berikutnya.
+  let future=all.filter(m=>{
     const t=getMatchDateTime(m);
     const status=String(m.status||"").toUpperCase();
-    const relevant=status==="LIVE" || (status!=="SELESAI" && t >= now);
-    return relevant && (!q || JSON.stringify(m).toLowerCase().includes(q));
+    return t>=now && status!=="SELESAI" &&
+      (!q || JSON.stringify(m).toLowerCase().includes(q));
   });
 
+  let data=today.length ? today : future.slice(0,5);
+
+  // LIVE dulu, lalu yang akan datang, lalu yang sudah lewat.
   data.sort((a,b)=>{
-    if(a.status==="LIVE" && b.status!=="LIVE") return -1;
-    if(b.status==="LIVE" && a.status!=="LIVE") return 1;
-    return getMatchDateTime(a)-getMatchDateTime(b);
+    const sa=String(a.status||"").toUpperCase();
+    const sb=String(b.status||"").toUpperCase();
+    if(sa==="LIVE" && sb!=="LIVE") return -1;
+    if(sb==="LIVE" && sa!=="LIVE") return 1;
+
+    const ta=getMatchDateTime(a), tb=getMatchDateTime(b);
+    const aFuture=ta>=now, bFuture=tb>=now;
+    if(aFuture && !bFuture) return -1;
+    if(bFuture && !aFuture) return 1;
+    return ta-tb;
   });
-  data=data.slice(0,5);
 
   const count=document.getElementById("count");
-  if(count)count.textContent=data.length ? `${data.length} jadwal terdekat` : "tidak ada jadwal";
+  if(count) count.textContent=data.length
+    ? `${data.length} pertandingan ${today.length?"hari ini":"berikutnya"}`
+    : "tidak ada jadwal";
 
   const target=document.getElementById("jadwalList") || document.getElementById("jadwal");
   if(!target)return;
 
   target.innerHTML=data.length?data.map(m=>{
-    const statusClass=m.status==="SELESAI"?"done":m.status==="LIVE"?"live":"";
-    const score=m.teamScoreA!=null?m.teamScoreA+" - "+m.teamScoreB:"VS";
     const t=getMatchDateTime(m);
-    const mins=Math.max(0,Math.floor((t-now)/60000));
-    let eta="";
-    if(m.status==="LIVE") eta="🔴 SEDANG BERLANGSUNG";
-    else if(mins<60) eta=`⏱️ ${mins} menit lagi`;
-    else if(mins<1440) eta=`⏱️ ${Math.floor(mins/60)} jam ${mins%60} menit lagi`;
-    else eta=`📅 ${esc(prettyDate(m.date))}`;
+    const mins=Math.floor((t-now)/60000);
+    const rawStatus=String(m.status||"").toUpperCase();
 
-    return `<div class="card match" data-status="${esc(m.status)}">
+    // Status tampil berdasarkan Firebase + waktu jadwal.
+    let displayStatus=rawStatus || "JADWAL";
+    let statusClass="";
+    let eta="";
+
+    if(rawStatus==="LIVE"){
+      displayStatus="LIVE";
+      statusClass="live";
+      eta="🔴 SEDANG BERLANGSUNG";
+    }else if(rawStatus==="SELESAI"){
+      displayStatus="SELESAI";
+      statusClass="done";
+      eta="✅ PERTANDINGAN SELESAI";
+    }else if(t < now){
+      displayStatus="JADWAL LEWAT";
+      statusClass="done";
+      eta="🕒 WAKTU JADWAL SUDAH LEWAT";
+    }else{
+      displayStatus="AKAN DATANG";
+      if(mins<60) eta=`⏱️ ${Math.max(0,mins)} menit lagi`;
+      else if(mins<1440) eta=`⏱️ ${Math.floor(mins/60)} jam ${mins%60} menit lagi`;
+      else eta=`📅 ${esc(prettyDate(m.date))}`;
+    }
+
+    const score=m.teamScoreA!=null?m.teamScoreA+" - "+m.teamScoreB:"VS";
+
+    return `<div class="card match" data-status="${esc(displayStatus)}">
       <div class="round">${esc(m.sport)} • ${esc(m.round)}</div>
       <div class="date">${esc(prettyDate(m.date))} • ${esc(m.time)}</div>
       <div class="match-teams">
@@ -638,9 +681,9 @@ function renderSchedule(){
       </div>
       <div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">${eta}</div>
       <div class="venue">📍 ${esc(VENUE)}</div>
-      <span class="status ${statusClass}">${esc(m.status)}</span>
+      <span class="status ${statusClass}">${esc(displayStatus)}</span>
     </div>`
-  }).join(""):`<div class="card empty">Belum ada pertandingan berikutnya pada jadwal saat ini.</div>`;
+  }).join(""):`<div class="card empty">Belum ada jadwal pertandingan.</div>`;
 }
 function renderBracket(){
   let sport=activeSport==="SEMUA"?"BADMINTON":activeSport,
