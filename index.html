@@ -1196,26 +1196,32 @@ function renderLatestResultsArchive(){
 }
 
 function renderAll(){
-  renderSchedule();
-  renderBracket();
-  renderResults();
-  renderLatestResultsArchive();
-  renderNextMatch();
+  if(document.getElementById("jadwalList") || document.getElementById("jadwal")) renderSchedule();
+  if(document.getElementById("bracketGrid")) renderBracket();
+  if(document.getElementById("results")) renderResults();
+  if(document.getElementById("latestResultsArchive")) renderLatestResultsArchive();
+  if(document.getElementById("nextMatchMain")) renderNextMatch();
 }
 
-document.getElementById("sportFilters").onclick=e=>{
-  let b=e.target.closest("[data-sport]");if(!b)return;
-  activeSport=b.dataset.sport;
-  document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x===b));
-  renderAll()
+const sportFiltersEl=document.getElementById("sportFilters");
+if(sportFiltersEl){
+  sportFiltersEl.onclick=e=>{
+    let b=e.target.closest("[data-sport]");if(!b)return;
+    activeSport=b.dataset.sport;
+    document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x===b));
+    renderAll()
+  };
 }
-document.getElementById("bracketFilters").onclick=e=>{
-  let b=e.target.closest("[data-bracket]");if(!b)return;
-  activeSport=b.dataset.bracket;
-  document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x.dataset.sport===activeSport));
-  renderAll()
+const bracketFiltersEl=document.getElementById("bracketFilters");
+if(bracketFiltersEl){
+  bracketFiltersEl.onclick=e=>{
+    let b=e.target.closest("[data-bracket]");if(!b)return;
+    activeSport=b.dataset.bracket;
+    document.querySelectorAll("#sportFilters .pill").forEach(x=>x.classList.toggle("active",x.dataset.sport===activeSport));
+    renderAll()
+  };
 }
-document.getElementById("search").oninput=renderSchedule;
+const searchElMain=document.getElementById("search"); if(searchElMain) searchElMain.oninput=renderSchedule;
 
 const NOTIFY_MINUTES_BEFORE=15;
 const NOTIFY_PREF_KEY="VIPT_MATCH_NOTIFICATIONS_ENABLED";
@@ -1253,6 +1259,7 @@ function renderNextMatch(){
   const main=document.getElementById("nextMatchMain");
   const time=document.getElementById("nextMatchTime");
   const cd=document.getElementById("nextMatchCountdown");
+  if(!main || !time || !cd) return;
   if(!next){
     main.textContent="Belum ada pertandingan berikutnya.";
     time.textContent="";
@@ -1269,6 +1276,7 @@ function notificationSupported(){return "Notification" in window}
 function refreshNotifyButton(){
   const btn=document.getElementById("notifyBtn");
   const note=document.getElementById("notifySupportText");
+  if(!btn || !note) return;
   if(!notificationSupported()){
     btn.textContent="TIDAK DIDUKUNG";
     btn.disabled=true;
@@ -1406,6 +1414,7 @@ document.addEventListener("visibilitychange",()=>{
 /* Audio Vocaroo */
 document.addEventListener("DOMContentLoaded",()=>{
   let a=document.getElementById("vocaAudio");
+  if(!a)return;
   a.volume=1;
   a.play().catch(()=>document.addEventListener("click",()=>a.play().catch(()=>{}),{once:true}))
 });
