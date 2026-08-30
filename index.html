@@ -861,6 +861,32 @@ function historyTeamScore(st,side){
     ).length;
   }
 
+  // BADMINTON BEREGU:
+  // scoreboard lama menyimpan 3 partai pada badmintonSets [{a,b},{a,b},{a,b}].
+  // Skor beregu dihitung dari jumlah partai yang dimenangkan.
+  if(String(sport).toUpperCase().includes("BADMINTON")){
+    const ties=Array.isArray(st?.badmintonMatches)
+      ? st.badmintonMatches
+      : (Array.isArray(st?.badmintonSets) ? st.badmintonSets : []);
+
+    return ties.filter(x=>{
+      if(Array.isArray(x?.games)){
+        let wa=0, wb=0;
+        x.games.forEach(g=>{
+          const ga=Number(g?.a ?? g?.scoreA ?? 0)||0;
+          const gb=Number(g?.b ?? g?.scoreB ?? 0)||0;
+          if(ga>gb)wa++;
+          else if(gb>ga)wb++;
+        });
+        return side==="A" ? wa>wb : wb>wa;
+      }
+
+      const a=Number(x?.a ?? x?.scoreA ?? 0)||0;
+      const b=Number(x?.b ?? x?.scoreB ?? 0)||0;
+      return side==="A" ? a>b : b>a;
+    }).length;
+  }
+
   return 0;
 }
 
@@ -904,6 +930,121 @@ function uniqueResultKey(st){
   const b=norm(historyTeamName(st,"B"));
   const sport=normalizeMatchSport(st?.sport||st?.cabang,"");
   return st?.matchId || `${sport}|${a}|${b}|${st?.date||""}`;
+}
+
+
+function getBadmintonBereguPartai(st){
+  // Format baru yang didukung:
+  // badmintonMatches: [
+  //   {name:"PARTAI 1", games:[{a:21,b:18},{a:18,b:21},{a:21,b:15}]}, ...
+  // ]
+  if(Array.isArray(st?.badmintonMatches) && st.badmintonMatches.length){
+    return st.badmintonMatches.map((p,i)=>({
+      number:i+1,
+      label:p?.name || p?.label || `PARTAI ${i+1}`,
+      games:Array.isArray(p?.games) ? p.games.map((g,j)=>({
+        number:j+1,
+        a:Number(g?.a ?? g?.scoreA ?? 0)||0,
+        b:Number(g?.b ?? g?.scoreB ?? 0)||0
+      })) : []
+    }));
+  }
+
+  // Kompatibilitas dengan scoreboard yang sekarang:
+  // badmintonSets berisi tiga skor. Data ini ditampilkan sebagai Partai 1–3,
+  // tanpa mengarang Game 2/3 yang memang tidak tersimpan di Firebase.
+  if(Array.isArray(st?.badmintonSets) && st.badmintonSets.length){
+    return st.badmintonSets.map((p,i)=>({
+      number:i+1,
+      label:`PARTAI ${i+1}`,
+      legacy:true,
+      games:[{
+        number:1,
+        a:Number(p?.a ?? 0)||0,
+        b:Number(p?.b ?? 0)||0
+      }]
+    }));
+  }
+
+  return [];
+}
+
+function renderBadmintonBereguDetail(st){
+  const partai=getBadmintonBereguPartai(st);
+  if(!partai.length)return "";
+
+  const rows=partai.map(p=>{
+    let wa=0,wb=0;
+    p.games.forEach(g=>{
+      if(g.a>g.b)wa++;
+      else if(g.b>g.a)wb++;
+    });
+
+    const pWinner=wa>wb ? "TIM A" : (wb>wa ? "TIM B" : "—");
+
+    const games=p.games.map(g=>`
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:8px;
+        padding:7px 9px;
+        margin-top:5px;
+        border:1px solid rgba(255,255,255,.08);
+        background:rgba(255,255,255,.035);
+        border-radius:8px;
+        font-size:9px;
+      ">
+        <span style="color:#cbd5e1;font-weight:800">GAME ${g.number}</span>
+        <b style="font-size:11px">${g.a} - ${g.b}</b>
+      </div>
+    `).join("");
+
+    return `
+      <div style="
+        margin-top:8px;
+        padding:9px;
+        border:1px solid rgba(245,196,81,.22);
+        background:rgba(0,0,0,.18);
+        border-radius:10px;
+      ">
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:8px;
+          font-size:9px;
+          font-weight:1000;
+          color:#f5c451;
+        ">
+          <span>${esc(p.label)}</span>
+          <span>${pWinner==="—" ? "" : "MENANG: "+pWinner}</span>
+        </div>
+        ${games}
+        ${p.legacy ? `
+          <div style="
+            margin-top:5px;
+            color:#94a3b8;
+            font-size:8px;
+            line-height:1.35;
+          ">
+            Data scoreboard tersimpan sebagai satu skor untuk partai ini.
+          </div>` : ""}
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div style="margin-top:10px">
+      <div style="
+        font-size:9px;
+        font-weight:1000;
+        color:#e2e8f0;
+        margin-bottom:3px;
+      ">🏸 RINCIAN BADMINTON BEREGU</div>
+      ${rows}
+    </div>
+  `;
 }
 
 function renderLatestResultsArchive(){
@@ -983,16 +1124,20 @@ function renderLatestResultsArchive(){
       }));
     }
 
-    const setHtml=sets.length
-      ? `<div class="badminton-set-list">${
-          sets.map((x,i)=>`
-            <div class="badminton-set">
-              SET ${x.setNumber||i+1}:
-              <b>${Number(x.a)||0} - ${Number(x.b)||0}</b>
-            </div>`
-          ).join("")
-        }</div>`
-      : "";
+    const isBadminton=String(sport).toUpperCase().includes("BADMINTON");
+
+    const setHtml=isBadminton
+      ? renderBadmintonBereguDetail(st)
+      : (sets.length
+          ? `<div class="badminton-set-list">${
+              sets.map((x,i)=>`
+                <div class="badminton-set">
+                  SET ${x.setNumber||i+1}:
+                  <b>${Number(x.a)||0} - ${Number(x.b)||0}</b>
+                </div>`
+              ).join("")
+            }</div>`
+          : "");
 
     return `
       <div class="card badminton-result-card">
