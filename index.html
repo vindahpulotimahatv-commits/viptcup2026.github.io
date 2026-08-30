@@ -223,7 +223,6 @@ main{padding:0 14px}
 <div class="app">
 <header></header>
 <main>
-
 <section class="hero">
   <div class="eyebrow">OFFICIAL MATCH CENTER • 2026</div>
   <img src="https://i.ibb.co.com/1V2zk03/logo.jpg" alt="VIPT CUP IV 2026" class="hero-logo"
@@ -233,28 +232,9 @@ main{padding:0 14px}
   <p>MEDIA VILLA INDAH PULO TIMAHA</p>
   <div class="location">📍 <span>LOKASI UTAMA</span> Lapangan Central Villa Indah Pulo Timaha</div>
 </section>
-
 <div id="tab-beranda">
 
-<div class="section"><h2>🔔 Notifikasi Pertandingan</h2></div>
-<div class="card notify-card">
-  <div class="notify-top">
-    <div>
-      <div class="notify-title">Jangan Sampai Ketinggalan Pertandingan</div>
-      <div class="notify-sub">Aktifkan notifikasi. Match Center akan memberi pengingat 15 menit sebelum pertandingan dimulai.</div>
-    </div>
-    <button id="notifyBtn" class="notify-btn" type="button" onclick="enableMatchNotifications()">AKTIFKAN</button>
-  </div>
-  <div class="next-match">
-    <div class="next-label">PERTANDINGAN BERIKUTNYA</div>
-    <div id="nextMatchMain" class="next-main">Memuat jadwal...</div>
-    <div id="nextMatchTime" class="next-time"></div>
-    <div id="nextMatchCountdown" class="countdown">—</div>
-  </div>
-  <div id="notifySupportText" class="notify-note">Notifikasi browser bekerja setelah Anda menekan tombol AKTIFKAN dan memberi izin notifikasi.</div>
-</div>
-
-<div class="section"><h2>🔴 Live Score</h2><a href="#jadwal">Lihat Jadwal</a></div>
+<div class="section"><h2>🔴 Live Score</h2><a href="#jadwal">Jadwal Berikutnya</a></div>
 <div class="card live">
   <div class="livebar">
     <span id="liveStatusLabel" class="waiting">● MENUNGGU PERTANDINGAN</span>
@@ -273,7 +253,6 @@ main{padding:0 14px}
       <b id="liveB">-</b>
     </div>
   </div>
-  <a class="btn" href="#jadwal">LIHAT JADWAL</a>
 </div>
 
 <div class="section"><h2>🎥 Live Streaming</h2></div>
@@ -288,16 +267,23 @@ main{padding:0 14px}
   <a class="btn" href="https://www.youtube.com/live/ZG0K0NGUG8Q?si=6coN42w2PFSb7QKR" target="_blank" rel="noopener noreferrer">▶️ BUKA DI YOUTUBE</a>
 </div>
 
-<div class="section"><h2>🤝 Support VIPT 2026</h2></div>
-<div class="card" style="text-align:center">
-  <b style="font-size:12px;color:var(--gold)">🔥 Bikin VIPT CUP IV 2026 Makin Meriah!</b>
-  <p style="color:var(--muted);font-size:10px;line-height:1.4">Yuk, dukung kelancaran dan kemeriahan turnamen kita lewat Saweria agar fasilitas dan hadiah makin mantap!</p>
-  <a class="btn" href="https://saweria.co/VIPTSPORT" target="_blank">☕ DUKUNG VIA SAWERIA</a>
+<div class="section" id="jadwal"><h2>⏱️ Akan Bertanding Berikutnya</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
+<div class="card notify-card">
+  <div class="next-match">
+    <div class="next-label">PERTANDINGAN TERDEKAT</div>
+    <div id="nextMatchMain" class="next-main">Memuat jadwal...</div>
+    <div id="nextMatchTime" class="next-time"></div>
+    <div id="nextMatchCountdown" class="countdown">—</div>
+  </div>
 </div>
+<input class="search" id="search" type="search" placeholder="Cari tim / cabang olahraga...">
+<div id="sportFilters" style="display:none"></div>
+<div id="jadwalList"></div>
+<div id="jadwal" style="display:none"></div>
 
-<div class="section"><h2>📱 Ikuti Keseruan Kami</h2></div>
+<div class="section" id="sosial"><h2>📱 Sosial Media VIPT</h2></div>
 <div class="card" style="text-align:center">
-  <p style="font-size:10px;color:var(--muted)">Jangan ketinggalan update skor, cuplikan pertandingan, dan keseruan lapangan! Yuk follow semua sosial media resmi <b>VIPT</b>:</p>
+  <p style="font-size:10px;color:var(--muted)">Ikuti update skor, cuplikan pertandingan, dan informasi VIPT CUP IV 2026.</p>
   <div class="sosmed-container">
     <a href="https://www.tiktok.com/@vipt_sport" class="sosmed-btn" target="_blank">🎵 TikTok</a>
     <a href="https://www.instagram.com/vipt_sport" class="sosmed-btn" target="_blank">📸 Instagram</a>
@@ -306,85 +292,19 @@ main{padding:0 14px}
   </div>
 </div>
 
-<div class="section"><h2>🏆 Cabang Olahraga</h2></div>
-<div class="filters" id="sportFilters">
-  <button class="pill active" data-sport="SEMUA">Semua</button>
-  <button class="pill" data-sport="VOLLY PUTRA">Volly Putra</button>
-  <button class="pill" data-sport="VOLLY PUTRI">Volly Putri</button>
-  <button class="pill" data-sport="FUTSAL">Futsal</button>
-  <button class="pill" data-sport="TENIS MEJA">Tenis Meja</button>
-  <button class="pill" data-sport="BADMINTON">Badminton</button>
 </div>
-
-<div class="section"><h2>📅 Semua Pertandingan Terbaru</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
-<input class="search" id="search" type="search" placeholder="Cari RT / RW / cabang olahraga...">
-<div id="jadwal"></div>
-
-<div class="section"><h2>🏆 Bracket</h2></div>
-<div class="card" id="bracket">
-  <div class="filters" id="bracketFilters"></div>
-  <div class="bracket-wrap"><div class="bracket" id="bracketGrid"></div></div>
-</div>
-
-<div class="section" id="hasil"><h2>📋 Hasil Pertandingan</h2></div>
-<div id="results"></div>
-
-<div class="section"><h2>🏁 Hasil Pertandingan Terbaru</h2></div>
-<div id="latestResultsArchive">
-  <div class="card empty">Memuat hasil pertandingan terbaru...</div>
-</div>
-
-<div class="section"><h2>📰 Update VIPT CUP</h2></div>
-<div class="card news">
-  <div class="thumb">VIPT CUP</div>
-  <div>
-    <b>Jadwal semifinal dan pertandingan terbaru telah dirilis.</b>
-    <small>Aktifkan notifikasi agar mendapat pengingat 15 menit sebelum pertandingan dimulai.</small>
-  </div>
-</div>
-
-<section class="informasi-section" id="informasi">
-  <div class="section"><h2>ℹ️ INFORMASI</h2></div>
-  <div class="informasi-slides-wrap">
-    <iframe class="informasi-slides"
-            src="https://docs.google.com/presentation/d/1XGhqW8y5ZLJSM-eXKN7SSEHUPW79gl76JG-pZxzXnn0/embed?start=true&loop=true&delayms=5000"
-            allow="autoplay; fullscreen" allowfullscreen></iframe>
-  </div>
-</section>
-
-</div>
-
-<div id="tab-topskor" class="hidden">
-  <div class="section"><h2>⚡ Top Skor Futsal VIPT CUP IV</h2></div>
-  <div class="card">
-    <div style="text-align:center">
-      <b style="font-size:13px;color:var(--gold)">DAFTAR PENCETAK GOL TERBANYAK</b>
-      <p style="font-size:9px;color:var(--muted)">Update resmi perolehan gol cabang olahraga Futsal</p>
-    </div>
-    <div class="topskor-stats">
-      <div class="stat-box"><small>Total Gol Tercatat</small><b id="totalGolDisplay">0</b></div>
-      <div class="stat-box"><small>Top Gol Sementara</small><b id="topScorerDisplay">-</b></div>
-    </div>
-    <table class="topskor-table">
-      <thead><tr><th>NO</th><th>NAMA PEMAIN</th><th>ASAL TIM</th><th>GOL</th></tr></thead>
-      <tbody id="topSkorBody"></tbody>
-    </table>
-  </div>
-</div>
-
 <div class="footer">
   © 2026 VIPT CUP IV • Sportivitas • Fairplay • Solidaritas • Prestasi
   <br><span style="display:block;margin-top:6px">Design By <a href="#">Uda_RnL</a></span>
 </div>
-
 </main>
 
 <nav class="bottom">
-  <a class="nav active" data-tabnav="beranda" onclick="switchTab('beranda',this)"><span>🏠</span>Beranda</a>
-  <a class="nav" onclick="openSection('jadwal',this)"><span>📅</span>Jadwal</a>
-  <a class="nav" data-tabnav="topskor" onclick="switchTab('topskor',this)"><span>⚡</span>Top Skor</a>
-  <a class="nav" onclick="openSection('bracket',this)"><span>🏆</span>Bracket</a>
-  <a class="nav" onclick="openSection('hasil',this)"><span>☰</span>Hasil</a>
+  <a class="nav active" href="index.html"><span>🏠</span>Beranda</a>
+  <a class="nav active" href="index.html#jadwal"><span>📅</span>Jadwal</a>
+  <a class="nav " href="bracket.html"><span>🏆</span>Bracket</a>
+  <a class="nav " href="hasil.html"><span>☰</span>Hasil</a>
+  <a class="nav" href="index.html#sosial"><span>📱</span>Sosial</a>
 </nav>
 
 </div>
@@ -435,20 +355,20 @@ function openSection(id,e){
   setActiveNav(e);
   setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"start"}),40)
 }
-renderTopSkor();
+if(document.getElementById("topSkorBody")) renderTopSkor();
 
 window.VENUE="Lapangan Central";
 
 const MATCHES=[
   {id:"VP-SF1",sport:"VOLLY PUTRA",round:"SEMIFINAL",date:"2026-08-28",time:"20:30 WIB",a:"RT 09 / RW 014",b:"RT 04 / RW 021",status:"JADWAL"},
   {id:"VP-SF2",sport:"VOLLY PUTRA",round:"SEMIFINAL",date:"2026-08-28",time:"21:30 WIB",a:"RT 10 / RW 021",b:"RT 06 / RW 021",status:"JADWAL"},
-  {id:"BD-W-SF1",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRI",date:"2026-08-29",time:"20:00 WIB",a:"RT 06 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
-  {id:"BD-M-SF1",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRA",date:"2026-08-29",time:"21:30 WIB",a:"RT 10 / RW 021",b:"RT 07 / RW 014",status:"JADWAL"},
-  {id:"VW-1",sport:"VOLLY PUTRI",round:"PERTANDINGAN",date:"2026-08-30",time:"15:45 WIB",a:"RT 06 / RW 021",b:"RT 08 / RW 014",status:"JADWAL"},
+  {id:"BDW-SF1",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRI",date:"2026-08-29",time:"20:00 WIB",a:"RT 06 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
+  {id:"BDM-SF1",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRA",date:"2026-08-29",time:"21:30 WIB",a:"RT 10 / RW 021",b:"RT 07 / RW 014",status:"JADWAL"},
+  {id:"VW-3RD",sport:"VOLLY PUTRI",round:"PEREBUTAN JUARA 3 & 4",date:"2026-08-30",time:"15:45 WIB",a:"RT 08 / RW 014",b:"RT 06 / RW 021",status:"JADWAL"},
   {id:"TM-SF1",sport:"TENIS MEJA",round:"SEMIFINAL",date:"2026-08-30",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 10 / RW 014",status:"JADWAL"},
   {id:"TM-SF2",sport:"TENIS MEJA",round:"SEMIFINAL",date:"2026-08-30",time:"20:15 WIB",a:"RT 11 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
-  {id:"BD-W-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRI",date:"2026-08-30",time:"21:00 WIB",a:"RT 10 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
-  {id:"BD-M-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRA",date:"2026-08-30",time:"22:15 WIB",a:"RT 08 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
+  {id:"BDW-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRI",date:"2026-08-30",time:"21:00 WIB",a:"RT 10 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
+  {id:"BDM-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRA",date:"2026-08-30",time:"22:15 WIB",a:"RT 08 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
 ];
 
 const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];
@@ -511,9 +431,9 @@ function cleanStatus(s){return String(s||"").toUpperCase().trim()}
 function statusForMatch(st){
   const x=cleanStatus(st);
   if(x.includes("PERTANDINGAN SELESAI")||x==="SELESAI")return"SELESAI";
-  if(x.includes("SET 1 SELESAI"))return"SET 1 SELESAI";
-  if(x.includes("SET 2 SELESAI"))return"SET 2 SELESAI";
-  if(x.includes("SET 3 SELESAI"))return"SET 3 SELESAI";
+  for(let i=1;i<=5;i++){
+    if(x.includes(`SET ${i} SELESAI`))return `SET ${i} SELESAI`;
+  }
   if(x.includes("LIVE"))return"LIVE";
   return x||"JADWAL"
 }
@@ -532,7 +452,7 @@ function getVollySets(st){
   }
 
   if(Array.isArray(raw) && raw.length){
-    return raw.slice(0,3).map((x,i)=>{
+    return raw.slice(0,5).map((x,i)=>{
       if(Array.isArray(x))return {a:Number(x[0])||0,b:Number(x[1])||0,winner:"",setNumber:i+1};
       return {
         a:Number(x?.a ?? x?.scoreA ?? x?.teamA ?? x?.pointsA ?? x?.A ?? 0)||0,
@@ -556,18 +476,25 @@ function getVollyWinner(st,m){
   const direct=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;
   if(direct)return direct;
   const sets=getVollySets(st),
-        winsA=sets.filter(x=>x.a>x.b).length,
-        winsB=sets.filter(x=>x.b>x.a).length;
+        winsA=sets.filter(x=>x.winner==="A" || (!x.winner && x.a>x.b && (x.a>0||x.b>0))).length,
+        winsB=sets.filter(x=>x.winner==="B" || (!x.winner && x.b>x.a && (x.a>0||x.b>0))).length;
   if(winsA>winsB)return st?.teamA?.name||m?.a||"";
   if(winsB>winsA)return st?.teamB?.name||m?.b||"";
   return""
 }
 
 function getStateForMatch(m){
-  const candidates=[];
-  if(liveState&&liveState.matchId===m.id)candidates.push(liveState);
-  for(const h of historyState)if(h&&h.matchId===m.id)candidates.push(h);
-  return candidates.length?candidates[candidates.length-1]:null
+  if(liveState && liveState.matchId===m.id){
+    const s=cleanStatus(liveState.status);
+    if(s==="LIVE" || s.includes("SET") || s==="JADWAL") return liveState;
+  }
+  const matches=historyState.filter(h=>h&&h.matchId===m.id);
+  if(matches.length){
+    matches.sort((a,b)=>historyTimestamp(a)-historyTimestamp(b));
+    return matches[matches.length-1];
+  }
+  if(liveState&&liveState.matchId===m.id)return liveState;
+  return null
 }
 
 function normalizeMatchSport(s,fallback){
@@ -584,7 +511,7 @@ function applyFirebaseMatchData(m,st){
   const out={...m},a=st.teamA||{},b=st.teamB||{};
   if(a.name)out.a=a.name;
   if(b.name)out.b=b.name;
-  if(st.sport)out.sport=normalizeMatchSport(st.sport,m.sport);
+  if(st.matchSportLabel||st.sport)out.sport=normalizeMatchSport(st.matchSportLabel||st.sport,m.sport);
   if(st.status)out.status=statusForMatch(st.status);
 
   if(isVollySport(out.sport)){
@@ -593,10 +520,10 @@ function applyFirebaseMatchData(m,st){
       out.sets=sets.map((x,i)=>[`SET ${i+1}`,`${x.a} - ${x.b}`]);
       out.volleyballSets=sets
     }
-    const setWinsA=sets.filter(x=>x.a>x.b).length,
-          setWinsB=sets.filter(x=>x.b>x.a).length;
-    out.teamScoreA=Number(a.score??setWinsA)||0;
-    out.teamScoreB=Number(b.score??setWinsB)||0;
+    const setWinsA=sets.filter(x=>x.winner==="A" || (!x.winner && x.a>x.b && (x.a>0||x.b>0))).length,
+          setWinsB=sets.filter(x=>x.winner==="B" || (!x.winner && x.b>x.a && (x.a>0||x.b>0))).length;
+    out.teamScoreA=setWinsA;
+    out.teamScoreB=setWinsB;
     out.winner=getVollyWinner(st,m);
     out.period=st.period||"";
     out.isFirebaseVolly=true;
@@ -624,32 +551,25 @@ function renderLive(){
     label.className="waiting"
   }
 
-  document.getElementById("liveSport").textContent=liveState.sport||"LIVE SCORE";
+  document.getElementById("liveSport").textContent=liveState.matchSportLabel||liveState.sport||"LIVE SCORE";
   document.getElementById("liveA").textContent=a.name||"-";
   document.getElementById("liveB").textContent=b.name||"-";
 
-  const sport=normalizeMatchSport(liveState.sport,"");
+  const sport=normalizeMatchSport(liveState.matchSportLabel||liveState.sport,"");
   if(isVollySport(sport)){
     const sets=getVollySets(liveState);
-    let current=sets.length?sets[sets.length-1]:null;
-    let pointA=current?Number(current.a):NaN;
-    let pointB=current?Number(current.b):NaN;
 
-    if(!Number.isFinite(pointA)||!Number.isFinite(pointB)){
-      pointA=Number(liveState.currentSetScoreA ?? liveState.currentSetA ?? liveState.setScoreA ?? liveState.pointsA);
-      pointB=Number(liveState.currentSetScoreB ?? liveState.currentSetB ?? liveState.setScoreB ?? liveState.pointsB)
-    }
-    if(!Number.isFinite(pointA))pointA=0;
-    if(!Number.isFinite(pointB))pointB=0;
+    // Scoreboard menyimpan poin SET AKTIF di teamA.score / teamB.score.
+    const pointA=Number(a.score)||0;
+    const pointB=Number(b.score)||0;
 
-    let setWinA=sets.filter(x=>Number(x.a)>Number(x.b)).length;
-    let setWinB=sets.filter(x=>Number(x.b)>Number(x.a)).length;
-    if(Number.isFinite(Number(a.score)))setWinA=Number(a.score);
-    if(Number.isFinite(Number(b.score)))setWinB=Number(b.score);
+    // Skor pertandingan voli = jumlah SET yang sudah dimenangkan.
+    const setWinA=sets.filter(x=>x.winner==="A" || (!x.winner && x.a>x.b && (x.a>0||x.b>0))).length;
+    const setWinB=sets.filter(x=>x.winner==="B" || (!x.winner && x.b>x.a && (x.a>0||x.b>0))).length;
 
-    const setNo=Number(current?.setNumber ?? liveState.currentSet ?? liveState.setNumber ?? liveState.periodNumber)||Math.max(sets.length,1);
+    const setNo=Math.max(1,Math.min(5,Number(liveState.periodNumber)||1));
     document.getElementById("liveScore").firstChild.textContent=`${pointA} - ${pointB}`;
-    document.getElementById("liveRound").textContent=`SET ${Math.min(setNo,3)} • ${setWinA} - ${setWinB} • ${liveStatus}`
+    document.getElementById("liveRound").textContent=`SET ${setNo} • SET MENANG ${setWinA} - ${setWinB} • ${liveStatus}`
   }else{
     document.getElementById("liveScore").firstChild.textContent=(a.score||0)+" - "+(b.score||0);
     document.getElementById("liveRound").textContent=(liveState.period||liveStatus)+" • "+liveStatus
@@ -664,15 +584,50 @@ function renderLive(){
   if(fb)fb.style.display=sb?"none":"grid"
 }
 
+function getMatchDateTime(m){
+  const hm=String(m.time||"00:00").match(/(\d{1,2}):(\d{2})/);
+  const h=hm?hm[1].padStart(2,"0"):"00", min=hm?hm[2]:"00";
+  return new Date(`${m.date}T${h}:${min}:00+07:00`).getTime();
+}
+
 function renderSchedule(){
-  let q=document.getElementById("search").value.toLowerCase().trim(),all=buildMergedMatches();
-  let data=all.filter(m=>(activeSport==="SEMUA"||m.sport===activeSport)&&(!q||JSON.stringify(m).toLowerCase().includes(q)));
-  data.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-  document.getElementById("count").textContent=data.length+" pertandingan";
-  document.getElementById("jadwal").innerHTML=data.length?data.map(m=>{
+  const searchEl=document.getElementById("search");
+  const q=(searchEl?.value||"").toLowerCase().trim();
+  const now=Date.now();
+  let all=buildMergedMatches();
+
+  // Halaman utama hanya menampilkan LIVE dan jadwal yang belum lewat.
+  let data=all.filter(m=>{
+    const t=getMatchDateTime(m);
+    const status=String(m.status||"").toUpperCase();
+    const relevant=status==="LIVE" || (status!=="SELESAI" && t >= now);
+    return relevant && (!q || JSON.stringify(m).toLowerCase().includes(q));
+  });
+
+  data.sort((a,b)=>{
+    if(a.status==="LIVE" && b.status!=="LIVE") return -1;
+    if(b.status==="LIVE" && a.status!=="LIVE") return 1;
+    return getMatchDateTime(a)-getMatchDateTime(b);
+  });
+  data=data.slice(0,5);
+
+  const count=document.getElementById("count");
+  if(count)count.textContent=data.length ? `${data.length} jadwal terdekat` : "tidak ada jadwal";
+
+  const target=document.getElementById("jadwalList") || document.getElementById("jadwal");
+  if(!target)return;
+
+  target.innerHTML=data.length?data.map(m=>{
     const statusClass=m.status==="SELESAI"?"done":m.status==="LIVE"?"live":"";
     const score=m.teamScoreA!=null?m.teamScoreA+" - "+m.teamScoreB:"VS";
-    const setsHtml=m.sets?.length?`<div class="sets">${m.sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:"";
+    const t=getMatchDateTime(m);
+    const mins=Math.max(0,Math.floor((t-now)/60000));
+    let eta="";
+    if(m.status==="LIVE") eta="🔴 SEDANG BERLANGSUNG";
+    else if(mins<60) eta=`⏱️ ${mins} menit lagi`;
+    else if(mins<1440) eta=`⏱️ ${Math.floor(mins/60)} jam ${mins%60} menit lagi`;
+    else eta=`📅 ${esc(prettyDate(m.date))}`;
+
     return `<div class="card match" data-status="${esc(m.status)}">
       <div class="round">${esc(m.sport)} • ${esc(m.round)}</div>
       <div class="date">${esc(prettyDate(m.date))} • ${esc(m.time)}</div>
@@ -681,18 +636,16 @@ function renderSchedule(){
         <span class="vs">${score}</span>
         <div class="match-team">${logoHtml(m.b)}<div class="match-team-name">${esc(m.b)}</div></div>
       </div>
-      ${setsHtml}
+      <div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">${eta}</div>
       <div class="venue">📍 ${esc(VENUE)}</div>
-      ${m.winner?`<div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">🏆 PEMENANG: ${esc(m.winner)}</div>`:""}
-      ${m.period&&m.status!=="SELESAI"?`<div style="margin-top:5px;color:#aaa;font-size:8px">Periode: ${esc(m.period)}</div>`:""}
       <span class="status ${statusClass}">${esc(m.status)}</span>
     </div>`
-  }).join(""):`<div class="card empty">Pertandingan tidak ditemukan.</div>`
+  }).join(""):`<div class="card empty">Belum ada pertandingan berikutnya pada jadwal saat ini.</div>`;
 }
-
 function renderBracket(){
   let sport=activeSport==="SEMUA"?"BADMINTON":activeSport,
       data=buildMergedMatches().filter(m=>m.sport===sport);
+  if(!document.getElementById("bracketFilters"))return;
   document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`<button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>`).join("");
   let badminton=sport==="BADMINTON";
   document.getElementById("bracketGrid").innerHTML=`
@@ -711,6 +664,7 @@ function renderBracket(){
 
 function renderResults(){
   const d=buildMergedMatches().filter(m=>m.status==="SELESAI"&&(m.sport==="BADMINTON"||isVollySport(m.sport)));
+  if(!document.getElementById("results"))return;
   document.getElementById("results").innerHTML=d.length?d.map(m=>{
     const sets=m.sets||[];
     return `<div class="card result-card">
@@ -816,11 +770,14 @@ function formatHistoryDate(st){
     }catch(e){}
   }
 
-  if(st?.date){
-    return `${prettyDate(st.date)}${st.time?" • "+st.time:""}`;
+  const d=st?.matchDate||st?.date;
+  const tm=st?.matchTime||st?.time;
+  if(d){
+    // matchDate dari scoreboard berbentuk "30 AGUSTUS 2026", jadi tampilkan apa adanya.
+    return `${d}${tm?" • "+tm:""}`;
   }
 
-  return st?.time||"Waktu pertandingan tidak tersedia";
+  return tm||"Waktu pertandingan tidak tersedia";
 }
 
 function historyTeamName(st,side){
@@ -836,6 +793,18 @@ function historyTeamName(st,side){
 
 function historyTeamScore(st,side){
   const obj=side==="A"?st?.teamA:st?.teamB;
+  const sport=normalizeMatchSport(st?.matchSportLabel||st?.sport||st?.cabang,"");
+
+  // VOLLY: hasil akhir dihitung dari SET MENANG, bukan team.score
+  // karena scoreboard memakai team.score sebagai poin set aktif.
+  if(isVollySport(sport)){
+    const sets=getVollySets(st);
+    return sets.filter(x=>
+      side==="A"
+        ? (x.winner==="A" || (!x.winner && Number(x.a)>Number(x.b) && (Number(x.a)>0||Number(x.b)>0)))
+        : (x.winner==="B" || (!x.winner && Number(x.b)>Number(x.a) && (Number(x.a)>0||Number(x.b)>0)))
+    ).length;
+  }
 
   const direct=
     obj?.score ??
@@ -849,8 +818,6 @@ function historyTeamScore(st,side){
 
   const n=Number(direct);
   if(Number.isFinite(n))return n;
-
-  const sport=normalizeMatchSport(st?.sport||st?.cabang,"");
 
   if(isVollySport(sport)){
     const sets=getVollySets(st);
@@ -928,7 +895,7 @@ function isFinishedLive(st){
 function uniqueResultKey(st){
   const a=norm(historyTeamName(st,"A"));
   const b=norm(historyTeamName(st,"B"));
-  const sport=normalizeMatchSport(st?.sport||st?.cabang,"");
+  const sport=normalizeMatchSport(st?.matchSportLabel||st?.sport||st?.cabang,"");
   return st?.matchId || `${sport}|${a}|${b}|${st?.date||""}`;
 }
 
