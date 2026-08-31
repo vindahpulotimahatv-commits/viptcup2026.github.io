@@ -11,6 +11,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 
 <style>
 :root{
@@ -210,6 +211,21 @@ main{padding:0 14px}
   .hero h1{font-size:28px}.hero h2{font-size:22px}
   .notify-top{flex-direction:column}.notify-btn{width:100%}
 }
+
+/* ===== VIPT SURVEY ===== */
+.survey-invite{border:1px solid rgba(245,183,43,.48);background:linear-gradient(145deg,rgba(245,183,43,.12),rgba(255,255,255,.025));overflow:hidden;position:relative;margin-top:12px}
+.survey-invite:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(#ffd46a,#9d6708)}
+.survey-kicker{font-size:10px;color:var(--gold);font-weight:900;letter-spacing:.5px;margin-bottom:7px}.survey-title{font-size:17px;font-weight:900;margin:0 0 7px}.survey-desc{font-size:11px;line-height:1.55;color:var(--muted);margin:0 0 13px}
+.survey-start{width:100%;border:0;border-radius:10px;padding:12px 14px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,#ffd35c,#b97a0b);color:#17120a}.survey-start:disabled{opacity:.6}
+.survey-status{margin-top:9px;font-size:10px;color:var(--muted);text-align:center;line-height:1.4}
+.survey-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.84);backdrop-filter:blur(7px);display:none;align-items:flex-end;justify-content:center;padding:12px}.survey-modal.open{display:flex}
+.survey-sheet{width:min(100%,580px);max-height:91vh;overflow:auto;background:#101112;border:1px solid rgba(245,183,43,.58);border-radius:18px 18px 12px 12px;box-shadow:0 -14px 50px rgba(0,0,0,.6)}
+.survey-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;position:sticky;top:0;background:#101112;z-index:2;border-bottom:1px solid rgba(255,255,255,.07)}.survey-head h3{margin:0;color:var(--gold);font-size:15px}.survey-close{width:34px;height:34px;border:0;border-radius:50%;background:#242528;color:#fff;font-size:19px}
+.survey-body{padding:15px}.survey-progress{font-size:10px;font-weight:900;margin-bottom:13px}.survey-q{font-size:14px;font-weight:900;line-height:1.45;margin-bottom:13px}.survey-options{display:grid;gap:9px}.survey-option{display:flex;gap:10px;align-items:center;padding:11px;border:1px solid rgba(255,255,255,.11);border-radius:10px;background:#17181b;font-size:11px}.survey-option input{accent-color:#dba72c}
+.survey-textarea,.survey-select{width:100%;border:1px solid rgba(255,255,255,.13);background:#151619;color:#fff;border-radius:10px;padding:12px;font:inherit}.survey-textarea{min-height:100px;resize:vertical}.survey-select option{background:#151619}
+.survey-actions{display:flex;gap:9px;margin-top:15px}.survey-actions button{flex:1;border:0;border-radius:10px;padding:12px;font-weight:900}.survey-back{background:#25272a;color:#fff}.survey-next{background:linear-gradient(135deg,#ffd35c,#b97a0b);color:#18120a}.survey-next:disabled{opacity:.55}.survey-note{font-size:9px;line-height:1.5;color:#8f9196;margin-top:12px}.survey-success{text-align:center;padding:24px 15px}.survey-success .check{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;background:#218c43;font-size:34px}.survey-success h3{color:var(--gold);font-size:20px;margin:6px 0 8px}.survey-success p{font-size:11px;line-height:1.6;color:#ddd}
+@media(min-width:680px){.survey-modal{align-items:center}.survey-sheet{border-radius:18px}}
+
 </style>
 </head>
 
@@ -279,7 +295,22 @@ main{padding:0 14px}
 <input class="search" id="search" type="search" placeholder="Cari tim / cabang olahraga...">
 <div id="sportFilters" style="display:none"></div>
 <div id="jadwalList"></div>
-<div id="jadwal" style="display:none"></div>
+
+
+
+<div class="card survey-invite" id="surveyInvite">
+  <div class="survey-kicker">📊 SUARA WARGA • VIPT CUP IV 2026</div>
+  <h3 class="survey-title">Seberapa penting Multimedia VIPT CUP?</h3>
+  <p class="survey-desc">Bantu evaluasi Live Streaming, Live Score, jadwal digital, dokumentasi, dan media sosial. Survei anonim dan sekitar 1 menit.</p>
+  <button class="survey-start" id="surveyStartBtn" type="button">ISI SURVEI • ± 1 MENIT</button>
+  <div class="survey-status" id="surveyStatus">Menghubungkan sistem survei aman...</div>
+</div>
+<div class="survey-modal" id="surveyModal" aria-hidden="true">
+  <div class="survey-sheet" role="dialog" aria-modal="true" aria-labelledby="surveyDialogTitle">
+    <div class="survey-head"><h3 id="surveyDialogTitle">SURVEI MULTIMEDIA VIPT CUP IV 2026</h3><button class="survey-close" id="surveyCloseBtn" type="button" aria-label="Tutup">×</button></div>
+    <div class="survey-body" id="surveyBody"></div>
+  </div>
+</div>
 
 <div class="section" id="sosial"><h2>📱 Sosial Media VIPT</h2></div>
 <div class="card" style="text-align:center">
@@ -1452,6 +1483,65 @@ document.addEventListener("DOMContentLoaded",()=>{
     document.addEventListener(evt,activateYoutubeSound,{once:true,passive:true});
   });
 })();
+
+
+/* ===== FIREBASE SURVEI BARU (TERPISAH DARI SCOREBOARD) ===== */
+const SURVEY_FIREBASE_CONFIG={
+  apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",
+  authDomain:"vipt-survey-2026.firebaseapp.com",
+  databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"vipt-survey-2026",
+  storageBucket:"vipt-survey-2026.firebasestorage.app",
+  messagingSenderId:"761699971320",
+  appId:"1:761699971320:web:2cabe1effb822597534b0d"
+};
+const SURVEY_QUESTIONS=[
+ {key:"importance",type:"radio",title:"Menurut Anda, seberapa penting keberadaan Multimedia dalam pelaksanaan VIPT CUP?",options:["Sangat Penting","Penting","Cukup Penting","Kurang Penting","Tidak Penting"]},
+ {key:"feature",type:"radio",title:"Fitur Multimedia VIPT CUP mana yang paling bermanfaat?",options:["Live Streaming","Live Score","Jadwal Pertandingan Digital","Dokumentasi Foto/Video","Highlight Pertandingan","Informasi Media Sosial"]},
+ {key:"benefit",type:"radio",title:"Seberapa membantu Live Streaming dan Match Center dalam mengikuti VIPT CUP?",options:["Sangat Membantu","Membantu","Cukup Membantu","Kurang Membantu","Tidak Membantu"]},
+ {key:"continuation",type:"radio",title:"Apakah layanan Multimedia VIPT CUP perlu dilanjutkan pada penyelenggaraan berikutnya?",options:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu"]},
+ {key:"area",type:"select",title:"Anda berasal dari wilayah mana? (opsional)",options:["","RT 02 / RW 021","RT 04 / RW 021","RT 06 / RW 021","RT 07 / RW 014","RT 07 / RW 021","RT 08 / RW 014","RT 08 / RW 021","RT 09 / RW 014","RT 10 / RW 014","RT 10 / RW 021","RT 11 / RW 021","RT 13 / RW 021","Penonton Umum / Lainnya"]},
+ {key:"suggestion",type:"text",title:"Saran untuk Multimedia VIPT CUP berikutnya (opsional)"}
+];
+let surveyApp=null,surveyAuth=null,surveyDB=null,surveyUser=null,surveySubmitted=false,surveyStep=0,surveyAnswers={};
+const surveyModal=document.getElementById("surveyModal"),surveyBody=document.getElementById("surveyBody"),surveyStartBtn=document.getElementById("surveyStartBtn"),surveyStatus=document.getElementById("surveyStatus"),surveyCloseBtn=document.getElementById("surveyCloseBtn");
+function surveyEsc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function setSurveyStatus(t){if(surveyStatus)surveyStatus.textContent=t}
+function closeSurvey(){surveyModal?.classList.remove("open");surveyModal?.setAttribute("aria-hidden","true")}
+function openSurvey(){if(!surveyUser){setSurveyStatus("Sistem survei sedang menghubungkan Firebase. Coba beberapa detik lagi.");return}if(surveySubmitted){renderSurveySuccess()}else{surveyStep=0;renderSurveyStep()}surveyModal?.classList.add("open");surveyModal?.setAttribute("aria-hidden","false")}
+function renderSurveyStep(){
+ if(!surveyBody)return; const q=SURVEY_QUESTIONS[surveyStep]; if(!q)return; let control="";
+ if(q.type==="radio") control=`<div class="survey-options">${q.options.map(o=>`<label class="survey-option"><input type="radio" name="surveyChoice" value="${surveyEsc(o)}" ${surveyAnswers[q.key]===o?"checked":""}><span>${surveyEsc(o)}</span></label>`).join("")}</div>`;
+ else if(q.type==="select") control=`<select class="survey-select" id="surveyInput"><option value="">Pilih wilayah (opsional)</option>${q.options.filter(Boolean).map(o=>`<option value="${surveyEsc(o)}" ${surveyAnswers[q.key]===o?"selected":""}>${surveyEsc(o)}</option>`).join("")}</select>`;
+ else control=`<textarea class="survey-textarea" id="surveyInput" maxlength="500" placeholder="Tulis saran Anda di sini...">${surveyEsc(surveyAnswers[q.key]||"")}</textarea>`;
+ surveyBody.innerHTML=`<div class="survey-progress">${surveyStep+1} / ${SURVEY_QUESTIONS.length}</div><div class="survey-q">${surveyEsc(q.title)}</div>${control}<div class="survey-actions">${surveyStep?'<button class="survey-back" id="surveyBack" type="button">KEMBALI</button>':''}<button class="survey-next" id="surveyNext" type="button">${surveyStep===SURVEY_QUESTIONS.length-1?'KIRIM SURVEI':'BERIKUTNYA'}</button></div><div class="survey-note">Survei bersifat anonim. Jawaban individu tidak dapat dibaca publik.</div>`;
+ document.getElementById("surveyBack")?.addEventListener("click",()=>{saveSurveyCurrent();surveyStep--;renderSurveyStep()});
+ document.getElementById("surveyNext")?.addEventListener("click",async()=>{if(!saveSurveyCurrent(true))return;if(surveyStep<SURVEY_QUESTIONS.length-1){surveyStep++;renderSurveyStep()}else await submitSurvey()});
+}
+function saveSurveyCurrent(validate=false){const q=SURVEY_QUESTIONS[surveyStep];let v="";if(q.type==="radio")v=document.querySelector('input[name="surveyChoice"]:checked')?.value||"";else v=document.getElementById("surveyInput")?.value?.trim()||"";if(validate&&q.type==="radio"&&!v){alert("Silakan pilih salah satu jawaban.");return false}surveyAnswers[q.key]=v;return true}
+async function submitSurvey(){
+ if(!surveyUser||surveySubmitted)return;const btn=document.getElementById("surveyNext");if(btn){btn.disabled=true;btn.textContent="MENGIRIM..."}
+ const raw={importance:surveyAnswers.importance,feature:surveyAnswers.feature,benefit:surveyAnswers.benefit,continuation:surveyAnswers.continuation,area:surveyAnswers.area||"",suggestion:(surveyAnswers.suggestion||"").slice(0,500),submittedAt:firebase.database.ServerValue.TIMESTAMP};
+ try{
+   await surveyDB.ref(`vipt_survey/responses/${surveyUser.uid}`).set(raw);
+   surveySubmitted=true;localStorage.setItem("VIPT_SURVEY_2026_DONE","1");setSurveyStatus("✅ Terima kasih, survei Anda sudah terkirim.");if(surveyStartBtn){surveyStartBtn.textContent="SURVEI SUDAH DIISI";surveyStartBtn.disabled=true}renderSurveySuccess();
+ }catch(e){console.error("Survey submit:",e);alert(e?.code==="PERMISSION_DENIED"?"Survei ditolak oleh Firebase Rules. Pastikan Rules sudah dipublish.":"Survei belum berhasil dikirim. Periksa koneksi internet lalu coba lagi.");if(btn){btn.disabled=false;btn.textContent="KIRIM SURVEI"}}
+}
+function renderSurveySuccess(){if(!surveyBody)return;surveyBody.innerHTML=`<div class="survey-success"><div class="check">✓</div><h3>TERIMA KASIH!</h3><p>Penilaian Anda berhasil dikirim dan menjadi bahan evaluasi pengembangan Multimedia VIPT CUP berikutnya.</p><p><b>SATU SEMANGAT, SATU TUJUAN<br>MENANG BERSAMA!</b></p><button class="survey-next" style="width:100%;margin-top:10px" type="button" onclick="closeSurvey()">SELESAI</button></div>`}
+async function initSurveyFirebase(){
+ try{
+   surveyApp=firebase.apps.find(a=>a.name==="viptSurvey")||firebase.initializeApp(SURVEY_FIREBASE_CONFIG,"viptSurvey");
+   surveyAuth=surveyApp.auth();surveyDB=surveyApp.database();
+   await surveyAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+   let u=surveyAuth.currentUser;if(!u){const c=await surveyAuth.signInAnonymously();u=c.user}surveyUser=u;
+   const snap=await surveyDB.ref(`vipt_survey/responses/${u.uid}`).once("value");surveySubmitted=snap.exists();
+   if(surveySubmitted){setSurveyStatus("✅ Perangkat ini sudah mengisi survei.");if(surveyStartBtn){surveyStartBtn.textContent="SURVEI SUDAH DIISI";surveyStartBtn.disabled=true}}
+   else setSurveyStatus("🔐 Survei anonim • satu respons per akun anonymous");
+ }catch(e){console.error("Survey init:",e);setSurveyStatus("⚠️ Survei belum terhubung. Periksa Authentication/Rules.")}
+}
+surveyStartBtn?.addEventListener("click",openSurvey);surveyCloseBtn?.addEventListener("click",closeSurvey);surveyModal?.addEventListener("click",e=>{if(e.target===surveyModal)closeSurvey()});
+initSurveyFirebase();
+
 </script>
 </body>
 </html>
