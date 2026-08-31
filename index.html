@@ -1540,7 +1540,7 @@ async function submitSurvey(){
  const publicAnswer={
    q1:surveyAnswers.q1,q2:surveyAnswers.q2,q3:surveyAnswers.q3,q4:surveyAnswers.q4,q5:surveyAnswers.q5,
    q6:surveyAnswers.q6,q7:surveyAnswers.q7,q8:surveyAnswers.q8,q9:surveyAnswers.q9,
-   submittedAt:firebase.database.ServerValue.TIMESTAMP
+   q10:(surveyAnswers.q10||"").slice(0,500),submittedAt:firebase.database.ServerValue.TIMESTAMP
  };
  try{
    const updates={};
