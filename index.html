@@ -196,7 +196,7 @@ main{padding:0 14px}
 .hidden{display:none!important}
 .bottom{
   position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);
-  width:min(620px,100%);display:grid;grid-template-columns:repeat(5,1fr);
+  width:min(620px,100%);display:grid;grid-template-columns:repeat(6,1fr);
   padding:8px 8px 11px;background:rgba(5,5,5,.98);border-top:1px solid #7a5514;
   backdrop-filter:blur(12px)
 }
@@ -227,15 +227,14 @@ main{padding:0 14px}
 .survey-actions{display:flex;gap:9px;margin-top:15px}.survey-actions button{flex:1;border:0;border-radius:10px;padding:12px;font-weight:900}.survey-back{background:#25272a;color:#fff}.survey-next{background:linear-gradient(135deg,#ffd35c,#b97a0b);color:#18120a}.survey-next:disabled{opacity:.55}.survey-note{font-size:9px;line-height:1.5;color:#8f9196;margin-top:12px}.survey-success{text-align:center;padding:24px 15px}.survey-success .check{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;background:#218c43;font-size:34px}.survey-success h3{color:var(--gold);font-size:20px;margin:6px 0 8px}.survey-success p{font-size:11px;line-height:1.6;color:#ddd}
 @media(min-width:680px){.survey-modal{align-items:center}.survey-sheet{border-radius:18px}}
 
+
+
 </style>
 </head>
 
 <body>
 <div id="notifyToast" class="toast"><b id="toastTitle">VIPT CUP IV 2026</b><span id="toastText"></span></div>
 
-<audio id="vocaAudio" autoplay loop>
-  <source src="https://media1.vocaroo.com/mp3/1oVLhmdzAasW" type="audio/mpeg">
-</audio>
 
 <div class="app">
 <header></header>
@@ -283,6 +282,7 @@ main{padding:0 14px}
           allowfullscreen></iframe>
   <a class="btn" href="https://www.youtube.com/live/ZG0K0NGUG8Q?si=6coN42w2PFSb7QKR" target="_blank" rel="noopener noreferrer">▶️ BUKA DI YOUTUBE</a>
 </div>
+
 
 <div class="section" id="jadwal"><h2>📅 Jadwal Pertandingan</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
 <div class="card notify-card">
@@ -332,11 +332,13 @@ main{padding:0 14px}
 </div>
 </main>
 
+
 <nav class="bottom">
   <a class="nav active" href="index.html"><span>🏠</span>Beranda</a>
-  <a class="nav active" href="index.html#jadwal"><span>📅</span>Jadwal</a>
-  <a class="nav " href="bracket.html"><span>🏆</span>Bracket</a>
-  <a class="nav " href="hasil.html"><span>☰</span>Hasil</a>
+  <a class="nav" href="index.html#jadwal"><span>📅</span>Jadwal</a>
+  <a class="nav" href="bracket.html"><span>🏆</span>Bracket</a>
+  <a class="nav" href="hasil.html"><span>☰</span>Hasil</a>
+  <a class="nav" href="musik.html"><span>🎵</span>Musik</a>
   <a class="nav" href="index.html#sosial"><span>📱</span>Sosial</a>
 </nav>
 
@@ -1568,5 +1570,7 @@ surveyStartBtn?.addEventListener("click",openSurvey);surveyCloseBtn?.addEventLis
 initSurveyFirebase();
 
 </script>
+
+
 </body>
 </html>
