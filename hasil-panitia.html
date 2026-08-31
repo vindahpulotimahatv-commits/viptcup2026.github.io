@@ -24,7 +24,7 @@
  <div class="card mini"><div class="k">LIVE STREAMING SANGAT MEMBANTU / MEMBANTU</div><div class="v" id="streamPct">0%</div></div>
 </div>
 <div class="grid" id="metrics"></div>
-<div class="card comments-card"><h3>💬 Kritik, Saran & Harapan Responden</h3><div id="comments" class="comments"><div class="comment-empty">Belum ada komentar tertulis.</div></div></div>
+<div class="card comments-card"><h3>💬 Kritik, Saran & Harapan Responden <span id="commentCount" style="color:#aaa;font-size:10px;font-weight:700"></span></h3><div id="comments" class="comments"><div class="comment-empty">Belum ada komentar tertulis.</div></div></div>
 <div class="card privacy"><b>Catatan:</b> komentar ditampilkan tanpa nama responden. Halaman ini ditujukan untuk internal panitia dan dibuka menggunakan password panitia.</div>
 <div class="status" id="status">Menghubungkan Firebase...</div>
 <a class="back" href="index.html">← Kembali ke Match Center</a>
@@ -32,6 +32,16 @@
 <script>
 const CFG={apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",authDomain:"vipt-survey-2026.firebaseapp.com",databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"vipt-survey-2026",storageBucket:"vipt-survey-2026.firebasestorage.app",messagingSenderId:"761699971320",appId:"1:761699971320:web:2cabe1effb822597534b0d"};
 const PATH="vipt_survey_public_eval_multimedia_v2/respondents";
+const LEGACY_COMMENTS=[
+  "untuk para wasit harus profesional jgn berat pada 1 team",
+  "Kamera kamera yg lebih pro",
+  "Harapannya semua RT dapat mengirimkan 1 kandidat Muda / Mudi untuk bergabung bersama Tim Multimedia Villa Indah Pulo Timaha. Untuk Kemaslahatan Bersama. Kecup 2 Jari dari Kang Ded. ☺Jaya.. Jaya.. Jaya.. ✊🏻✊🏻✊🏻",
+  "Terus belajar dan berimprovisasi agar semakin lebih baik.Sehat selalu untuk semua Team",
+  "Kalo bisa wasit ambil dari luar jangan dari dalam..selama dua kali tiap tahun menurut saya wasit kurang adil harusnya wasit keputusan mutlak jangan dikendalikan pemain ataupun pihak manapun belajar profesional",
+  "Saran : highlight cabor per pertandingan bila memungkinkan",
+  "Tahun besok Kamera Harus Baru Bukan Pakai CCTV LAGI",
+  "Gambar untuk kamera dilapangan klo bisa thn depan qualitasnya lebih bagus lagi,  untuk skor yg di layar monitor mungkin bisa adobe sperti nasional .... dan klo memungkinkan ada replay untuk momen2 tertentu ... mantapzzz"
+];
 const META={
  q1:{t:"Penilaian layanan Multimedia",o:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
  q2:{t:"Manfaat Live Streaming",o:["Sangat Membantu","Membantu","Cukup Membantu","Kurang Membantu","Tidak Membantu"]},
@@ -56,9 +66,13 @@ function render(rows){
    const bars=m.o.map(o=>{const n=count(rows,k,o),p=pct(n,denom);return `<div class="row"><div class="rowtop"><span>${o}</span><b>${n} • ${p}%</b></div><div class="bar"><div class="fill" style="width:${p}%"></div></div></div>`}).join('');
    return `<div class="card metric"><h3>${m.t}</h3>${bars}</div>`;
  }).join('');
- const comments=rows.map(r=>String(r?.q10||'').trim()).filter(Boolean);
+ const liveComments=rows.map(r=>String(r?.q10||'').trim()).filter(Boolean);
+ const norm=t=>String(t).trim().toLowerCase().replace(/\s+/g,' ');
+ const seen=new Set();
+ const comments=[...LEGACY_COMMENTS,...liveComments].filter(t=>{const k=norm(t);if(!k||seen.has(k))return false;seen.add(k);return true;});
  const escHtml=t=>String(t).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
- document.getElementById('comments').innerHTML=comments.length?comments.map((t,i)=>`<div class="comment"><div class="comment-num">RESPONDEN ${i+1}</div><div class="comment-text">${escHtml(t)}</div></div>`).join(''):'<div class="comment-empty">Belum ada komentar tertulis.</div>';
+ document.getElementById('commentCount').textContent=`• ${comments.length} komentar`;
+ document.getElementById('comments').innerHTML=comments.length?comments.map((t,i)=>`<div class="comment"><div class="comment-num">KOMENTAR ${i+1}</div><div class="comment-text">${escHtml(t)}</div></div>`).join(''):'<div class="comment-empty">Belum ada komentar tertulis.</div>';
  document.getElementById('status').textContent=`✅ Terhubung • ${total} responden • diperbarui otomatis`;
 }
 const PASS_HASH="d57c257513fa90c0285a633ccfbe5f313c8dff9f705bc977a18e43a44ffcc768"; // VIPT2026PANITIA
