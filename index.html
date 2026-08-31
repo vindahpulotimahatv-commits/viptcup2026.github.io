@@ -1525,7 +1525,7 @@ async function submitSurvey(){
  try{
    await surveyDB.ref(`vipt_survey/responses/${surveyUser.uid}`).set(raw);
    surveySubmitted=true;localStorage.setItem("VIPT_SURVEY_2026_DONE","1");setSurveyStatus("✅ Terima kasih, survei Anda sudah terkirim.");if(surveyStartBtn){surveyStartBtn.textContent="SURVEI SUDAH DIISI";surveyStartBtn.disabled=true}renderSurveySuccess();
- }catch(e){console.error("Survey submit:",e);alert(e?.code==="PERMISSION_DENIED"?"Survei ditolak oleh Firebase Rules. Pastikan Rules sudah dipublish.":"Survei belum berhasil dikirim. Periksa koneksi internet lalu coba lagi.");if(btn){btn.disabled=false;btn.textContent="KIRIM SURVEI"}}
+ }catch(e){console.error("Survey submit:",e);alert(e?.code==="PERMISSION_DENIED"?"Respons untuk UID ini sudah ada atau Firebase Rules menolak penulisan. Jika Anda sudah pernah mengisi, tidak perlu mengisi lagi.":"Survei belum berhasil dikirim. Periksa koneksi internet lalu coba lagi.");if(btn){btn.disabled=false;btn.textContent="KIRIM SURVEI"}}
 }
 function renderSurveySuccess(){if(!surveyBody)return;surveyBody.innerHTML=`<div class="survey-success"><div class="check">✓</div><h3>TERIMA KASIH!</h3><p>Penilaian Anda berhasil dikirim dan menjadi bahan evaluasi pengembangan Multimedia VIPT CUP berikutnya.</p><p><b>SATU SEMANGAT, SATU TUJUAN<br>MENANG BERSAMA!</b></p><button class="survey-next" style="width:100%;margin-top:10px" type="button" onclick="closeSurvey()">SELESAI</button></div>`}
 async function initSurveyFirebase(){
@@ -1534,10 +1534,12 @@ async function initSurveyFirebase(){
    surveyAuth=surveyApp.auth();surveyDB=surveyApp.database();
    await surveyAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
    let u=surveyAuth.currentUser;if(!u){const c=await surveyAuth.signInAnonymously();u=c.user}surveyUser=u;
-   const snap=await surveyDB.ref(`vipt_survey/responses/${u.uid}`).once("value");surveySubmitted=snap.exists();
+   // Respons mentah memang private (.read=false), jadi jangan mencoba membacanya dari browser.
+   // Status lokal hanya untuk UX; Firebase Rules tetap menjadi pengaman server-side agar UID tidak bisa menimpa respons.
+   surveySubmitted=localStorage.getItem("VIPT_SURVEY_2026_DONE")==="1";
    if(surveySubmitted){setSurveyStatus("✅ Perangkat ini sudah mengisi survei.");if(surveyStartBtn){surveyStartBtn.textContent="SURVEI SUDAH DIISI";surveyStartBtn.disabled=true}}
-   else setSurveyStatus("🔐 Survei anonim • satu respons per akun anonymous");
- }catch(e){console.error("Survey init:",e);setSurveyStatus("⚠️ Survei belum terhubung. Periksa Authentication/Rules.")}
+   else setSurveyStatus("✅ Survei terhubung • anonim • satu respons per UID");
+ }catch(e){console.error("Survey init:",e);setSurveyStatus("⚠️ Survei belum terhubung: "+(e?.code||"koneksi-error"))}
 }
 surveyStartBtn?.addEventListener("click",openSurvey);surveyCloseBtn?.addEventListener("click",closeSurvey);surveyModal?.addEventListener("click",e=>{if(e.target===surveyModal)closeSurvey()});
 initSurveyFirebase();
