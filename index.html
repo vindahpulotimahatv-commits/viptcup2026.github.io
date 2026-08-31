@@ -304,7 +304,6 @@ main{padding:0 14px}
   <h3 class="survey-title">Survei Multimedia & Pelaksanaan VIPT CUP</h3>
   <p class="survey-desc">Bantu kami mengevaluasi layanan Multimedia, Live Streaming, Saweria, informasi digital, dan pelaksanaan VIPT CUP. Survei anonim ± 2 menit.</p>
   <button class="survey-start" id="surveyStartBtn" type="button">ISI SURVEI • ± 2 MENIT</button>
-  <a class="survey-result-btn" href="survey-result.html">📊 LIHAT HASIL SURVEI</a>
   <div class="survey-status" id="surveyStatus">Menghubungkan sistem survei aman...</div>
 </div>
 <div class="survey-modal" id="surveyModal" aria-hidden="true">
@@ -1551,7 +1550,7 @@ async function submitSurvey(){
    surveySubmitted=true;localStorage.setItem(SURVEY_LOCAL_KEY,"1");setSurveyStatus("✅ Terima kasih, survei Anda sudah terkirim.");if(surveyStartBtn){surveyStartBtn.textContent="SURVEI SUDAH DIISI";surveyStartBtn.disabled=true}renderSurveySuccess();
  }catch(e){console.error("Survey submit:",e);alert(e?.code==="PERMISSION_DENIED"?"Respons untuk UID ini sudah ada atau Firebase Rules menolak penulisan. Jika Anda sudah pernah mengisi, tidak perlu mengisi lagi.":"Survei belum berhasil dikirim. Periksa koneksi internet lalu coba lagi.");if(btn){btn.disabled=false;btn.textContent="KIRIM SURVEI"}}
 }
-function renderSurveySuccess(){if(!surveyBody)return;surveyBody.innerHTML=`<div class="survey-success"><div class="check">✓</div><h3>TERIMA KASIH!</h3><p>Penilaian Anda berhasil dikirim. Hasil indikator publik diperbarui secara real-time tanpa menampilkan kritik/saran pribadi Anda.</p><p><b>SATU SEMANGAT, SATU TUJUAN<br>MENANG BERSAMA!</b></p><a class="survey-result-btn" style="margin-top:12px" href="survey-result.html">📊 LIHAT HASIL SURVEI</a><button class="survey-next" style="width:100%;margin-top:10px" type="button" onclick="closeSurvey()">SELESAI</button></div>`}
+function renderSurveySuccess(){if(!surveyBody)return;surveyBody.innerHTML=`<div class="survey-success"><div class="check">✓</div><h3>TERIMA KASIH!</h3><p>Penilaian Anda berhasil dikirim. Hasil indikator publik diperbarui secara real-time tanpa menampilkan kritik/saran pribadi Anda.</p><p><b>SATU SEMANGAT, SATU TUJUAN<br>MENANG BERSAMA!</b></p><button class="survey-next" style="width:100%;margin-top:10px" type="button" onclick="closeSurvey()">SELESAI</button></div>`}
 async function initSurveyFirebase(){
  try{
    surveyApp=firebase.apps.find(a=>a.name==="viptSurvey")||firebase.initializeApp(SURVEY_FIREBASE_CONFIG,"viptSurvey");

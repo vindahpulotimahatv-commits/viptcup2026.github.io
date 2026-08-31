@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Survei VIPT CUP IV 2026</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<style>
+:root{--bg:#08090b;--card:#111215;--card2:#17191d;--gold:#f5b72b;--gold2:#ffd76d;--text:#f7f7f7;--muted:#a7a9ae;--line:rgba(255,255,255,.09);--green:#39b85a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at top,#202124 0,#0a0b0d 40%,#050607 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}.wrap{max-width:620px;margin:0 auto;padding:18px 14px 34px}.hero{border:1px solid rgba(245,183,43,.35);background:linear-gradient(145deg,rgba(245,183,43,.14),rgba(255,255,255,.025));border-radius:20px;padding:22px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}.badge{display:inline-flex;gap:7px;align-items:center;padding:7px 11px;border:1px solid rgba(245,183,43,.45);border-radius:999px;color:var(--gold);font-size:10px;font-weight:900;letter-spacing:.5px}.hero h1{font-size:26px;line-height:1.15;margin:14px 0 8px;color:#fff}.hero p{font-size:12px;line-height:1.6;color:var(--muted);margin:0}.card{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}.status{font-size:10px;text-align:center;color:var(--muted);line-height:1.5;margin-bottom:12px}.progress{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.progress strong{font-size:11px;color:var(--gold)}.bar{height:5px;background:#282a2f;border-radius:999px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;width:10%;background:linear-gradient(90deg,#b97a0b,#ffd35c);transition:.25s}.q{font-size:16px;font-weight:900;line-height:1.45;margin:14px 0}.options{display:grid;gap:9px}.option{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 12px;font-size:12px;cursor:pointer}.option input{accent-color:var(--gold)}textarea{width:100%;min-height:120px;background:var(--card2);border:1px solid rgba(255,255,255,.12);color:white;border-radius:12px;padding:12px;font:inherit;resize:vertical}.actions{display:flex;gap:9px;margin-top:15px}.actions button,.primary,.linkbtn{border:0;border-radius:11px;padding:13px 14px;font-weight:900;font-size:11px;cursor:pointer;text-decoration:none;text-align:center}.back{background:#25272b;color:white;flex:1}.next,.primary{background:linear-gradient(135deg,#ffd35c,#b97a0b);color:#18120a;flex:1}.next:disabled,.primary:disabled{opacity:.55}.note{font-size:9px;line-height:1.5;color:#888b91;margin-top:11px}.success{text-align:center;padding:18px 6px}.check{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;background:var(--green);font-size:34px}.success h2{color:var(--gold);margin:8px 0}.success p{font-size:11px;color:#d2d3d6;line-height:1.6}.linkbtn{display:block;margin-top:10px;border:1px solid rgba(245,183,43,.5);color:var(--gold);background:rgba(245,183,43,.08)}.smalllinks{display:flex;gap:8px;margin-top:12px}.smalllinks a{flex:1;color:#ddd;text-decoration:none;font-size:10px;text-align:center;padding:10px;border:1px solid var(--line);border-radius:10px}.footer{text-align:center;color:#676a70;font-size:9px;margin-top:18px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="badge">📊 SURVEI RESMI • VIPT CUP IV 2026</div>
+    <h1>Survei Multimedia & Pelaksanaan VIPT CUP</h1>
+    <p>Bantu kami mengevaluasi Live Streaming, Saweria, informasi digital, peran Tim Multimedia, dan pelaksanaan VIPT CUP. Survei anonim dan membutuhkan sekitar 2 menit.</p>
+  </section>
+
+  <section class="card">
+    <div class="status" id="surveyStatus">Menghubungkan sistem survei aman...</div>
+    <div id="surveyBody">
+      <button class="primary" id="surveyStartBtn" style="width:100%" type="button" disabled>MENGHUBUNGKAN...</button>
+    </div>
+    <div class="smalllinks"><a href="index.html">← Match Center</a></div>
+  </section>
+  <div class="footer">Survei bersifat anonim. Kritik/saran tidak ditampilkan pada hasil publik.</div>
+</div>
+<script>
+const SURVEY_FIREBASE_CONFIG={apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",authDomain:"vipt-survey-2026.firebaseapp.com",databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"vipt-survey-2026",storageBucket:"vipt-survey-2026.firebasestorage.app",messagingSenderId:"761699971320",appId:"1:761699971320:web:2cabe1effb822597534b0d"};
+const SURVEY_VERSION="eval_multimedia_v2";
+const SURVEY_PRIVATE_PATH=`vipt_survey_${SURVEY_VERSION}/responses`;
+const SURVEY_PUBLIC_PATH=`vipt_survey_public_${SURVEY_VERSION}/respondents`;
+const SURVEY_LOCAL_KEY="VIPT_SURVEY_EVAL_MULTIMEDIA_V2_DONE";
+const SURVEY_QUESTIONS=[
+ {key:"q1",type:"radio",title:"Bagaimana penilaian Anda terhadap layanan Multimedia VIPT CUP secara keseluruhan?",options:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
+ {key:"q2",type:"radio",title:"Seberapa membantu Live Streaming VIPT CUP dalam memudahkan Anda mengikuti pertandingan?",options:["Sangat Membantu","Membantu","Cukup Membantu","Kurang Membantu","Tidak Membantu"]},
+ {key:"q3",type:"radio",title:"Bagaimana pendapat Anda mengenai penggunaan Saweria sebagai bentuk dukungan dan partisipasi penonton terhadap pelaksanaan VIPT CUP?",options:["Sangat Baik","Baik","Cukup Baik","Kurang Baik","Tidak Perlu"]},
+ {key:"q4",type:"radio",title:"Bagaimana penilaian Anda terhadap penyampaian jadwal, hasil pertandingan, dokumentasi, dan informasi VIPT CUP melalui media digital?",options:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
+ {key:"q5",type:"radio",title:"Menurut Anda, seberapa penting keberadaan Tim Multimedia dalam pelaksanaan VIPT CUP?",options:["Sangat Penting","Penting","Cukup Penting","Kurang Penting","Tidak Penting"]},
+ {key:"q6",type:"radio",title:"Apakah keberadaan Multimedia membuat VIPT CUP menjadi lebih menarik, profesional, dan mudah diikuti masyarakat?",options:["Sangat Setuju","Setuju","Cukup Setuju","Tidak Setuju","Sangat Tidak Setuju"]},
+ {key:"q7",type:"radio",title:"Menurut Anda, apakah layanan Multimedia VIPT CUP perlu dipertahankan dan dikembangkan pada pelaksanaan berikutnya?",options:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]},
+ {key:"q8",type:"radio",title:"Bagaimana penilaian Anda secara keseluruhan terhadap pelaksanaan VIPT CUP IV 2026?",options:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
+ {key:"q9",type:"radio",title:"Menurut Anda, apakah VIPT CUP perlu diselenggarakan setiap tahun?",options:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]},
+ {key:"q10",type:"text",title:"Apa kritik, saran, dan harapan Anda untuk pengembangan Multimedia serta pelaksanaan VIPT CUP berikutnya? (opsional)"}
+];
+let app,auth,db,user,step=0,answers={},submitted=false;
+const body=document.getElementById('surveyBody'),statusEl=document.getElementById('surveyStatus');
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function setStatus(t){statusEl.textContent=t}
+function renderStart(){body.innerHTML=`<button class="primary" id="surveyStartBtn" style="width:100%" type="button">ISI SURVEI • ± 2 MENIT</button>`;document.getElementById('surveyStartBtn').onclick=()=>{step=0;renderStep()}}
+function renderStep(){const q=SURVEY_QUESTIONS[step];let control=q.type==='radio'?`<div class="options">${q.options.map(o=>`<label class="option"><input type="radio" name="choice" value="${esc(o)}" ${answers[q.key]===o?'checked':''}><span>${esc(o)}</span></label>`).join('')}</div>`:`<textarea id="textInput" maxlength="500" placeholder="Tulis saran Anda di sini...">${esc(answers[q.key]||'')}</textarea>`;body.innerHTML=`<div class="progress"><strong>${step+1} / ${SURVEY_QUESTIONS.length}</strong><span style="font-size:10px;color:#8f9196">± 2 menit</span></div><div class="bar"><i style="width:${((step+1)/SURVEY_QUESTIONS.length)*100}%"></i></div><div class="q">${esc(q.title)}</div>${control}<div class="actions">${step?'<button class="back" id="backBtn">KEMBALI</button>':''}<button class="next" id="nextBtn">${step===SURVEY_QUESTIONS.length-1?'KIRIM SURVEI':'BERIKUTNYA'}</button></div><div class="note">Survei anonim. Hanya jawaban pilihan ganda yang digunakan untuk indikator publik; kritik/saran tetap privat.</div>`;document.getElementById('backBtn')?.addEventListener('click',()=>{saveCurrent();step--;renderStep()});document.getElementById('nextBtn').onclick=async()=>{if(!saveCurrent(true))return;if(step<SURVEY_QUESTIONS.length-1){step++;renderStep()}else await submitSurvey()}}
+function saveCurrent(validate=false){const q=SURVEY_QUESTIONS[step];let v=q.type==='radio'?(document.querySelector('input[name="choice"]:checked')?.value||''):(document.getElementById('textInput')?.value?.trim()||'');if(validate&&q.type==='radio'&&!v){alert('Silakan pilih salah satu jawaban.');return false}answers[q.key]=v;return true}
+async function submitSurvey(){if(!user||submitted)return;const btn=document.getElementById('nextBtn');btn.disabled=true;btn.textContent='MENGIRIM...';const raw={q1:answers.q1,q2:answers.q2,q3:answers.q3,q4:answers.q4,q5:answers.q5,q6:answers.q6,q7:answers.q7,q8:answers.q8,q9:answers.q9,q10:(answers.q10||'').slice(0,500),submittedAt:firebase.database.ServerValue.TIMESTAMP};const pub={q1:answers.q1,q2:answers.q2,q3:answers.q3,q4:answers.q4,q5:answers.q5,q6:answers.q6,q7:answers.q7,q8:answers.q8,q9:answers.q9,submittedAt:firebase.database.ServerValue.TIMESTAMP};try{const updates={};updates[`${SURVEY_PRIVATE_PATH}/${user.uid}`]=raw;updates[`${SURVEY_PUBLIC_PATH}/${user.uid}`]=pub;await db.ref().update(updates);submitted=true;localStorage.setItem(SURVEY_LOCAL_KEY,'1');renderSuccess()}catch(e){console.error(e);alert(e?.code==='PERMISSION_DENIED'?'Perangkat/UID ini sudah pernah mengisi atau Firebase Rules menolak penulisan.':'Survei belum berhasil dikirim. Periksa koneksi internet lalu coba lagi.');btn.disabled=false;btn.textContent='KIRIM SURVEI'}}
+function renderSuccess(){setStatus('✅ Survei berhasil dikirim.');body.innerHTML=`<div class="success"><div class="check">✓</div><h2>TERIMA KASIH!</h2><p>Penilaian Anda berhasil dikirim. Hasil indikator publik akan diperbarui secara real-time.</p><a class="linkbtn" href="index.html">← KEMBALI KE MATCH CENTER</a></div>`}
+async function init(){try{app=firebase.apps.find(a=>a.name==='viptSurveyStandalone')||firebase.initializeApp(SURVEY_FIREBASE_CONFIG,'viptSurveyStandalone');auth=app.auth();db=app.database();await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);let u=auth.currentUser;if(!u){const c=await auth.signInAnonymously();u=c.user}user=u;submitted=localStorage.getItem(SURVEY_LOCAL_KEY)==='1';if(submitted){setStatus('✅ Perangkat ini sudah mengisi survei.');renderSuccess()}else{setStatus('✅ Survei aktif • anonim • hasil real-time');renderStart()}}catch(e){console.error(e);setStatus('⚠️ Survei belum terhubung: '+(e?.code||'koneksi-error'));body.innerHTML='<button class="primary" style="width:100%" disabled>COBA MUAT ULANG HALAMAN</button>'}}
+init();
+</script>
+</body>
+</html>

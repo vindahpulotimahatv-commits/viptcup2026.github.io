@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hasil Survei Panitia • VIPT CUP IV 2026</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#070809;--panel:#111214;--line:#5c4312;--gold:#f5b72b;--muted:#aaa;--green:#55c66d}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 30% 0,rgba(245,183,43,.13),transparent 28%),var(--bg);color:#fff;font-family:Arial,sans-serif}.wrap{max-width:760px;margin:auto;padding:20px 14px 50px}.hero,.card{background:#111214;border:1px solid var(--line);border-radius:16px;padding:17px}.hero{margin-bottom:12px}.hero small{color:var(--gold);font-weight:900;letter-spacing:.4px}.hero h1{font-size:23px;margin:8px 0}.hero p{color:var(--muted);font-size:11px;line-height:1.55;margin:0}.count{text-align:center;padding:28px 16px;margin-bottom:12px}.count .label{font-size:12px;color:#bbb}.count .num{font-size:62px;font-weight:900;line-height:1;margin:10px 0}.live{font-size:10px;color:var(--green);font-weight:900}.grid{display:grid;grid-template-columns:1fr;gap:10px}.metric h3{font-size:13px;color:var(--gold);margin:0 0 12px;line-height:1.4}.row{margin:9px 0}.rowtop{display:flex;justify-content:space-between;gap:10px;font-size:10px;margin-bottom:5px}.bar{height:8px;background:#25272a;border-radius:99px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#b67b12,#ffd35c);width:0}.summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}.mini{text-align:center}.mini .v{font-size:24px;font-weight:900;color:var(--gold);margin:5px 0}.mini .k{font-size:9px;color:var(--muted);line-height:1.35}.status{text-align:center;color:var(--muted);font-size:10px;margin:14px 0}.back{display:block;text-align:center;text-decoration:none;background:linear-gradient(135deg,#ffd35c,#b97a0b);color:#17120a;font-weight:900;padding:13px 16px;border-radius:12px;margin-top:16px}.privacy{font-size:10px;line-height:1.55;color:#c7c7c7;margin-top:10px}.privacy b{color:var(--gold)}@media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+
+.gate{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at 50% 0,rgba(245,183,43,.16),transparent 32%),#070809;display:flex;align-items:center;justify-content:center;padding:18px}.gate.hidden{display:none}.loginbox{width:min(100%,420px);background:#111214;border:1px solid #8a6118;border-radius:20px;padding:22px;box-shadow:0 25px 70px rgba(0,0,0,.6)}.loginbadge{font-size:10px;color:var(--gold);font-weight:900;letter-spacing:1px}.loginbox h2{margin:10px 0 6px;font-size:24px}.loginbox p{margin:0 0 16px;color:var(--muted);font-size:11px;line-height:1.5}.pass{width:100%;border:1px solid #6f4d13;background:#080807;color:#fff;border-radius:12px;padding:13px 14px;outline:none;font-size:16px}.loginbtn{width:100%;border:0;border-radius:12px;padding:13px 14px;margin-top:10px;background:linear-gradient(135deg,#ffd35c,#b97a0b);color:#17120a;font-weight:900;cursor:pointer}.loginerr{min-height:18px;margin-top:9px;text-align:center;color:#ff7777;font-size:10px}.locked-note{margin-top:12px;text-align:center;color:#777;font-size:9px}
+</style>
+</head><body>
+<div class="gate" id="gate"><div class="loginbox"><div class="loginbadge">🔐 AKSES KHUSUS PANITIA</div><h2>Hasil Survei VIPT CUP</h2><p>Masukkan password panitia untuk membuka dashboard hasil survei real-time.</p><input id="passInput" class="pass" type="password" autocomplete="current-password" placeholder="Password panitia"><button id="loginBtn" class="loginbtn" type="button">BUKA HASIL SURVEI</button><div id="loginErr" class="loginerr"></div><div class="locked-note">VIPT CUP IV 2026 • Internal Panitia</div></div></div>
+<div class="wrap" id="dashboard" style="display:none">
+<div class="hero"><small>🔐 DASHBOARD PANITIA • REAL-TIME</small><h1>Hasil Evaluasi Multimedia & VIPT CUP IV 2026</h1><p>Halaman khusus panitia. Angka berubah otomatis setiap respons baru berhasil dikirim. Kritik/saran tertulis tidak ditampilkan pada dashboard ini.</p></div>
+<div class="card count"><div class="label">TOTAL RESPONDEN SURVEI BARU</div><div class="num" id="total">0</div><div class="live">● LIVE • FIREBASE REAL-TIME</div></div>
+<div class="summary">
+ <div class="card mini"><div class="k">MULTIMEDIA SANGAT PENTING / PENTING</div><div class="v" id="importantPct">0%</div></div>
+ <div class="card mini"><div class="k">MULTIMEDIA SANGAT PERLU / PERLU DIKEMBANGKAN</div><div class="v" id="continuePct">0%</div></div>
+ <div class="card mini"><div class="k">VIPT CUP SANGAT PERLU / PERLU SETIAP TAHUN</div><div class="v" id="annualPct">0%</div></div>
+ <div class="card mini"><div class="k">LIVE STREAMING SANGAT MEMBANTU / MEMBANTU</div><div class="v" id="streamPct">0%</div></div>
+</div>
+<div class="grid" id="metrics"></div>
+<div class="card privacy"><b>Privasi:</b> halaman ini hanya menggunakan jawaban pilihan ganda untuk membuat indikator. Kritik, saran, dan harapan tertulis disimpan pada data privat dan tidak ditampilkan di sini.</div>
+<div class="status" id="status">Menghubungkan Firebase...</div>
+<a class="back" href="index.html">← Kembali ke Match Center</a>
+</div>
+<script>
+const CFG={apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",authDomain:"vipt-survey-2026.firebaseapp.com",databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"vipt-survey-2026",storageBucket:"vipt-survey-2026.firebasestorage.app",messagingSenderId:"761699971320",appId:"1:761699971320:web:2cabe1effb822597534b0d"};
+const PATH="vipt_survey_public_eval_multimedia_v2/respondents";
+const META={
+ q1:{t:"Penilaian layanan Multimedia",o:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
+ q2:{t:"Manfaat Live Streaming",o:["Sangat Membantu","Membantu","Cukup Membantu","Kurang Membantu","Tidak Membantu"]},
+ q3:{t:"Pendapat tentang Saweria",o:["Sangat Baik","Baik","Cukup Baik","Kurang Baik","Tidak Perlu"]},
+ q4:{t:"Jadwal, hasil, dokumentasi & informasi digital",o:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
+ q5:{t:"Pentingnya Tim Multimedia",o:["Sangat Penting","Penting","Cukup Penting","Kurang Penting","Tidak Penting"]},
+ q6:{t:"Multimedia membuat event lebih menarik/profesional",o:["Sangat Setuju","Setuju","Cukup Setuju","Tidak Setuju","Sangat Tidak Setuju"]},
+ q7:{t:"Multimedia perlu dipertahankan & dikembangkan",o:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]},
+ q8:{t:"Penilaian pelaksanaan VIPT CUP IV 2026",o:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
+ q9:{t:"VIPT CUP perlu diselenggarakan setiap tahun",o:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]}
+};
+function pct(n,d){return d?Math.round(n/d*100):0}
+function count(rows,key,val){let n=0;rows.forEach(r=>{if(r&&r[key]===val)n++});return n}
+function render(rows){
+ const total=rows.length;document.getElementById('total').textContent=total;
+ document.getElementById('importantPct').textContent=pct(count(rows,'q5','Sangat Penting')+count(rows,'q5','Penting'),total)+'%';
+ document.getElementById('continuePct').textContent=pct(count(rows,'q7','Sangat Perlu')+count(rows,'q7','Perlu'),total)+'%';
+ document.getElementById('annualPct').textContent=pct(count(rows,'q9','Sangat Perlu')+count(rows,'q9','Perlu'),total)+'%';
+ document.getElementById('streamPct').textContent=pct(count(rows,'q2','Sangat Membantu')+count(rows,'q2','Membantu'),total)+'%';
+ document.getElementById('metrics').innerHTML=Object.entries(META).map(([k,m])=>{
+   const denom=rows.filter(r=>r&&r[k]).length;
+   const bars=m.o.map(o=>{const n=count(rows,k,o),p=pct(n,denom);return `<div class="row"><div class="rowtop"><span>${o}</span><b>${n} • ${p}%</b></div><div class="bar"><div class="fill" style="width:${p}%"></div></div></div>`}).join('');
+   return `<div class="card metric"><h3>${m.t}</h3>${bars}</div>`;
+ }).join('');
+ document.getElementById('status').textContent=`✅ Terhubung • ${total} responden • diperbarui otomatis`;
+}
+const PASS_HASH="8799f667e5e3b0c8f6ee816256a648a312e3aa9b4eb0223edfa3a9f9faf09636"; // VIPT2026PANITIA
+async function sha256(t){const b=new TextEncoder().encode(t);const h=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+let firebaseStarted=false;
+function startDashboard(){if(firebaseStarted)return;firebaseStarted=true;try{firebase.initializeApp(CFG);firebase.database().ref(PATH).on('value',s=>{const v=s.val()||{};render(Object.values(v));},e=>{console.error(e);document.getElementById('status').textContent='⚠️ Data hasil belum dapat dibaca. Periksa Rules Firebase.'})}catch(e){console.error(e);document.getElementById('status').textContent='⚠️ Firebase belum terhubung.'}}
+async function unlock(){const input=document.getElementById('passInput');const err=document.getElementById('loginErr');const value=input.value.trim();if(!value){err.textContent='Masukkan password panitia.';return}const h=await sha256(value);if(h!==PASS_HASH){err.textContent='Password salah.';input.select();return}sessionStorage.setItem('VIPT_PANITIA_UNLOCKED','1');document.getElementById('gate').classList.add('hidden');document.getElementById('dashboard').style.display='block';startDashboard()}
+document.getElementById('loginBtn').addEventListener('click',unlock);document.getElementById('passInput').addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});if(sessionStorage.getItem('VIPT_PANITIA_UNLOCKED')==='1'){document.getElementById('gate').classList.add('hidden');document.getElementById('dashboard').style.display='block';startDashboard()}
+</script></body></html>
