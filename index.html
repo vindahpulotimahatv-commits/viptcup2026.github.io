@@ -398,7 +398,7 @@ const MATCHES=[
   {id:"BDW-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRI",date:"2026-09-04",time:"20:30 WIB",a:"RT 06 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
   {id:"BDW-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRI",date:"2026-09-04",time:"21:30 WIB",a:"RT 08 / RW 021",b:"RT 10 / RW 021",status:"JADWAL"},
   {id:"TM-3RD",sport:"TENIS MEJA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
-  {id:"VP-3RD",sport:"VOLLY PUTRA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"20:30 WIB",a:"RT 04 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
+  {id:"VP-3RD",sport:"VOLLY PUTRA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"20:30 WIB",a:"RT 04 / RW 021",b:"RT 06 / RW 021",status:"JADWAL"},
   {id:"VP-FINAL",sport:"VOLLY PUTRA",round:"FINAL",date:"2026-09-05",time:"22:00 WIB",a:"RT 09 / RW 014",b:"RT 10 / RW 021",status:"JADWAL"},
   {id:"VW-FINAL",sport:"VOLLY PUTRI",round:"FINAL",date:"2026-09-06",time:"16:00 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 021",status:"JADWAL"},
   {id:"BDM-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRA",date:"2026-09-06",time:"20:30 WIB",a:"RT 10 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
@@ -645,7 +645,8 @@ function renderSchedule(){
     return relevantDate && (!q || JSON.stringify(m).toLowerCase().includes(q));
   });
 
-  // Jika jadwal hari ini kosong, tampilkan maksimal 5 jadwal berikutnya.
+  // Tampilkan SELURUH jadwal Final Week yang belum selesai.
+  // Tidak dibatasi 5 pertandingan, sehingga jadwal Minggu dan Closing Night tetap muncul.
   let future=all.filter(m=>{
     const t=getMatchDateTime(m);
     const status=String(m.status||"").toUpperCase();
@@ -653,7 +654,7 @@ function renderSchedule(){
       (!q || JSON.stringify(m).toLowerCase().includes(q));
   });
 
-  let data=today.length ? today : future.slice(0,5);
+  let data=future;
 
   // LIVE dulu, lalu yang akan datang, lalu yang sudah lewat.
   data.sort((a,b)=>{
@@ -671,7 +672,7 @@ function renderSchedule(){
 
   const count=document.getElementById("count");
   if(count) count.textContent=data.length
-    ? `${data.length} pertandingan ${today.length?"hari ini":"berikutnya"}`
+    ? `${data.length} pertandingan berikutnya`
     : "tidak ada jadwal";
 
   const target=document.getElementById("jadwalList") || document.getElementById("jadwal");
