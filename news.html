@@ -25,8 +25,8 @@
 </section>
 <div class="section"><h2>🔥 Berita Pertandingan</h2><small id="newsCount">Memuat...</small></div>
 <div id="featured"></div>
-<div id="newsList" class="loading">Menghubungkan hasil pertandingan...</div>
-<div class="footer">© 2026 VIPT CUP IV • Media Villa Indah Pulo Timaha<br><span style="display:block;margin-top:6px;color:#f5c451">AUTO MATCH REPORT</span></div>
+<div id="newsList" class="loading">Menyusun berita dari cerita pertandingan & hasil resmi...</div>
+<div class="footer">© 2026 VIPT CUP IV • Media Villa Indah Pulo Timaha<br><span style="display:block;margin-top:6px;color:#f5c451">VIDEO RECAP × OFFICIAL SCOREBOARD</span></div>
 </main>
 <nav class="bottom">
   <a class="nav" href="index.html"><span>🏠</span>Beranda</a>
@@ -101,9 +101,39 @@ function score(st,side){
 function winner(st){const d=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;if(d)return typeof d==="string"?d:(d?.name||d?.teamName||"-");const a=score(st,"A"),b=score(st,"B");return a>b?team(st,"A"):b>a?team(st,"B"):"Pertandingan berakhir imbang"}
 function done(st){const s=String(st?.status||"").toUpperCase();return s.includes("SELESAI")||s.includes("FINISH")||!!st?.winner||!!st?.pemenang}
 function fmtDate(st){const t=ts(st);if(!t)return st?.matchDate||st?.date||"VIPT CUP IV 2026";return new Date(t).toLocaleString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Jakarta"}).replace(" pukul "," • ")+" WIB"}
-function title(st){const a=team(st,"A"),b=team(st,"B"),w=winner(st);if(w&&w!=="Pertandingan berakhir imbang"&&w!=="-")return `${w} Raih Kemenangan atas ${w===a?b:a}`;return `${a} vs ${b}: Pertandingan Tuntas di VIPT CUP IV 2026`}
-function recap(st){const a=team(st,"A"),b=team(st,"B"),sa=score(st,"A"),sb=score(st,"B"),w=winner(st),sport=normSport(st?.matchSportLabel||st?.sport||st?.cabang);if(w&&w!=="Pertandingan berakhir imbang"&&w!=="-")return `Pertandingan ${sport} VIPT CUP IV 2026 antara ${a} dan ${b} telah selesai. ${w} berhasil mengamankan kemenangan dengan skor akhir ${sa}-${sb}. Hasil ini tercatat otomatis dari Scoreboard resmi VIPT CUP.`;return `Pertandingan ${sport} antara ${a} dan ${b} telah selesai dengan skor ${sa}-${sb}. Hasil pertandingan diperbarui otomatis dari Scoreboard resmi VIPT CUP IV 2026.`}
-function card(st,featured=false){const a=team(st,"A"),b=team(st,"B"),sa=score(st,"A"),sb=score(st,"B"),w=winner(st),sport=normSport(st?.matchSportLabel||st?.sport||st?.cabang),sets=getSets(st);if(featured)return `<article class="featured"><div class="cover"><span class="badge">MATCH REPORT • ${esc(sport)}</span><h2>${esc(title(st))}</h2><div class="sub">${esc(fmtDate(st))}</div></div><div class="article"><div class="meta">📍 Lapangan Central Villa Indah Pulo Timaha • VIPT CUP IV 2026</div><p>${esc(recap(st))}</p><div class="scorebox"><div class="team">${esc(a)}</div><div class="score">${sa} - ${sb}</div><div class="team">${esc(b)}</div></div><div class="winner">🏆 PEMENANG: ${esc(w)}</div>${sets.length?`<div class="sets">${sets.map(x=>`<div class="setrow"><span>SET ${x.n}</span><b>${x.a} - ${x.b}</b></div>`).join("")}</div>`:""}<div class="btns"><a class="btn primary" href="${REPLAY_URL}" target="_blank" rel="noopener">▶ TONTON REPLAY</a><a class="btn ghost" href="hasil.html">LIHAT HASIL</a></div></div></article>`;return `<article class="news-card"><div class="tag">${esc(sport)} • MATCH REPORT</div><h3>${esc(title(st))}</h3><p>${esc(recap(st))}</p><div class="meta">${esc(fmtDate(st))} • 🏆 ${esc(w)}</div><div class="btns"><a class="btn primary" href="${REPLAY_URL}" target="_blank" rel="noopener">▶ Replay</a><a class="btn ghost" href="hasil.html">Hasil</a></div></article>`}
+function normTeamText(v){return String(v||"").toUpperCase().replace(/RW/g,"").replace(/[^A-Z0-9]/g,"")}
+function hasRT(v,n){return normTeamText(v).includes("RT"+String(n).padStart(2,"0"))||normTeamText(v).includes("RT"+Number(n))}
+function pairIs(st,x,y){const a=team(st,"A"),b=team(st,"B");return (hasRT(a,x)&&hasRT(b,y))||(hasRT(a,y)&&hasRT(b,x))}
+function storyFor(st){
+  const sport=normSport(st?.matchSportLabel||st?.sport||st?.cabang);
+  if(sport.includes("VOLLY") && pairIs(st,6,8)) return {
+    headline:"RT 08 Amankan Juara 3 Voli Putri Setelah Laga Dramatis",
+    body:"Perebutan juara ketiga Voli Putri berlangsung ketat dan dramatis. RT 06 dan RT 08 saling jual beli serangan dengan persaingan poin yang tipis. Reli-reli panjang membuat pertandingan berjalan sengit hingga akhir. RT 08 mampu menjaga momentum pada fase penentuan dan menutup laga dengan hasil terbaik untuk mengamankan posisi Juara 3 Voli Putri VIPT CUP IV 2026. Seusai pertandingan, suasana dilanjutkan dengan selebrasi, penyerahan penghargaan, dan pesan sportivitas."
+  };
+  if(sport==="TENIS MEJA" && pairIs(st,10,13)) return {
+    headline:"RT 10 Tuntaskan Perlawanan RT 13 di Tenis Meja",
+    body:"Pertandingan tenis meja antara RT 10 dan RT 13 berlangsung kompetitif. RT 10 tampil tajam sejak awal, sementara RT 13 terus memberikan perlawanan dan sempat meningkatkan performa pada set berikutnya. Pertarungan taktik dan konsistensi menjadi warna utama laga sebelum pertandingan akhirnya dituntaskan dengan hasil resmi yang tercatat pada Match Center VIPT CUP IV 2026."
+  };
+  if(sport==="BADMINTON" && pairIs(st,11,10)) return {
+    headline:"RT 11 dan RT 10 Sajikan Duel Ketat di Bulu Tangkis Putri",
+    body:"Pertandingan Bulu Tangkis Putri antara RT 11 dan RT 10 menghadirkan permainan yang kompetitif. Drop shot yang akurat, smash, serta reli yang membutuhkan konsentrasi tinggi menjadi bagian penting dari jalannya pertandingan. Kondisi angin malam turut menambah tantangan bagi para pemain, namun kedua tim tetap tampil penuh semangat hingga laga selesai."
+  };
+  if(sport==="BADMINTON" && pairIs(st,8,11)) return {
+    headline:"RT 08 dan RT 11 Tampilkan Persaingan Sengit di Bulu Tangkis Putra",
+    body:"Pertandingan Bulu Tangkis Putra antara RT 08 dan RT 11 berlangsung dinamis. Kedua tim saling mengejar poin dan memperlihatkan permainan yang agresif di setiap fase pertandingan. Reli, penempatan bola, dan serangan cepat membuat laga menjadi salah satu penutup malam yang menarik di VIPT CUP IV 2026."
+  };
+  return null;
+}
+function officialWinner(st){const w=winner(st);return w&&w!=="Pertandingan berakhir imbang"&&w!=="-"?w:""}
+function title(st){const story=storyFor(st);if(story)return story.headline;const a=team(st,"A"),b=team(st,"B"),w=officialWinner(st);if(w)return `${w} Raih Kemenangan atas ${w===a?b:a}`;return `${a} vs ${b}: Pertandingan Tuntas di VIPT CUP IV 2026`}
+function recap(st){
+  const story=storyFor(st),a=team(st,"A"),b=team(st,"B"),sa=score(st,"A"),sb=score(st,"B"),w=officialWinner(st),sport=normSport(st?.matchSportLabel||st?.sport||st?.cabang);
+  let text=story?story.body:`Pertandingan ${sport} VIPT CUP IV 2026 antara ${a} dan ${b} telah selesai.`;
+  if(w) text+=` Berdasarkan hasil resmi Match Center, ${w} tercatat sebagai pemenang pertandingan`+(Number.isFinite(sa)&&Number.isFinite(sb)?` dengan skor akhir ${sa}-${sb}.`:".");
+  else text+=` Hasil akhir pertandingan mengikuti data resmi Match Center VIPT CUP IV 2026.`;
+  return text;
+}
+function card(st,featured=false){const a=team(st,"A"),b=team(st,"B"),sa=score(st,"A"),sb=score(st,"B"),w=officialWinner(st),sport=normSport(st?.matchSportLabel||st?.sport||st?.cabang),sets=getSets(st),resultLabel=w?`🏆 PEMENANG: ${esc(w)}`:"HASIL RESMI • MATCH CENTER";if(featured)return `<article class="featured"><div class="cover"><span class="badge">MATCH REPORT • ${esc(sport)}</span><h2>${esc(title(st))}</h2><div class="sub">${esc(fmtDate(st))}</div></div><div class="article"><div class="meta">📍 Lapangan Central Villa Indah Pulo Timaha • VIPT CUP IV 2026</div><p>${esc(recap(st))}</p><div class="scorebox"><div class="team">${esc(a)}</div><div class="score">${sa} - ${sb}</div><div class="team">${esc(b)}</div></div><div class="winner">${resultLabel}</div>${sets.length?`<div class="sets">${sets.map(x=>`<div class="setrow"><span>SET ${x.n}</span><b>${x.a} - ${x.b}</b></div>`).join("")}</div>`:""}<div class="btns"><a class="btn primary" href="${REPLAY_URL}" target="_blank" rel="noopener">▶ TONTON REPLAY</a><a class="btn ghost" href="hasil.html">LIHAT HASIL</a></div></div></article>`;return `<article class="news-card"><div class="tag">${esc(sport)} • MATCH REPORT</div><h3>${esc(title(st))}</h3><p>${esc(recap(st))}</p><div class="meta">${esc(fmtDate(st))}${w?` • 🏆 ${esc(w)}`:""}</div><div class="btns"><a class="btn primary" href="${REPLAY_URL}" target="_blank" rel="noopener">▶ Replay</a><a class="btn ghost" href="hasil.html">Hasil</a></div></article>`}
 function dedupe(rows){const map=new Map();for(const r of rows){const key=r.matchId||`${team(r,"A")}|${team(r,"B")}|${normSport(r.sport||r.cabang)}`;const old=map.get(key);if(!old||ts(r)>=ts(old))map.set(key,r)}return [...map.values()]}
 function render(rows){rows=dedupe(rows.filter(done)).sort((a,b)=>ts(b)-ts(a));document.getElementById("newsCount").textContent=`${rows.length} berita otomatis`;const f=document.getElementById("featured"),l=document.getElementById("newsList");if(!rows.length){f.innerHTML="";l.className="empty";l.innerHTML="Belum ada pertandingan berstatus selesai di Firebase Scoreboard. Begitu hasil pertandingan tersimpan, berita akan muncul otomatis di halaman ini.";return}f.innerHTML=card(rows[0],true);l.className="";l.innerHTML=rows.slice(1).map(x=>card(x,false)).join("")}
 try{firebase.initializeApp(FIREBASE_CONFIG);firebase.database().ref("vipt_scoreboard/history").on("value",s=>render(flatten(s.val()||{})),e=>{document.getElementById("newsList").className="empty";document.getElementById("newsList").textContent="Gagal membaca hasil pertandingan dari Firebase.";console.error(e)})}catch(e){document.getElementById("newsList").className="empty";document.getElementById("newsList").textContent="Firebase belum dapat dihubungkan.";console.error(e)}
