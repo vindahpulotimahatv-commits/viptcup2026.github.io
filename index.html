@@ -196,7 +196,7 @@ main{padding:0 14px}
 .hidden{display:none!important}
 .bottom{
   position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);
-  width:min(620px,100%);display:grid;grid-template-columns:repeat(7,1fr);
+  width:min(620px,100%);display:grid;grid-template-columns:repeat(6,1fr);
   padding:8px 8px 11px;background:rgba(5,5,5,.98);border-top:1px solid #7a5514;
   backdrop-filter:blur(12px)
 }
@@ -286,11 +286,23 @@ main{padding:0 14px}
 
 <div class="section" id="jadwal"><h2>📅 Jadwal Pertandingan</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
 <div class="card notify-card">
+  <div class="notify-top">
+    <div>
+      <div class="notify-title">🔔 NOTIFIKASI PERTANDINGAN</div>
+      <div class="notify-sub">Aktifkan pengingat agar tidak ketinggalan pertandingan VIPT CUP IV 2026.</div>
+    </div>
+    <button class="notify-btn" id="notifyBtn" type="button">AKTIFKAN</button>
+  </div>
+
   <div class="next-match">
     <div class="next-label">PERTANDINGAN TERDEKAT</div>
     <div id="nextMatchMain" class="next-main">Memuat jadwal...</div>
     <div id="nextMatchTime" class="next-time"></div>
     <div id="nextMatchCountdown" class="countdown">—</div>
+  </div>
+
+  <div class="notify-note" id="notifySupportText">
+    Tekan AKTIFKAN untuk mendapat pengingat 15 menit sebelum setiap pertandingan.
   </div>
 </div>
 <input class="search" id="search" type="search" placeholder="Cari tim / cabang olahraga...">
@@ -336,7 +348,6 @@ main{padding:0 14px}
   <a class="nav active" href="index.html"><span>🏠</span>Beranda</a>
   <a class="nav" href="index.html#jadwal"><span>📅</span>Jadwal</a>
   <a class="nav" href="news.html"><span>📰</span>News</a>
-  <a class="nav" href="bracket.html"><span>🏆</span>Bracket</a>
   <a class="nav" href="hasil.html"><span>☰</span>Hasil</a>
   <a class="nav" href="musik.html"><span>🎵</span>Musik</a>
   <a class="nav" href="index.html#sosial"><span>📱</span>Sosial</a>
@@ -1406,6 +1417,8 @@ function checkMatchNotifications(force=false){
   }
 }
 
+document.getElementById("notifyBtn")?.addEventListener("click",enableMatchNotifications);
+
 function initFirebase(){
   try{
     if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
@@ -1440,6 +1453,7 @@ function initFirebase(){
 
 initFirebase();
 renderAll();
+refreshNotifyButton();
 refreshNotifyButton();
 checkMatchNotifications();
 setInterval(checkMatchNotifications,30000);
