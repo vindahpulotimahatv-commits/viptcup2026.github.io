@@ -46,8 +46,58 @@ function normSport(s){const x=String(s||"").toUpperCase();if(x.includes("VOLLY")
 function flatten(value){const out=[];function walk(n,k=""){if(!n||typeof n!=="object")return;const isMatch=n.teamA||n.teamB||n.matchId||n.sport||n.cabang||n.teamAName||n.teamBName;if(isMatch){out.push({...n,_key:k});return}Object.entries(n).forEach(([x,v])=>walk(v,x))}walk(value);return out}
 function ts(st){for(const v of [st?.endedAt,st?.finishedAt,st?.completedAt,st?.updatedAt,st?.timestamp,st?.createdAt,st?.savedAt,st?._key]){if(v==null)continue;let n=Number(v);if(Number.isFinite(n)&&n>0)return n<1e11?n*1000:n;const d=Date.parse(v);if(Number.isFinite(d))return d}return 0}
 function team(st,side){const o=side==="A"?st?.teamA:st?.teamB;return o?.name||o?.teamName||st?.[side==="A"?"a":"b"]||st?.[side==="A"?"teamAName":"teamBName"]||"-"}
-function getSets(st){let raw=st?.volleyballSets||st?.vollySets||st?.sets||st?.setScores||st?.setHistory;if(!Array.isArray(raw)&&raw&&typeof raw==="object")raw=Object.values(raw);if(!Array.isArray(raw))return[];return raw.map((x,i)=>Array.isArray(x)?{a:Number(x[0])||0,b:Number(x[1])||0,n:i+1}:{a:Number(x?.a??x?.scoreA??0)||0,b:Number(x?.b??x?.scoreB??0)||0,n:Number(x?.setNumber??i+1)||i+1,winner:x?.winner||""})}
-function score(st,side){const sport=normSport(st?.matchSportLabel||st?.sport||st?.cabang);if(sport.includes("VOLLY")){return getSets(st).filter(x=>side==="A"?(x.winner==="A"||(!x.winner&&x.a>x.b)):(x.winner==="B"||(!x.winner&&x.b>x.a))).length}if(sport==="BADMINTON"){const ties=Array.isArray(st?.badmintonMatches)?st.badmintonMatches:(Array.isArray(st?.badmintonSets)?st.badmintonSets:[]);if(ties.length)return ties.filter(x=>{const a=Number(x?.a??x?.scoreA??0)||0,b=Number(x?.b??x?.scoreB??0)||0;return side==="A"?a>b:b>a}).length}const o=side==="A"?st?.teamA:st?.teamB;const v=o?.score??o?.goals??o?.points??st?.[side==="A"?"scoreA":"scoreB"]??st?.[side==="A"?"teamScoreA":"teamScoreB"]??0;return Number(v)||0}
+function getSets(st){
+  const sport=normSport(st?.matchSportLabel||st?.sport||st?.cabang);
+  if(!sport.includes("VOLLY")) return [];
+  let raw=st?.volleyballSets||st?.vollySets||st?.sets||st?.setScores||st?.setHistory;
+  if(!Array.isArray(raw)&&raw&&typeof raw==="object")raw=Object.values(raw);
+  if(!Array.isArray(raw))return[];
+  return raw.map((x,i)=>Array.isArray(x)?{a:Number(x[0])||0,b:Number(x[1])||0,n:i+1}:{a:Number(x?.a??x?.scoreA??0)||0,b:Number(x?.b??x?.scoreB??0)||0,n:Number(x?.setNumber??i+1)||i+1,winner:x?.winner||""})
+}
+
+function getBadmintonTies(st){
+  let ties=Array.isArray(st?.badmintonMatches)?st.badmintonMatches:(Array.isArray(st?.badmintonSets)?st.badmintonSets:[]);
+  if(!Array.isArray(ties)&&ties&&typeof ties==="object") ties=Object.values(ties);
+  return Array.isArray(ties)?ties:[];
+}
+
+function badmintonTieWinner(x){
+  if(Array.isArray(x?.games)&&x.games.length){
+    let wa=0,wb=0;
+    x.games.forEach(g=>{
+      const ga=Number(g?.a??g?.scoreA??g?.teamA??0)||0;
+      const gb=Number(g?.b??g?.scoreB??g?.teamB??0)||0;
+      if(ga>gb)wa++; else if(gb>ga)wb++;
+    });
+    if(wa>wb)return "A";
+    if(wb>wa)return "B";
+  }
+  const direct=String(x?.winner||x?.pemenang||"").toUpperCase();
+  if(direct==="A"||direct==="B")return direct;
+  const a=Number(x?.a??x?.scoreA??x?.teamA??0)||0;
+  const b=Number(x?.b??x?.scoreB??x?.teamB??0)||0;
+  if(a>b)return "A";
+  if(b>a)return "B";
+  return "";
+}
+
+function score(st,side){
+  const sport=normSport(st?.matchSportLabel||st?.sport||st?.cabang);
+  if(sport.includes("VOLLY")){
+    return getSets(st).filter(x=>side==="A"?(x.winner==="A"||(!x.winner&&x.a>x.b)):(x.winner==="B"||(!x.winner&&x.b>x.a))).length
+  }
+  if(sport==="BADMINTON"){
+    const ties=getBadmintonTies(st);
+    if(ties.length){
+      return ties.filter(x=>badmintonTieWinner(x)===side).length;
+    }
+    const direct=st?.[side==="A"?"teamScoreA":"teamScoreB"] ?? st?.[side==="A"?"scoreA":"scoreB"];
+    if(direct!=null && Number.isFinite(Number(direct))) return Number(direct);
+  }
+  const o=side==="A"?st?.teamA:st?.teamB;
+  const v=o?.score??o?.goals??o?.points??st?.[side==="A"?"scoreA":"scoreB"]??st?.[side==="A"?"teamScoreA":"teamScoreB"]??0;
+  return Number(v)||0
+}
 function winner(st){const d=st?.winner||st?.winnerTeam||st?.matchWinner||st?.pemenang;if(d)return typeof d==="string"?d:(d?.name||d?.teamName||"-");const a=score(st,"A"),b=score(st,"B");return a>b?team(st,"A"):b>a?team(st,"B"):"Pertandingan berakhir imbang"}
 function done(st){const s=String(st?.status||"").toUpperCase();return s.includes("SELESAI")||s.includes("FINISH")||!!st?.winner||!!st?.pemenang}
 function fmtDate(st){const t=ts(st);if(!t)return st?.matchDate||st?.date||"VIPT CUP IV 2026";return new Date(t).toLocaleString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Jakarta"}).replace(" pukul "," • ")+" WIB"}
