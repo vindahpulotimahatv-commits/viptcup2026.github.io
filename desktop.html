@@ -1,61 +1,181 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>VIPT CUP IV 2026 Desktop</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VIPT CUP IV 2026 - Desktop Match Center</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#050505;color:#fff;font-family:Arial,sans-serif;overflow:hidden}
-.screen{height:100vh;width:100vw;padding:25px;display:grid;grid-template-rows:90px 1fr 120px;gap:18px}
-.header{border:2px solid #d29b20;border-radius:18px;display:flex;justify-content:space-between;align-items:center;padding:0 35px;background:#111}
-.header h1{font-size:38px;color:#f5c451;margin:0}
-.live{background:#c00000;padding:14px 30px;border-radius:40px;font-weight:bold}
-.center{display:grid;grid-template-columns:1fr 330px;gap:18px}
-.scorebox,.side,.bottom{background:#0d0d0d;border:2px solid #8d6415;border-radius:22px}
-.scorebox{display:flex;flex-direction:column;justify-content:center;align-items:center}
-.sport{font-size:32px;color:#f5c451;font-weight:900}
-.match{width:85%;display:grid;grid-template-columns:1fr 260px 1fr;align-items:center;text-align:center;margin-top:25px}
-.team{font-size:28px;font-weight:bold}
-.logo{width:140px;height:140px;border-radius:50%;background:#222;border:3px solid #d29b20;margin:auto auto 15px}
-.score{font-size:110px;font-weight:900;color:white}
-.info{color:#f5c451;font-size:25px;font-weight:bold}
-.side{padding:25px}
-.side h2{color:#f5c451}
-.card{background:#191919;border-radius:15px;padding:20px;margin-bottom:20px}
-.bottom{display:flex;align-items:center;justify-content:space-around;color:#f5c451;font-size:25px}
+body{
+ margin:0;
+ background:#050505;
+ color:white;
+ font-family:Arial,Helvetica,sans-serif;
+ overflow:hidden;
+}
+.screen{
+ width:100vw;
+ height:100vh;
+ padding:24px;
+ display:grid;
+ grid-template-rows:90px 1fr 130px;
+ gap:18px;
+}
+.header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:0 35px;
+ background:linear-gradient(90deg,#120d03,#090909);
+ border:2px solid #b27a14;
+ border-radius:20px;
+}
+.title{
+ font-size:42px;
+ font-weight:900;
+ color:#f5c451;
+}
+.live{
+ background:#c00000;
+ padding:15px 30px;
+ border-radius:40px;
+ font-weight:900;
+}
+.main{
+ display:grid;
+ grid-template-columns:2.2fr 1fr;
+ gap:18px;
+}
+.score-panel,.side,.bottom{
+ background:linear-gradient(145deg,#121212,#050505);
+ border:2px solid #765212;
+ border-radius:22px;
+}
+.score-panel{
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+}
+.sport{
+ color:#f5c451;
+ font-size:32px;
+ font-weight:900;
+}
+.teams{
+ width:90%;
+ display:grid;
+ grid-template-columns:1fr 260px 1fr;
+ align-items:center;
+ text-align:center;
+ margin-top:30px;
+}
+.team{
+ font-size:30px;
+ font-weight:900;
+}
+.logo{
+ width:150px;
+ height:150px;
+ margin:auto;
+ border-radius:25px;
+ background:#222;
+ border:3px solid #b27a14;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:#f5c451;
+}
+.score{
+ font-size:110px;
+ font-weight:900;
+}
+.status{
+ color:#35df89;
+ font-size:28px;
+}
+.side{
+ padding:25px;
+}
+.side h2{
+ color:#f5c451;
+}
+.card{
+ background:#181818;
+ padding:18px;
+ border-radius:15px;
+ margin-bottom:18px;
+}
+.bottom{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ align-items:center;
+ text-align:center;
+ font-size:24px;
+ color:#f5c451;
+}
 </style>
 </head>
 <body>
 <div class="screen">
+
 <div class="header">
-<h1>🏆 VIPT CUP IV 2026 • OFFICIAL MATCH CENTER</h1>
-<div class="live">🔴 LIVE</div>
+<div class="title">🏆 VIPT CUP IV 2026 • OFFICIAL MATCH CENTER</div>
+<div class="live">🔴 LIVE NOW</div>
 </div>
-<div class="center">
-<div class="scorebox">
+
+<div class="main">
+
+<div class="score-panel">
 <div class="sport">VOLLY PUTRA • FINAL</div>
-<div class="match">
-<div class="team"><div class="logo"></div>RT 08 / RW 021</div>
+
+<div class="teams">
+<div class="team">
+<div class="logo">LOGO</div>
+RT 08 / RW 021
+</div>
+
 <div>
-<div class="score">0 - 0</div>
-<div class="info">SET 1 • LIVE</div>
+<div class="score">25 - 21</div>
+<div class="status">SET 2 • LIVE</div>
 </div>
-<div class="team"><div class="logo"></div>RT 11 / RW 021</div>
+
+<div class="team">
+<div class="logo">LOGO</div>
+RT 11 / RW 021
+</div>
+
 </div>
 </div>
+
 <div class="side">
 <h2>📅 NEXT MATCH</h2>
-<div class="card">Pertandingan berikutnya</div>
+<div class="card">
+🏐 VOLLY PUTRI<br>
+RT 09 vs RT 08<br>
+16:00 WIB
+</div>
+
 <h2>📰 NEWS</h2>
-<div class="card">Update VIPT CUP IV 2026</div>
+<div class="card">
+RT 08 memastikan kemenangan dan melaju ke babak berikutnya.
+</div>
+
+<h2>🎥 STREAMING</h2>
+<div class="card">
+VIPT CUP IV 2026 LIVE
 </div>
 </div>
+
+</div>
+
 <div class="bottom">
 <div>📡 LIVE SCORE</div>
-<div>🏆 HASIL</div>
 <div>📅 JADWAL</div>
+<div>🏆 HASIL</div>
 <div>📰 NEWS</div>
 </div>
+
 </div>
 </body>
 </html>
