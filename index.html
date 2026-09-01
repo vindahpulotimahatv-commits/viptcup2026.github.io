@@ -482,6 +482,12 @@ function statusForMatch(st){
   for(let i=1;i<=5;i++){
     if(x.includes(`SET ${i} SELESAI`))return `SET ${i} SELESAI`;
   }
+  for(let i=1;i<=2;i++){
+    if(x.includes(`BABAK ${i} SELESAI`))return `BABAK ${i} SELESAI`;
+  }
+  for(let i=1;i<=5;i++){
+    if(x.includes(`GAME ${i} SELESAI`))return `GAME ${i} SELESAI`;
+  }
   if(x.includes("LIVE"))return"LIVE";
   return x||"JADWAL"
 }
@@ -534,7 +540,7 @@ function getVollyWinner(st,m){
 function getStateForMatch(m){
   if(liveState && liveState.matchId===m.id){
     const s=cleanStatus(liveState.status);
-    if(s==="LIVE" || s.includes("SET") || s==="JADWAL") return liveState;
+    if(s==="LIVE" || s.includes("SET") || s.includes("BABAK") || s.includes("GAME") || s==="JADWAL") return liveState;
   }
   const matches=historyState.filter(h=>h&&h.matchId===m.id);
   if(matches.length){
@@ -576,6 +582,21 @@ function applyFirebaseMatchData(m,st){
     out.period=st.period||"";
     out.isFirebaseVolly=true;
     if(cleanStatus(st.status).includes("PERTANDINGAN SELESAI"))out.status="SELESAI"
+  }
+
+  if(String(out.sport||"").toUpperCase()==="TENIS MEJA" && Array.isArray(st?.tennisGames)){
+    const games=st.tennisGames.slice(0,3).map((g,i)=>({
+      a:Number(g?.a||0)||0,
+      b:Number(g?.b||0)||0,
+      winner:g?.winner||"",
+      gameNumber:i+1
+    }));
+    const winsA=games.filter(g=>g.winner==="A").length;
+    const winsB=games.filter(g=>g.winner==="B").length;
+    out.teamScoreA=winsA;
+    out.teamScoreB=winsB;
+    out.sets=games.filter(g=>g.winner).map(g=>[`GAME ${g.gameNumber}`,`${g.a} - ${g.b}`]);
+    out.winner=winsA>winsB?(st?.teamA?.name||m?.a||""):(winsB>winsA?(st?.teamB?.name||m?.b||""):"");
   }
   return out
 }
