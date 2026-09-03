@@ -155,13 +155,16 @@ main{padding:0 14px}
 .status.done{background:#222;color:#aaa}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:10px}
 .bracket-wrap{overflow-x:auto;padding-bottom:4px}
-.bracket{min-width:880px;display:grid;grid-template-columns:repeat(4,205px);gap:14px}
+.bracket{min-width:1100px;display:grid;grid-template-columns:repeat(5,205px);gap:14px}
 .col h3{font-size:9px;text-align:center;color:#f5d36c;margin:0 0 10px}
 .game{background:#0b0b09;border:1px solid #6f4d13;border-radius:12px;padding:9px;margin-bottom:16px}
 .game div{display:flex;justify-content:space-between;font-size:9px;padding:6px 0;border-bottom:1px solid #3b2b10}
 .game div:last-of-type{border:0}
 .game small{display:block;color:#a89e8d;font-size:8px;margin-top:4px}
-.final .game{border-color:#f5b72b}
+.final .game{border-color:#f5b72b;box-shadow:0 10px 26px rgba(245,183,43,.2)}
+.col:last-child .game{background:linear-gradient(180deg,#1a1006,#0b0b09);border-color:#f5b72b;box-shadow:0 12px 30px rgba(245,183,43,.3)}
+.col+.col{position:relative}
+.col+.col:before{content:"›";position:absolute;left:-11px;top:36px;color:#f5b72b;font-size:20px;font-weight:900;opacity:.55}
 .team-details{margin-top:10px;border-top:1px solid #3b2b10;padding-top:8px}
 .team-detail{padding:8px 0;border-bottom:1px solid #2b210e}
 .team-detail:last-child{border-bottom:0}
@@ -364,7 +367,22 @@ const MATCHES=[
   {id:"TM-SF1",sport:"TENIS MEJA",round:"SEMIFINAL",date:"2026-08-30",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 10 / RW 014",status:"JADWAL"},
   {id:"TM-SF2",sport:"TENIS MEJA",round:"SEMIFINAL",date:"2026-08-30",time:"20:15 WIB",a:"RT 11 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
   {id:"BD-W-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRI",date:"2026-08-30",time:"21:00 WIB",a:"RT 10 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
-  {id:"BD-M-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRA",date:"2026-08-30",time:"22:15 WIB",a:"RT 08 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
+  {id:"BD-M-SF2",sport:"BADMINTON",round:"SEMIFINAL • REGU PUTRA",date:"2026-08-30",time:"22:15 WIB",a:"RT 08 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
+
+  // PEREBUTAN JUARA 3/4 — 4-6 SEPTEMBER 2026
+  {id:"BDW-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRI",date:"2026-09-04",time:"20:30 WIB",a:"RT 06 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
+  {id:"TM-3RD",sport:"TENIS MEJA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
+  {id:"VP-3RD",sport:"VOLLY PUTRA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"20:30 WIB",a:"RT 04 / RW 021",b:"RT 06 / RW 021",status:"JADWAL"},
+  {id:"FS-3RD",sport:"FUTSAL",round:"PEREBUTAN JUARA 3",date:"2026-09-06",time:"19:30 WIB",a:"RT 04 / RW 021",b:"RT 02 / RW 021",status:"JADWAL"},
+  {id:"BDM-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRA",date:"2026-09-06",time:"20:30 WIB",a:"RT 10 / RW 014",b:"RT 08 / RW 021",status:"JADWAL"},
+
+  // FINAL — 4, 11 & 12 SEPTEMBER 2026
+  {id:"BDW-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRI",date:"2026-09-04",time:"21:30 WIB",a:"RT 08 / RW 021",b:"RT 10 / RW 021",status:"JADWAL"},
+  {id:"TM-FINAL",sport:"TENIS MEJA",round:"FINAL",date:"2026-09-11",time:"19:30 WIB",a:"RT 10 / RW 014",b:"RT 11 / RW 021",status:"JADWAL"},
+  {id:"BDM-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRA",date:"2026-09-11",time:"20:30 WIB",a:"RT 07 / RW 014",b:"RT 11 / RW 021",status:"JADWAL"},
+  {id:"VW-FINAL",sport:"VOLLY PUTRI",round:"FINAL",date:"2026-09-12",time:"15:30 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 021",status:"JADWAL"},
+  {id:"VP-FINAL",sport:"VOLLY PUTRA",round:"FINAL",date:"2026-09-12",time:"19:30 WIB",a:"RT 10 / RW 021",b:"RT 09 / RW 014",status:"JADWAL"},
+  {id:"FS-FINAL",sport:"FUTSAL",round:"FINAL",date:"2026-09-12",time:"20:30 WIB",a:"RT 13 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
 ];
 
 const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];
@@ -611,18 +629,28 @@ function renderBracket(){
       data=buildMergedMatches().filter(m=>m.sport===sport);
   document.getElementById("bracketFilters").innerHTML=SPORT_ORDER.map(s=>`<button class="pill ${s===sport?"active":""}" data-bracket="${s}">${s}</button>`).join("");
   let badminton=sport==="BADMINTON";
+
+  const roundGame=g=>`<div class="game">
+    <div>${esc(g.a)} <b>${g.teamScoreA!=null?g.teamScoreA:"—"}</b></div>
+    <div>${esc(g.b)} <b>${g.teamScoreB!=null?g.teamScoreB:"—"}</b></div>
+    <small>${esc(g.round)}${g.winner?" • LOLOS: "+esc(g.winner):""}</small>
+    ${g.sets?`<div class="sets">${g.sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:""}
+  </div>`;
+
+  const semis=data.filter(g=>/SEMIFINAL/i.test(g.round));
+  const thirds=data.filter(g=>/JUARA 3/i.test(g.round));
+  const finals=data.filter(g=>/FINAL/i.test(g.round)&&!/JUARA 3/i.test(g.round));
+  const champFinal=finals.find(g=>g.winner)||finals[0];
+  const champion=champFinal?.winner||null;
+
   document.getElementById("bracketGrid").innerHTML=`
     <div class="col"><h3>${badminton?"HASIL / JADWAL":"DAFTAR MATCH"}</h3>
-      ${data.map(g=>`<div class="game">
-        <div>${esc(g.a)} <b>${g.teamScoreA!=null?g.teamScoreA:"—"}</b></div>
-        <div>${esc(g.b)} <b>${g.teamScoreB!=null?g.teamScoreB:"—"}</b></div>
-        <small>${esc(g.round)}${g.winner?" • LOLOS: "+esc(g.winner):""}</small>
-        ${g.sets?`<div class="sets">${g.sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:""}
-      </div>`).join("")||`<div class="game"><small>Belum ada data</small></div>`}
+      ${data.map(roundGame).join("")||`<div class="game"><small>Belum ada data</small></div>`}
     </div>
-    <div class="col"><h3>SEMIFINAL</h3><div class="game"><small>Hasil mengikuti pertandingan berjalan</small></div></div>
-    <div class="col final"><h3>FINAL</h3><div class="game"><small>Menunggu hasil semifinal</small></div></div>
-    <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">JUARA ${esc(sport)}</div></div></div>`
+    <div class="col"><h3>SEMIFINAL</h3>${semis.map(roundGame).join("")||`<div class="game"><small>Tidak ada babak semifinal untuk cabang ini</small></div>`}</div>
+    <div class="col"><h3>PEREBUTAN JUARA 3</h3>${thirds.map(roundGame).join("")||`<div class="game"><small>Belum ada jadwal juara 3</small></div>`}</div>
+    <div class="col final"><h3>FINAL</h3>${finals.map(roundGame).join("")||`<div class="game"><small>Menunggu hasil semifinal</small></div>`}</div>
+    <div class="col"><h3>JUARA</h3><div class="game" style="text-align:center"><div style="justify-content:center;border:0">🏆</div><div style="justify-content:center;border:0">${champion?esc(champion):"JUARA "+esc(sport)}</div></div></div>`
 }
 
 function renderResults(){
