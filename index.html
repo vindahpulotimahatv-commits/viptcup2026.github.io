@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script>
+(function(){
+  // Deteksi device: kalau laptop/desktop (bukan HP/tablet & layar lebar) -> lempar ke desktop.html
+  var ua = navigator.userAgent || "";
+  var isMobileUA = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|webOS/i.test(ua);
+  var isWideScreen = window.innerWidth >= 1024;
+  var isDesktop = !isMobileUA && isWideScreen;
+  if (isDesktop && !sessionStorage.getItem('viptForceMobile')) {
+    location.replace('desktop.html');
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -276,7 +288,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
 </div>
 <style>
 #bumperSplash{
-  position:fixed;inset:0;z-index:99999;background:#000;
+  position:fixed;top:0;right:0;bottom:0;left:0;z-index:99999;background:#000;
   display:flex;align-items:center;justify-content:center;
   opacity:1;transition:opacity .6s ease;cursor:pointer;overflow:hidden
 }

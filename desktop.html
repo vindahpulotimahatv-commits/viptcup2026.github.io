@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script>
+(function(){
+  // Deteksi device: kalau HP/tablet (bukan laptop/desktop) -> lempar ke index.html
+  var ua = navigator.userAgent || "";
+  var isMobileUA = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|webOS/i.test(ua);
+  var isNarrowScreen = window.innerWidth < 1024;
+  var isMobile = isMobileUA || isNarrowScreen;
+  if (isMobile) {
+    location.replace('index.html');
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -315,6 +327,40 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
 </head>
 
 <body>
+<div id="bumperSplash" onclick="document.getElementById('bumperSplash').classList.add('hide')">
+  <img src="assets/splash-bumper.jpg" alt="VIPT CUP IV 2026 - Finals Weeks">
+  <span id="bumperSkip">Klik untuk lanjut</span>
+</div>
+<style>
+#bumperSplash{
+  position:fixed;top:0;right:0;bottom:0;left:0;z-index:99999;background:#000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:1;transition:opacity .6s ease;cursor:pointer;overflow:hidden
+}
+#bumperSplash img{
+  height:100%;width:auto;margin:0 auto;display:block;object-fit:cover;object-position:center top;
+  animation:bumperZoom 3.2s ease-out forwards
+}
+#bumperSkip{
+  position:absolute;left:0;right:0;bottom:26px;text-align:center;
+  color:#fff;font-size:12px;font-weight:900;letter-spacing:.5px;
+  opacity:.75;animation:bumperPulse 1.6s ease-in-out infinite
+}
+#bumperSplash.hide{opacity:0;pointer-events:none}
+@keyframes bumperZoom{from{transform:scale(1.06)}to{transform:scale(1)}}
+@keyframes bumperPulse{0%,100%{opacity:.4}50%{opacity:.9}}
+</style>
+<script>
+(function(){
+  var el=document.getElementById('bumperSplash');
+  var t=setTimeout(function(){ el.classList.add('hide'); },2800);
+  el.addEventListener('click',function(){ clearTimeout(t); });
+  el.addEventListener('transitionend',function(){
+    if(el.classList.contains('hide')) el.remove();
+  });
+})();
+</script>
+
 <div id="notifyToast" class="toast"><b id="toastTitle">VIPT CUP IV 2026</b><span id="toastText"></span></div>
 
 <div class="desktop-wrapper">
