@@ -26,8 +26,9 @@ html{scroll-behavior:smooth;min-height:100%}
 body{
   margin:0;
   background:
-    radial-gradient(circle at 50% 0%,rgba(245,183,43,.12),transparent 28%),
-    linear-gradient(180deg,#030303,#080705 45%,#030303);
+    linear-gradient(180deg,rgba(3,3,3,.70),rgba(5,4,3,.55) 35%,rgba(3,3,3,.82)),
+    url('assets/hero-bg.jpg') center top/cover no-repeat;
+  background-color:#030303;
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
   padding-bottom:env(safe-area-inset-bottom)
@@ -269,6 +270,40 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
 </head>
 
 <body>
+<div id="bumperSplash" onclick="document.getElementById('bumperSplash').classList.add('hide')">
+  <img src="assets/splash-bumper.jpg" alt="VIPT CUP IV 2026 - Finals Weeks">
+  <span id="bumperSkip">Ketuk untuk lanjut</span>
+</div>
+<style>
+#bumperSplash{
+  position:fixed;inset:0;z-index:99999;background:#000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:1;transition:opacity .6s ease;cursor:pointer;overflow:hidden
+}
+#bumperSplash img{
+  width:100%;height:100%;object-fit:cover;object-position:center top;
+  animation:bumperZoom 3.2s ease-out forwards
+}
+#bumperSkip{
+  position:absolute;left:0;right:0;bottom:26px;text-align:center;
+  color:#fff;font-size:11px;font-weight:900;letter-spacing:.5px;
+  opacity:.75;animation:bumperPulse 1.6s ease-in-out infinite
+}
+#bumperSplash.hide{opacity:0;pointer-events:none}
+@keyframes bumperZoom{from{transform:scale(1.06)}to{transform:scale(1)}}
+@keyframes bumperPulse{0%,100%{opacity:.4}50%{opacity:.9}}
+</style>
+<script>
+(function(){
+  var el=document.getElementById('bumperSplash');
+  var t=setTimeout(function(){ el.classList.add('hide'); },2800);
+  el.addEventListener('click',function(){ clearTimeout(t); });
+  el.addEventListener('transitionend',function(){
+    if(el.classList.contains('hide')) el.remove();
+  });
+})();
+</script>
+
 <div id="notifyToast" class="toast"><b id="toastTitle">VIPT CUP IV 2026</b><span id="toastText"></span></div>
 
 
