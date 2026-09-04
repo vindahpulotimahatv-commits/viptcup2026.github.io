@@ -13,6 +13,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #050505;
@@ -273,6 +276,39 @@ button, input { font: inherit; }
 ::-webkit-scrollbar-track { background: #050505; }
 ::-webkit-scrollbar-thumb { background: #3b2b10; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #5a421a; }
+
+/* ===== VISUAL REFRESH — TYPOGRAPHY & DEPTH (VIPT CUP IV) ===== */
+:root{--font-display:'Fraunces',Georgia,serif;--font-body:'Inter',Arial,Helvetica,sans-serif}
+body{font-family:var(--font-body)}
+h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.survey-q,.notify-title,.stat-box b{font-family:var(--font-display);letter-spacing:.1px}
+.hero h1{font-weight:700;font-size:clamp(30px,9vw,40px);letter-spacing:.2px}
+.hero h2{font-weight:600;font-style:italic}
+.section h2{font-weight:700;font-size:16px}
+.hero{animation:heroReveal .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes heroReveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ===== COHESION PASS — HIERARCHY, CARDS, LOGOS (VIPT CUP IV) ===== */
+:root{--radius-lg:22px;--radius-md:14px;--radius-sm:11px}
+
+.card{border-radius:var(--radius-md);box-shadow:0 6px 18px rgba(0,0,0,.28)}
+
+.live{
+  border-radius:var(--radius-lg);
+  border-color:#d9a52c;
+  box-shadow:0 14px 34px rgba(245,183,43,.14),0 6px 18px rgba(0,0,0,.4);
+  position:relative;overflow:hidden
+}
+.live:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#ffd35c,#f5b72b,#9a650b)}
+
+.featured,.notify-card,.survey-invite{border-radius:var(--radius-lg)}
+
+.match,.news-card,.game{border-radius:var(--radius-sm);box-shadow:none;border-color:#3b2b10}
+
+.section{border-bottom:1px solid rgba(245,183,43,.14);padding-bottom:8px}
+
+.teamlogo,.team-logo-img{box-shadow:0 0 0 2px rgba(245,183,43,.35),0 6px 14px rgba(0,0,0,.4)}
+
+.btn{letter-spacing:.3px}
 </style>
 </head>
 
