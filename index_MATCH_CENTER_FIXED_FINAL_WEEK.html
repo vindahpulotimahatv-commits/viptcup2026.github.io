@@ -23,8 +23,9 @@ html{scroll-behavior:smooth;min-height:100%}
 body{
   margin:0;
   background:
-    radial-gradient(circle at 50% 0%,rgba(245,183,43,.12),transparent 28%),
-    linear-gradient(180deg,#030303,#080705 45%,#030303);
+    linear-gradient(180deg,rgba(3,3,3,.70),rgba(5,4,3,.55) 35%,rgba(3,3,3,.82)),
+    url('assets/hero-bg.jpg') center top/cover no-repeat;
+  background-color:#030303;
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
   padding-bottom:env(safe-area-inset-bottom)
@@ -397,15 +398,15 @@ window.VENUE="Lapangan Central";
 const MATCHES=[
   {id:"BDW-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRI",date:"2026-09-04",time:"20:30 WIB",a:"RT 06 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
   {id:"BDW-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRI",date:"2026-09-04",time:"21:30 WIB",a:"RT 08 / RW 021",b:"RT 10 / RW 021",status:"JADWAL"},
-  {id:"TM-3RD",sport:"TENIS MEJA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
-  {id:"VP-3RD",sport:"VOLLY PUTRA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"20:30 WIB",a:"RT 04 / RW 021",b:"RT 06 / RW 021",status:"JADWAL"},
-  {id:"VP-FINAL",sport:"VOLLY PUTRA",round:"FINAL",date:"2026-09-05",time:"22:00 WIB",a:"RT 09 / RW 014",b:"RT 10 / RW 021",status:"JADWAL"},
+  {id:"VP-3RD",sport:"VOLLY PUTRA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"19:30 WIB",a:"RT 06 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
+  {id:"VP-FINAL",sport:"VOLLY PUTRA",round:"FINAL",date:"2026-09-05",time:"21:00 WIB",a:"RT 09 / RW 014",b:"RT 10 / RW 021",status:"JADWAL"},
   {id:"VW-FINAL",sport:"VOLLY PUTRI",round:"FINAL",date:"2026-09-06",time:"16:00 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 021",status:"JADWAL"},
-  {id:"BDM-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRA",date:"2026-09-06",time:"20:30 WIB",a:"RT 10 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
-  {id:"BDM-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRA",date:"2026-09-06",time:"21:30 WIB",a:"RT 07 / RW 014",b:"RT 11 / RW 021",status:"JADWAL"},
-  {id:"TM-FINAL",sport:"TENIS MEJA",round:"FINAL",date:"2026-09-12",time:"20:00 WIB",a:"RT 10 / RW 014",b:"RT 11 / RW 021",status:"JADWAL"},
+  {id:"TM-3RD",sport:"TENIS MEJA",round:"PEREBUTAN JUARA 3",date:"2026-09-06",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
+  {id:"BDM-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRA",date:"2026-09-06",time:"20:30 WIB",a:"RT 08 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
+  {id:"BDM-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRA",date:"2026-09-06",time:"21:30 WIB",a:"RT 09 / RW 021",b:"RT 10 / RW 021",status:"JADWAL"},
+  {id:"TM-FINAL",sport:"TENIS MEJA",round:"FINAL",date:"2026-09-12",time:"20:00 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
   {id:"FS-3RD",sport:"FUTSAL",round:"PEREBUTAN JUARA 3",date:"2026-09-12",time:"20:45 WIB",a:"RT 04 / RW 021",b:"RT 02 / RW 021",status:"JADWAL"},
-  {id:"FS-FINAL",sport:"FUTSAL",round:"FINAL",date:"2026-09-12",time:"22:00 WIB",a:"RT 13 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
+  {id:"FS-FINAL",sport:"FUTSAL",round:"FINAL",date:"2026-09-12",time:"21:15 WIB",a:"RT 13 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
 ];
 
 const SPORT_ORDER=["VOLLY PUTRA","VOLLY PUTRI","FUTSAL","TENIS MEJA","BADMINTON"];

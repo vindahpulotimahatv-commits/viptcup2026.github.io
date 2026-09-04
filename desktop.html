@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script>
+(function(){
+  // Deteksi device: kalau HP/tablet (bukan laptop/desktop) -> lempar ke index.html
+  var ua = navigator.userAgent || "";
+  var isMobileUA = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|webOS/i.test(ua);
+  var isNarrowScreen = window.innerWidth < 1024;
+  var isMobile = isMobileUA || isNarrowScreen;
+  if (isMobile) {
+    location.replace('index.html');
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -32,8 +44,10 @@ html { scroll-behavior: smooth; min-height: 100%; }
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 50% 0%, rgba(245,183,43,.08), transparent 28%),
-    linear-gradient(180deg, #030303, #080705 45%, #030303);
+    linear-gradient(180deg, rgba(3,3,3,.70), rgba(5,4,3,.55) 35%, rgba(3,3,3,.82)),
+    url('assets/hero-bg.jpg') center top/cover no-repeat;
+  background-color: #030303;
+  background-attachment: fixed;
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -299,6 +313,12 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
   position:relative;overflow:hidden
 }
 .live:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#ffd35c,#f5b72b,#9a650b)}
+.live-countdown{text-align:center;padding:14px 6px 4px}
+.lc-label{font-size:9px;letter-spacing:2px;color:#f5c451;font-weight:900}
+.lc-timer{font-size:clamp(26px,4vw,44px);font-weight:900;color:var(--gold);line-height:1.15;margin:8px 0 6px;text-shadow:0 0 22px rgba(245,183,43,.35)}
+.lc-match{font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;line-height:1.4}
+.lc-bell{width:100%;border:1px solid #e7a91f;border-radius:12px;padding:12px 14px;background:linear-gradient(135deg,#f5b72b,#9a650b);color:#17120a;font-weight:900;font-size:11px;cursor:pointer}
+.lc-bell.on{background:rgba(30,211,147,.14);border-color:rgba(30,211,147,.55);color:var(--green)}
 
 .featured,.notify-card,.survey-invite{border-radius:var(--radius-lg)}
 
@@ -313,6 +333,40 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
 </head>
 
 <body>
+<div id="bumperSplash" onclick="document.getElementById('bumperSplash').classList.add('hide')">
+  <img src="assets/splash-bumper.jpg" alt="VIPT CUP IV 2026 - Finals Weeks">
+  <span id="bumperSkip">Klik untuk lanjut</span>
+</div>
+<style>
+#bumperSplash{
+  position:fixed;top:0;right:0;bottom:0;left:0;z-index:99999;background:#000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:1;transition:opacity .6s ease;cursor:pointer;overflow:hidden
+}
+#bumperSplash img{
+  height:100%;width:auto;margin:0 auto;display:block;object-fit:cover;object-position:center top;
+  animation:bumperZoom 3.2s ease-out forwards
+}
+#bumperSkip{
+  position:absolute;left:0;right:0;bottom:26px;text-align:center;
+  color:#fff;font-size:12px;font-weight:900;letter-spacing:.5px;
+  opacity:.75;animation:bumperPulse 1.6s ease-in-out infinite
+}
+#bumperSplash.hide{opacity:0;pointer-events:none}
+@keyframes bumperZoom{from{transform:scale(1.06)}to{transform:scale(1)}}
+@keyframes bumperPulse{0%,100%{opacity:.4}50%{opacity:.9}}
+</style>
+<script>
+(function(){
+  var el=document.getElementById('bumperSplash');
+  var t=setTimeout(function(){ el.classList.add('hide'); },6000);
+  el.addEventListener('click',function(){ clearTimeout(t); });
+  el.addEventListener('transitionend',function(){
+    if(el.classList.contains('hide')) el.remove();
+  });
+})();
+</script>
+
 <div id="notifyToast" class="toast"><b id="toastTitle">VIPT CUP IV 2026</b><span id="toastText"></span></div>
 
 <div class="desktop-wrapper">
@@ -377,7 +431,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
             <span id="liveStatusLabel" class="waiting">● MENUNGGU PERTANDINGAN</span>
             <span class="sportname" id="liveSport">BELUM ADA PERTANDINGAN LIVE</span>
           </div>
-          <div class="teams">
+          <div class="teams" id="liveTeamsView">
             <div class="team">
               <img id="liveLogoA" class="team-logo-img" hidden>
               <div id="liveLogoFallbackA" class="teamlogo">A</div>
@@ -389,6 +443,13 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
               <div id="liveLogoFallbackB" class="teamlogo">B</div>
               <b id="liveB">-</b>
             </div>
+          </div>
+
+          <div class="live-countdown" id="liveCountdownView" style="display:none">
+            <div class="lc-label">PERTANDINGAN BERIKUTNYA</div>
+            <div class="lc-timer" id="lcTimer">—</div>
+            <div class="lc-match" id="lcMatch">Memuat jadwal...</div>
+            <button class="lc-bell" id="lcBell" type="button">🔔 Klik lonceng untuk mengingatkan saya</button>
           </div>
         </div>
 
@@ -476,8 +537,8 @@ window.VENUE="Lapangan Central";
 const MATCHES=[
   {id:"BDW-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRI",date:"2026-09-04",time:"20:30 WIB",a:"RT 06 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"},
   {id:"BDW-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRI",date:"2026-09-04",time:"21:30 WIB",a:"RT 08 / RW 021",b:"RT 10 / RW 021",status:"JADWAL"},
-  {id:"VP-3RD",sport:"VOLLY PUTRA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"19:30 WIB",a:"RT 08 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
-  {id:"VP-FINAL",sport:"VOLLY PUTRA",round:"FINAL",date:"2026-09-05",time:"21:00 WIB",a:"RT 09 / RW 021",b:"RT 10 / RW 021",status:"JADWAL"},
+  {id:"VP-3RD",sport:"VOLLY PUTRA",round:"PEREBUTAN JUARA 3",date:"2026-09-05",time:"19:30 WIB",a:"RT 06 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
+  {id:"VP-FINAL",sport:"VOLLY PUTRA",round:"FINAL",date:"2026-09-05",time:"21:00 WIB",a:"RT 09 / RW 014",b:"RT 10 / RW 021",status:"JADWAL"},
   {id:"VW-FINAL",sport:"VOLLY PUTRI",round:"FINAL",date:"2026-09-06",time:"16:00 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 021",status:"JADWAL"},
   {id:"TM-3RD",sport:"TENIS MEJA",round:"PEREBUTAN JUARA 3",date:"2026-09-06",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
   {id:"BDM-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRA",date:"2026-09-06",time:"20:30 WIB",a:"RT 08 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
@@ -539,7 +600,32 @@ function setLiveOffline(msg){
   document.getElementById("liveA").textContent="-";
   document.getElementById("liveB").textContent="-";
   document.getElementById("liveScore").firstChild.textContent="-";
-  document.getElementById("liveRound").textContent="MENUNGGU DATA"
+  document.getElementById("liveRound").textContent="MENUNGGU DATA";
+  updateLiveDisplay()
+}
+
+function renderLiveCountdown(){
+  const timerEl=document.getElementById("lcTimer");
+  const matchEl=document.getElementById("lcMatch");
+  if(!timerEl||!matchEl)return;
+  const next=(typeof getUpcomingMatches==="function")?getUpcomingMatches()[0]:null;
+  if(!next){
+    timerEl.textContent="—";
+    matchEl.textContent="Belum ada pertandingan berikutnya.";
+    return
+  }
+  timerEl.textContent=formatCountdown(next.start.getTime()-Date.now());
+  matchEl.textContent=`${next.m.sport} • ${next.m.a} vs ${next.m.b} bertanding`
+}
+
+function updateLiveDisplay(){
+  const teamsView=document.getElementById("liveTeamsView");
+  const cdView=document.getElementById("liveCountdownView");
+  if(!teamsView||!cdView)return;
+  const isLive=liveState && statusForMatch(liveState.status)==="LIVE";
+  teamsView.style.display=isLive?"":"none";
+  cdView.style.display=isLive?"none":"";
+  if(!isLive)renderLiveCountdown()
 }
 
 function isVollySport(s){return /VOLLY/i.test(String(s||""))}
@@ -679,7 +765,9 @@ function renderLive(){
   if(la){la.src=sa;la.hidden=!sa}
   if(fa)fa.style.display=sa?"none":"grid";
   if(lb){lb.src=sb;lb.hidden=!sb}
-  if(fb)fb.style.display=sb?"none":"grid"
+  if(fb)fb.style.display=sb?"none":"grid";
+
+  updateLiveDisplay()
 }
 
 function getMatchDateTime(m){
@@ -822,6 +910,12 @@ function refreshNotifyButton(){
   const enabled=localStorage.getItem("VIPT_MATCH_NOTIFICATIONS_ENABLED")==="1" && Notification.permission==="granted";
   btn.textContent=enabled?"✓ NOTIFIKASI AKTIF":"AKTIFKAN";
   btn.classList.toggle("on",enabled);
+
+  const bell=document.getElementById("lcBell");
+  if(bell){
+    bell.textContent=enabled?"🔔 Pengingat aktif":"🔔 Klik lonceng untuk mengingatkan saya";
+    bell.classList.toggle("on",enabled)
+  }
 }
 
 async function enableMatchNotifications(){
@@ -832,6 +926,7 @@ async function enableMatchNotifications(){
   }
 }
 document.getElementById("notifyBtn")?.addEventListener("click",enableMatchNotifications);
+document.getElementById("lcBell")?.addEventListener("click",enableMatchNotifications);
 
 function initFirebase(){
   try{
@@ -847,7 +942,7 @@ function initFirebase(){
   }catch(e){ setLiveOffline("FIREBASE TIDAK AKTIF") }
 }
 
-initFirebase(); renderAll(); refreshNotifyButton(); setInterval(renderNextMatch,1000);
+initFirebase(); renderAll(); refreshNotifyButton(); updateLiveDisplay(); setInterval(renderNextMatch,1000); setInterval(renderLiveCountdown,1000);
 
 /* Survey Logic Minimalist Implementation */
 const SURVEY_FIREBASE_CONFIG={
