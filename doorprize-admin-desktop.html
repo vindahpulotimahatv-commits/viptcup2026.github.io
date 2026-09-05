@@ -1,23 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<script>
-(function(){
-  var ua = navigator.userAgent || "";
-  var isMobileUA = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|webOS/i.test(ua);
-  var isWideScreen = window.innerWidth >= 1024;
-  var isDesktop = !isMobileUA && isWideScreen;
-  if (isDesktop && !sessionStorage.getItem('viptForceMobileAdmin')) {
-    location.replace('doorprize-admin-desktop.html');
-  }
-})();
-</script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#050505">
-<title>Panel Undian Doorprize • Panitia VIPT CUP IV 2026</title>
+<title>Panel Undian Doorprize (Desktop) • Panitia VIPT CUP IV 2026</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
@@ -31,91 +20,102 @@
 *{box-sizing:border-box}
 body{
   margin:0;background:#030303;color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;padding-bottom:30px
+  font-family:Arial,Helvetica,sans-serif;min-height:100vh
 }
 button,input{font:inherit}
-.app{max-width:560px;margin:auto;min-height:100vh;padding:0 16px}
-header{padding:20px 0 8px;text-align:center}
-header .logo{font-size:26px}
-header h1{font-size:16px;margin:8px 0 2px;color:var(--gold)}
-header p{font-size:11px;color:var(--muted);margin:0}
+.wrap{max-width:1180px;margin:auto;padding:30px 28px 60px}
+
+header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+header.top .brand{display:flex;align-items:center;gap:14px}
+header.top .brand .logo{font-size:34px}
+header.top h1{font-size:20px;margin:0;color:var(--gold)}
+header.top p{font-size:12px;color:var(--muted);margin:2px 0 0}
+.mobile-link{font-size:11.5px;color:#f5c451;text-decoration:none;border:1px solid #6f4d13;padding:9px 14px;border-radius:10px}
+.mobile-link:hover{border-color:var(--gold)}
+
 .card{
   background:linear-gradient(145deg,#11100d,#050505);
-  border:1px solid #6f4d13;border-radius:17px;padding:18px;margin-bottom:14px;
-  box-shadow:0 8px 24px rgba(0,0,0,.35)
+  border:1px solid #6f4d13;border-radius:18px;padding:24px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35)
 }
-label{display:block;font-size:11px;font-weight:900;color:var(--gold);margin:0 0 6px}
+label{display:block;font-size:12px;font-weight:900;color:var(--gold);margin:0 0 8px}
 input.field{
   width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;
-  border-radius:12px;padding:13px 14px;outline:none;margin-bottom:14px;font-size:14px
+  border-radius:12px;padding:15px 16px;outline:none;margin-bottom:16px;font-size:15px
 }
 .btn{
   display:block;width:100%;text-align:center;text-decoration:none;color:#090705;
   background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;
-  border-radius:12px;padding:14px;font-size:12.5px;font-weight:900;cursor:pointer
+  border-radius:12px;padding:16px;font-size:13.5px;font-weight:900;cursor:pointer;transition:.15s
 }
+.btn:hover:not(:disabled){filter:brightness(1.08)}
 .btn.secondary{background:linear-gradient(135deg,#2a2a2a,#0e0e0e);color:#f5c451;border:1px solid #6f4d13}
-.btn:disabled{opacity:.5}
-#gateCard{max-width:400px;margin:60px auto 0}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-/* ==== STATS ==== */
-.stats{display:flex;gap:10px;margin-bottom:14px}
-.stat{flex:1;background:#0c0b09;border:1px solid #6f4d13;border-radius:12px;padding:12px;text-align:center}
-.stat b{display:block;font-size:20px;color:var(--gold)}
-.stat span{font-size:9.5px;color:var(--muted)}
+#gateCard{max-width:420px;margin:80px auto 0}
 
-/* ==== REEL ==== */
+.grid{display:grid;grid-template-columns:1.35fr .95fr;gap:22px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+.stats{display:flex;gap:14px;margin-bottom:18px}
+.stat{flex:1;background:#0c0b09;border:1px solid #6f4d13;border-radius:14px;padding:18px;text-align:center}
+.stat b{display:block;font-size:30px;color:var(--gold)}
+.stat span{font-size:11px;color:var(--muted)}
+
 .reel-wrap{
-  position:relative;overflow:hidden;border:1px solid #6f4d13;border-radius:14px;
-  background:#080807;height:64px;margin-bottom:16px
+  position:relative;overflow:hidden;border:1px solid #6f4d13;border-radius:16px;
+  background:#080807;height:96px;margin-bottom:22px
 }
 .reel-wrap:before,.reel-wrap:after{
-  content:"";position:absolute;top:0;bottom:0;width:40%;z-index:2;pointer-events:none
+  content:"";position:absolute;top:0;bottom:0;width:35%;z-index:2;pointer-events:none
 }
 .reel-wrap:before{left:0;background:linear-gradient(90deg,#080807,transparent)}
 .reel-wrap:after{right:0;background:linear-gradient(270deg,#080807,transparent)}
 .reel-pointer{
-  position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--gold);
-  transform:translateX(-50%);z-index:3;box-shadow:0 0 8px var(--gold)
+  position:absolute;left:50%;top:0;bottom:0;width:3px;background:var(--gold);
+  transform:translateX(-50%);z-index:3;box-shadow:0 0 10px var(--gold)
 }
 .reel-track{display:flex;align-items:center;height:100%;will-change:transform}
 .reel-item{
-  flex:0 0 auto;padding:0 26px;font-size:15px;font-weight:900;color:#665a3a;
-  white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.25
+  flex:0 0 auto;padding:0 38px;font-size:22px;font-weight:900;color:#665a3a;
+  white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.3
 }
-.reel-item small{font-size:9px;font-weight:700;color:#4a4130}
+.reel-item small{font-size:12px;font-weight:700;color:#4a4130}
 .reel-item.center{color:var(--gold)}
 .reel-item.center small{color:#c99a3a}
 
-.winner-box{display:none;text-align:center;padding:16px 0 4px}
-.winner-box .crown{font-size:34px}
-.winner-box h2{margin:8px 0 2px;font-size:20px;color:var(--gold)}
-.winner-box p{margin:0;font-size:12px;color:var(--muted)}
+.winner-box{display:none;text-align:center;padding:20px 0 6px}
+.winner-box .crown{font-size:50px}
+.winner-box h2{margin:10px 0 3px;font-size:30px;color:var(--gold)}
+.winner-box p{margin:0;font-size:15px;color:var(--muted)}
 
-.actions{display:flex;gap:10px;margin-top:14px}
+.actions{display:flex;gap:14px;margin-top:18px}
 .actions .btn{flex:1}
 
+.side-title{font-size:16px;font-weight:900;color:var(--gold);margin:0 0 14px}
+.winners-list{max-height:560px;overflow:auto;padding-right:4px}
 .list-item{
   display:flex;justify-content:space-between;align-items:center;
-  padding:9px 0;border-bottom:1px solid #221c10;font-size:12px
+  padding:12px 0;border-bottom:1px solid #221c10;font-size:13.5px
 }
 .list-item:last-child{border-bottom:none}
-.list-item b{color:#fff}
-.list-item span{color:var(--muted);font-size:10.5px}
-.badge{background:rgba(30,211,147,.15);color:var(--green);border:1px solid var(--green);border-radius:99px;padding:2px 8px;font-size:9px;font-weight:900}
-.empty{text-align:center;color:var(--muted);font-size:11px;padding:14px 0}
-.status{font-size:11px;text-align:center;margin-top:6px;color:var(--muted);min-height:14px}
-.back{display:block;text-align:center;margin-top:16px;font-size:11px;color:#f5c451;text-decoration:none}
+.list-item b{color:#fff;font-size:14.5px}
+.list-item span{color:var(--muted);font-size:11.5px}
+.badge{background:rgba(30,211,147,.15);color:var(--green);border:1px solid var(--green);border-radius:99px;padding:3px 10px;font-size:10px;font-weight:900;white-space:nowrap}
+.empty{text-align:center;color:var(--muted);font-size:12.5px;padding:20px 0}
+.status{font-size:12.5px;text-align:center;margin-top:10px;color:var(--muted);min-height:16px}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="wrap">
 
   <div class="card" id="gateCard">
-    <header style="padding-top:0">
-      <div class="logo">🔒</div>
-      <h1>PANEL PANITIA</h1>
-      <p>Masukkan PIN untuk membuka undian doorprize</p>
+    <header class="top" style="justify-content:center;margin-bottom:14px">
+      <div class="brand" style="flex-direction:column;text-align:center">
+        <div class="logo">🔒</div>
+        <h1>PANEL PANITIA</h1>
+        <p>Masukkan PIN untuk membuka undian doorprize</p>
+      </div>
     </header>
     <label for="pinInput">PIN Panitia</label>
     <input class="field" id="pinInput" type="password" inputmode="numeric" placeholder="••••••">
@@ -124,10 +124,15 @@ input.field{
   </div>
 
   <div id="panelWrap" style="display:none">
-    <header>
-      <div class="logo">🎡</div>
-      <h1>UNDIAN DOORPRIZE</h1>
-      <p>VIPT CUP IV 2026 • Khusus Panitia</p>
+    <header class="top">
+      <div class="brand">
+        <div class="logo">🎡</div>
+        <div>
+          <h1>UNDIAN DOORPRIZE VIPT CUP IV 2026</h1>
+          <p>Panel Panitia • Versi Desktop</p>
+        </div>
+      </div>
+      <a class="mobile-link" href="doorprize-admin.html" onclick="try{sessionStorage.setItem('viptForceMobileAdmin','1')}catch(e){}">📱 Buka Versi HP</a>
     </header>
 
     <div class="stats">
@@ -136,36 +141,37 @@ input.field{
       <div class="stat"><b id="statMenang">0</b><span>SUDAH MENANG</span></div>
     </div>
 
-    <div class="card">
-      <div class="reel-wrap"><div class="reel-pointer"></div><div class="reel-track" id="reelTrack"></div></div>
+    <div class="grid">
+      <div class="card">
+        <div class="reel-wrap"><div class="reel-pointer"></div><div class="reel-track" id="reelTrack"></div></div>
 
-      <div class="winner-box" id="winnerBox">
-        <div class="crown">👑</div>
-        <h2 id="winnerName">-</h2>
-        <p id="winnerRtRw">-</p>
+        <div class="winner-box" id="winnerBox">
+          <div class="crown">👑</div>
+          <h2 id="winnerName">-</h2>
+          <p id="winnerRtRw">-</p>
+        </div>
+
+        <button class="btn" id="btnSpin">🎡 PUTAR UNDIAN</button>
+        <div class="actions" id="confirmActions" style="display:none">
+          <button class="btn" id="btnConfirmWin">✅ TANDAI PEMENANG</button>
+          <button class="btn secondary" id="btnSpinAgain">🔁 PUTAR ULANG</button>
+        </div>
+        <div class="status" id="spinStatus"></div>
       </div>
 
-      <button class="btn" id="btnSpin">🎡 PUTAR UNDIAN</button>
-      <div class="actions" id="confirmActions" style="display:none">
-        <button class="btn" id="btnConfirmWin">✅ TANDAI PEMENANG</button>
-        <button class="btn secondary" id="btnSpinAgain">🔁 PUTAR ULANG</button>
+      <div class="card">
+        <div class="side-title">🏆 Riwayat Pemenang</div>
+        <div class="winners-list" id="winnersCard">
+          <div class="empty">Belum ada pemenang.</div>
+        </div>
       </div>
-      <div class="status" id="spinStatus"></div>
-    </div>
-
-    <div class="section" style="display:flex;justify-content:space-between;align-items:center;margin:19px 2px 9px">
-      <h2 style="font-size:15px;margin:0">🏆 Riwayat Pemenang</h2>
-    </div>
-    <div class="card" id="winnersCard">
-      <div class="empty">Belum ada pemenang.</div>
     </div>
   </div>
 
-  <a class="back" href="index.html">← Kembali ke Beranda</a>
 </div>
 
 <script>
-/* Ganti PIN di sini kapan saja */
+/* Ganti PIN di sini kapan saja (samakan dengan doorprize-admin.html) */
 const ADMIN_PIN="12345";
 
 const DOORPRIZE_FIREBASE_CONFIG={
@@ -243,7 +249,7 @@ function renderIdleReel(){
     reelTrack.innerHTML=`<div class="reel-item center">Belum ada peserta<small>Tunggu pendaftaran</small></div>`;
     return;
   }
-  const sample=sisa.slice(0,12);
+  const sample=sisa.slice(0,16);
   reelTrack.style.transform="translateX(0)";
   reelTrack.innerHTML=sample.map(p=>`<div class="reel-item">${esc(p.nama)}<small>${esc(p.rtrw)}</small></div>`).join("");
 }
