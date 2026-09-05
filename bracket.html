@@ -378,7 +378,7 @@ const MATCHES=[
   {id:"BDM-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRA",date:"2026-09-06",time:"20:30 WIB",a:"RT 10 / RW 014",b:"RT 08 / RW 021",status:"JADWAL"},
 
   // FINAL — 4, 11 & 12 SEPTEMBER 2026
-  {id:"BDW-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRI",date:"2026-09-04",time:"21:30 WIB",a:"RT 08 / RW 021",b:"RT 10 / RW 021",status:"JADWAL"},
+  {id:"BDW-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRI",date:"2026-09-04",time:"21:30 WIB",a:"RT 08 / RW 021",b:"RT 10 / RW 021",status:"SELESAI",winner:"RT 10 / RW 021"},
   {id:"TM-FINAL",sport:"TENIS MEJA",round:"FINAL",date:"2026-09-11",time:"19:30 WIB",a:"RT 10 / RW 014",b:"RT 11 / RW 021",status:"JADWAL"},
   {id:"BDM-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRA",date:"2026-09-11",time:"20:30 WIB",a:"RT 07 / RW 014",b:"RT 11 / RW 021",status:"JADWAL"},
   {id:"VW-FINAL",sport:"VOLLY PUTRI",round:"FINAL",date:"2026-09-12",time:"15:30 WIB",a:"RT 09 / RW 014",b:"RT 08 / RW 021",status:"JADWAL"},
@@ -618,7 +618,7 @@ function renderSchedule(){
       </div>
       ${setsHtml}
       <div class="venue">📍 ${esc(VENUE)}</div>
-      ${m.winner?`<div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">🏆 PEMENANG: ${esc(m.winner)}</div>`:""}
+      ${(m.winner&&m.status==="SELESAI")?`<div style="margin-top:8px;color:#f5c451;font-size:9px;font-weight:900">🏆 PEMENANG: ${esc(m.winner)}</div>`:""}
       ${m.period&&m.status!=="SELESAI"?`<div style="margin-top:5px;color:#aaa;font-size:8px">Periode: ${esc(m.period)}</div>`:""}
       <span class="status ${statusClass}">${esc(m.status)}</span>
     </div>`
@@ -634,14 +634,14 @@ function renderBracket(){
   const roundGame=g=>`<div class="game">
     <div>${esc(g.a)} <b>${g.teamScoreA!=null?g.teamScoreA:"—"}</b></div>
     <div>${esc(g.b)} <b>${g.teamScoreB!=null?g.teamScoreB:"—"}</b></div>
-    <small>${esc(g.round)}${g.winner?" • LOLOS: "+esc(g.winner):""}</small>
+    <small>${esc(g.round)}${(g.winner&&g.status==="SELESAI")?" • LOLOS: "+esc(g.winner):""}</small>
     ${g.sets?`<div class="sets">${g.sets.map(s=>`<div class="set-row"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join("")}</div>`:""}
   </div>`;
 
   const semis=data.filter(g=>/SEMIFINAL/i.test(g.round));
   const thirds=data.filter(g=>/JUARA 3/i.test(g.round));
   const finals=data.filter(g=>/FINAL/i.test(g.round)&&!/JUARA 3/i.test(g.round));
-  const champFinal=finals.find(g=>g.winner)||finals[0];
+  const champFinal=finals.find(g=>g.winner&&g.status==="SELESAI")||null;
   const champion=champFinal?.winner||null;
 
   document.getElementById("bracketGrid").innerHTML=`

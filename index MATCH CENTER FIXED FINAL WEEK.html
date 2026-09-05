@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<script>
-(function(){
-  // Deteksi device: kalau laptop/desktop (bukan HP/tablet & layar lebar) -> lempar ke desktop.html
-  var ua = navigator.userAgent || "";
-  var isMobileUA = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|webOS/i.test(ua);
-  var isWideScreen = window.innerWidth >= 1024;
-  var isDesktop = !isMobileUA && isWideScreen;
-  if (isDesktop && !sessionStorage.getItem('viptForceMobile')) {
-    location.replace('desktop.html');
-  }
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -25,9 +13,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#050505;--panel:#0b0b0b;--line:#7a5514;--text:#fff;--muted:#c7c0b2;
@@ -212,7 +197,7 @@ main{padding:0 14px}
 .hidden{display:none!important}
 .bottom{
   position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);
-  width:min(620px,100%);display:grid;grid-template-columns:repeat(6,1fr);
+  width:min(620px,100%);display:grid;grid-template-columns:repeat(7,1fr);
   padding:8px 8px 11px;background:rgba(5,5,5,.98);border-top:1px solid #7a5514;
   backdrop-filter:blur(12px)
 }
@@ -245,83 +230,10 @@ main{padding:0 14px}
 
 
 
-
-/* ===== VISUAL REFRESH — TYPOGRAPHY & DEPTH (VIPT CUP IV) ===== */
-:root{--font-display:'Fraunces',Georgia,serif;--font-body:'Inter',Arial,Helvetica,sans-serif}
-body{font-family:var(--font-body)}
-h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.survey-q,.notify-title,.stat-box b{font-family:var(--font-display);letter-spacing:.1px}
-.hero h1{font-weight:700;font-size:clamp(30px,9vw,40px);letter-spacing:.2px}
-.hero h2{font-weight:600;font-style:italic}
-.section h2{font-weight:700;font-size:16px}
-.hero{animation:heroReveal .8s cubic-bezier(.2,.8,.2,1) both}
-@keyframes heroReveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-/* ===== COHESION PASS — HIERARCHY, CARDS, LOGOS (VIPT CUP IV) ===== */
-:root{--radius-lg:22px;--radius-md:14px;--radius-sm:11px}
-
-.card{border-radius:var(--radius-md);box-shadow:0 6px 18px rgba(0,0,0,.28)}
-
-.live{
-  border-radius:var(--radius-lg);
-  border-color:#d9a52c;
-  box-shadow:0 14px 34px rgba(245,183,43,.14),0 6px 18px rgba(0,0,0,.4);
-  position:relative;overflow:hidden
-}
-.live:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#ffd35c,#f5b72b,#9a650b)}
-.live-countdown{text-align:center;padding:14px 6px 4px}
-.lc-label{font-size:9px;letter-spacing:2px;color:#f5c451;font-weight:900}
-.lc-timer{font-size:clamp(26px,8vw,40px);font-weight:900;color:var(--gold);line-height:1.15;margin:8px 0 6px;text-shadow:0 0 22px rgba(245,183,43,.35)}
-.lc-match{font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;line-height:1.4}
-.lc-bell{width:100%;border:1px solid #e7a91f;border-radius:12px;padding:12px 14px;background:linear-gradient(135deg,#f5b72b,#9a650b);color:#17120a;font-weight:900;font-size:11px;cursor:pointer}
-.lc-bell.on{background:rgba(30,211,147,.14);border-color:rgba(30,211,147,.55);color:var(--green)}
-
-.featured,.notify-card,.survey-invite{border-radius:var(--radius-lg)}
-
-.match,.news-card,.game{border-radius:var(--radius-sm);box-shadow:none;border-color:#3b2b10}
-
-.section{border-bottom:1px solid rgba(245,183,43,.14);padding-bottom:8px}
-
-.teamlogo,.team-logo-img{box-shadow:0 0 0 2px rgba(245,183,43,.35),0 6px 14px rgba(0,0,0,.4)}
-
-.btn{letter-spacing:.3px}
 </style>
 </head>
 
 <body>
-<div id="bumperSplash" onclick="document.getElementById('bumperSplash').classList.add('hide')">
-  <img src="assets/splash-bumper.jpg" alt="VIPT CUP IV 2026 - Finals Weeks">
-  <span id="bumperSkip">Ketuk untuk lanjut</span>
-</div>
-<style>
-#bumperSplash{
-  position:fixed;top:0;right:0;bottom:0;left:0;z-index:99999;background:#000;
-  display:flex;align-items:center;justify-content:center;
-  opacity:1;transition:opacity .6s ease;cursor:pointer;overflow:hidden
-}
-#bumperSplash img{
-  width:100%;height:100%;object-fit:cover;object-position:center top;
-  animation:bumperZoom 3.2s ease-out forwards
-}
-#bumperSkip{
-  position:absolute;left:0;right:0;bottom:26px;text-align:center;
-  color:#fff;font-size:11px;font-weight:900;letter-spacing:.5px;
-  opacity:.75;animation:bumperPulse 1.6s ease-in-out infinite
-}
-#bumperSplash.hide{opacity:0;pointer-events:none}
-@keyframes bumperZoom{from{transform:scale(1.06)}to{transform:scale(1)}}
-@keyframes bumperPulse{0%,100%{opacity:.4}50%{opacity:.9}}
-</style>
-<script>
-(function(){
-  var el=document.getElementById('bumperSplash');
-  var t=setTimeout(function(){ el.classList.add('hide'); },6000);
-  el.addEventListener('click',function(){ clearTimeout(t); });
-  el.addEventListener('transitionend',function(){
-    if(el.classList.contains('hide')) el.remove();
-  });
-})();
-</script>
-
 <div id="notifyToast" class="toast"><b id="toastTitle">VIPT CUP IV 2026</b><span id="toastText"></span></div>
 
 
@@ -345,7 +257,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
     <span id="liveStatusLabel" class="waiting">● MENUNGGU PERTANDINGAN</span>
     <span class="sportname" id="liveSport">BELUM ADA PERTANDINGAN LIVE</span>
   </div>
-  <div class="teams" id="liveTeamsView">
+  <div class="teams">
     <div class="team">
       <img id="liveLogoA" class="team-logo-img" hidden>
       <div id="liveLogoFallbackA" class="teamlogo">A</div>
@@ -357,13 +269,6 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
       <div id="liveLogoFallbackB" class="teamlogo">B</div>
       <b id="liveB">-</b>
     </div>
-  </div>
-
-  <div class="live-countdown" id="liveCountdownView" style="display:none">
-    <div class="lc-label">PERTANDINGAN BERIKUTNYA</div>
-    <div class="lc-timer" id="lcTimer">—</div>
-    <div class="lc-match" id="lcMatch">Memuat jadwal...</div>
-    <button class="lc-bell" id="lcBell" type="button">🔔 Klik lonceng untuk mengingatkan saya</button>
   </div>
 </div>
 
@@ -382,23 +287,11 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
 
 <div class="section" id="jadwal"><h2>📅 Jadwal Pertandingan</h2><span id="count" style="font-size:9px;color:var(--muted)"></span></div>
 <div class="card notify-card">
-  <div class="notify-top">
-    <div>
-      <div class="notify-title">🔔 NOTIFIKASI PERTANDINGAN</div>
-      <div class="notify-sub">Aktifkan pengingat agar tidak ketinggalan pertandingan VIPT CUP IV 2026.</div>
-    </div>
-    <button class="notify-btn" id="notifyBtn" type="button">AKTIFKAN</button>
-  </div>
-
   <div class="next-match">
     <div class="next-label">PERTANDINGAN TERDEKAT</div>
     <div id="nextMatchMain" class="next-main">Memuat jadwal...</div>
     <div id="nextMatchTime" class="next-time"></div>
     <div id="nextMatchCountdown" class="countdown">—</div>
-  </div>
-
-  <div class="notify-note" id="notifySupportText">
-    Tekan AKTIFKAN untuk mendapat pengingat 15 menit sebelum setiap pertandingan.
   </div>
 </div>
 <input class="search" id="search" type="search" placeholder="Cari tim / cabang olahraga...">
@@ -444,6 +337,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
   <a class="nav active" href="index.html"><span>🏠</span>Beranda</a>
   <a class="nav" href="index.html#jadwal"><span>📅</span>Jadwal</a>
   <a class="nav" href="news.html"><span>📰</span>News</a>
+  <a class="nav" href="bracket.html"><span>🏆</span>Bracket</a>
   <a class="nav" href="hasil.html"><span>☰</span>Hasil</a>
   <a class="nav" href="musik.html"><span>🎵</span>Musik</a>
   <a class="nav" href="index.html#sosial"><span>📱</span>Sosial</a>
@@ -567,32 +461,7 @@ function setLiveOffline(msg){
   document.getElementById("liveA").textContent="-";
   document.getElementById("liveB").textContent="-";
   document.getElementById("liveScore").firstChild.textContent="-";
-  document.getElementById("liveRound").textContent="MENUNGGU DATA";
-  updateLiveDisplay()
-}
-
-function renderLiveCountdown(){
-  const timerEl=document.getElementById("lcTimer");
-  const matchEl=document.getElementById("lcMatch");
-  if(!timerEl||!matchEl)return;
-  const next=(typeof getUpcomingMatches==="function")?getUpcomingMatches()[0]:null;
-  if(!next){
-    timerEl.textContent="—";
-    matchEl.textContent="Belum ada pertandingan berikutnya.";
-    return
-  }
-  timerEl.textContent=formatCountdown(next.start.getTime()-Date.now());
-  matchEl.textContent=`${next.m.sport} • ${next.m.a} vs ${next.m.b} bertanding`
-}
-
-function updateLiveDisplay(){
-  const teamsView=document.getElementById("liveTeamsView");
-  const cdView=document.getElementById("liveCountdownView");
-  if(!teamsView||!cdView)return;
-  const isLive=liveState && statusForMatch(liveState.status)==="LIVE";
-  teamsView.style.display=isLive?"":"none";
-  cdView.style.display=isLive?"none":"";
-  if(!isLive)renderLiveCountdown()
+  document.getElementById("liveRound").textContent="MENUNGGU DATA"
 }
 
 function isVollySport(s){return /VOLLY/i.test(String(s||""))}
@@ -602,12 +471,6 @@ function statusForMatch(st){
   if(x.includes("PERTANDINGAN SELESAI")||x==="SELESAI")return"SELESAI";
   for(let i=1;i<=5;i++){
     if(x.includes(`SET ${i} SELESAI`))return `SET ${i} SELESAI`;
-  }
-  for(let i=1;i<=2;i++){
-    if(x.includes(`BABAK ${i} SELESAI`))return `BABAK ${i} SELESAI`;
-  }
-  for(let i=1;i<=5;i++){
-    if(x.includes(`GAME ${i} SELESAI`))return `GAME ${i} SELESAI`;
   }
   if(x.includes("LIVE"))return"LIVE";
   return x||"JADWAL"
@@ -661,7 +524,7 @@ function getVollyWinner(st,m){
 function getStateForMatch(m){
   if(liveState && liveState.matchId===m.id){
     const s=cleanStatus(liveState.status);
-    if(s==="LIVE" || s.includes("SET") || s.includes("BABAK") || s.includes("GAME") || s==="JADWAL") return liveState;
+    if(s==="LIVE" || s.includes("SET") || s==="JADWAL") return liveState;
   }
   const matches=historyState.filter(h=>h&&h.matchId===m.id);
   if(matches.length){
@@ -703,21 +566,6 @@ function applyFirebaseMatchData(m,st){
     out.period=st.period||"";
     out.isFirebaseVolly=true;
     if(cleanStatus(st.status).includes("PERTANDINGAN SELESAI"))out.status="SELESAI"
-  }
-
-  if(String(out.sport||"").toUpperCase()==="TENIS MEJA" && Array.isArray(st?.tennisGames)){
-    const games=st.tennisGames.slice(0,3).map((g,i)=>({
-      a:Number(g?.a||0)||0,
-      b:Number(g?.b||0)||0,
-      winner:g?.winner||"",
-      gameNumber:i+1
-    }));
-    const winsA=games.filter(g=>g.winner==="A").length;
-    const winsB=games.filter(g=>g.winner==="B").length;
-    out.teamScoreA=winsA;
-    out.teamScoreB=winsB;
-    out.sets=games.filter(g=>g.winner).map(g=>[`GAME ${g.gameNumber}`,`${g.a} - ${g.b}`]);
-    out.winner=winsA>winsB?(st?.teamA?.name||m?.a||""):(winsB>winsA?(st?.teamB?.name||m?.b||""):"");
   }
   return out
 }
@@ -771,9 +619,7 @@ function renderLive(){
   if(la){la.src=sa;la.hidden=!sa}
   if(fa)fa.style.display=sa?"none":"grid";
   if(lb){lb.src=sb;lb.hidden=!sb}
-  if(fb)fb.style.display=sb?"none":"grid";
-
-  updateLiveDisplay()
+  if(fb)fb.style.display=sb?"none":"grid"
 }
 
 function getMatchDateTime(m){
@@ -1480,12 +1326,6 @@ function refreshNotifyButton(){
   btn.textContent=enabled?"✓ NOTIFIKASI AKTIF":"AKTIFKAN";
   btn.classList.toggle("on",enabled);
 
-  const bell=document.getElementById("lcBell");
-  if(bell){
-    bell.textContent=enabled?"🔔 Pengingat aktif":"🔔 Klik lonceng untuk mengingatkan saya";
-    bell.classList.toggle("on",enabled)
-  }
-
   if(Notification.permission==="denied"){
     note.textContent="Izin notifikasi diblokir. Aktifkan kembali dari pengaturan browser/situs lalu muat ulang halaman.";
   }else if(enabled){
@@ -1567,9 +1407,6 @@ function checkMatchNotifications(force=false){
   }
 }
 
-document.getElementById("notifyBtn")?.addEventListener("click",enableMatchNotifications);
-document.getElementById("lcBell")?.addEventListener("click",enableMatchNotifications);
-
 function initFirebase(){
   try{
     if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
@@ -1604,13 +1441,10 @@ function initFirebase(){
 
 initFirebase();
 renderAll();
-updateLiveDisplay();
-refreshNotifyButton();
 refreshNotifyButton();
 checkMatchNotifications();
 setInterval(checkMatchNotifications,30000);
 setInterval(renderNextMatch,1000);
-setInterval(renderLiveCountdown,1000);
 
 document.addEventListener("visibilitychange",()=>{
   if(!document.hidden)checkMatchNotifications()

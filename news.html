@@ -119,7 +119,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
 </div>
 <script>
 const FIREBASE_CONFIG={apiKey:"AIzaSyBIww6sg-mRtUUx3rIylnu6qfYG6Ahfih8",authDomain:"scorebordviptcup.firebaseapp.com",databaseURL:"https://scorebordviptcup-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"scorebordviptcup",storageBucket:"scorebordviptcup.firebasestorage.app",messagingSenderId:"1001557073666",appId:"1:1001557073666:web:10999e31e2b0c9add4ec1b"};
-const REPLAY_URL="https://www.youtube.com/live/ZG0K0NGUG8Q?si=998bpHse1dUrxMch";
+const REPLAY_URL="https://www.youtube.com/live/mKVc7o1qpeU?si=r8B5aZJ07cCfjvx-";
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function normSport(s){const x=String(s||"").toUpperCase();if(x.includes("VOLLY"))return x.includes("PUTRI")?"VOLLY PUTRI":"VOLLY PUTRA";if(x.includes("BADMINTON"))return"BADMINTON";if(x.includes("FUTSAL"))return"FUTSAL";if(x.includes("TENIS"))return"TENIS MEJA";return x||"PERTANDINGAN"}
 function flatten(value){const out=[];function walk(n,k=""){if(!n||typeof n!=="object")return;const isMatch=n.teamA||n.teamB||n.matchId||n.sport||n.cabang||n.teamAName||n.teamBName;if(isMatch){out.push({...n,_key:k});return}Object.entries(n).forEach(([x,v])=>walk(v,x))}walk(value);return out}
