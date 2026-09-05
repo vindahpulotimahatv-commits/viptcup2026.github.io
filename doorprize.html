@@ -87,7 +87,7 @@ input.field:focus{border-color:var(--gold)}
     <p style="text-align:center" id="successName"></p>
     <div class="ticket" style="text-align:center" id="ticketCode"></div>
     <p style="text-align:center">Simpan / screenshot kode tiket ini sebagai bukti pendaftaran. Nantikan pengundian doorprize langsung di lokasi & live streaming VIPT CUP!</p>
-    <button class="btn" id="btnLagi" style="margin-top:10px;background:linear-gradient(135deg,#2a2a2a,#0e0e0e);color:#f5c451">DAFTARKAN NAMA LAIN</button>
+    <p class="note" style="margin-top:10px">Satu perangkat hanya bisa mendaftar 1 kali. Kalau ingin daftarkan anggota keluarga lain, gunakan HP masing-masing.</p>
   </div>
 
   <a class="back" href="index.html">← Kembali ke Beranda</a>
@@ -104,17 +104,27 @@ const DOORPRIZE_FIREBASE_CONFIG={
   appId:"1:761699971320:web:2cabe1effb822597534b0d"
 };
 const DP_PATH="vipt_doorprize/entries";
+const DP_LOCAL_KEY="VIPT_DOORPRIZE_REGISTERED_V1";
 let dpApp=null,dpAuth=null,dpDB=null,dpUser=null;
 
 const formCard=document.getElementById("formCard"),successCard=document.getElementById("successCard"),
       fNama=document.getElementById("fNama"),fRtRw=document.getElementById("fRtRw"),
       btnDaftar=document.getElementById("btnDaftar"),statusMsg=document.getElementById("statusMsg"),
-      successName=document.getElementById("successName"),ticketCode=document.getElementById("ticketCode"),
-      btnLagi=document.getElementById("btnLagi");
+      successName=document.getElementById("successName"),ticketCode=document.getElementById("ticketCode");
 
 function setStatus(t){statusMsg.textContent=t}
 
+function showAlreadyRegistered(data){
+  successName.textContent=`${data.nama} • ${data.rtrw}`;
+  ticketCode.textContent="#"+data.code;
+  formCard.style.display="none";successCard.style.display="block";
+}
+
 async function initFirebase(){
+  try{
+    const saved=localStorage.getItem(DP_LOCAL_KEY);
+    if(saved){showAlreadyRegistered(JSON.parse(saved));return}
+  }catch(e){}
   try{
     dpApp=firebase.apps.find(a=>a.name==="viptDoorprize")||firebase.initializeApp(DOORPRIZE_FIREBASE_CONFIG,"viptDoorprize");
     dpAuth=dpApp.auth();dpDB=dpApp.database();
@@ -126,6 +136,7 @@ async function initFirebase(){
 }
 
 btnDaftar.addEventListener("click",async()=>{
+  if(localStorage.getItem(DP_LOCAL_KEY)){setStatus("⚠️ Perangkat ini sudah terdaftar sebelumnya.");return}
   const nama=fNama.value.trim(),rtrw=fRtRw.value.trim();
   if(!nama){setStatus("⚠️ Nama wajib diisi.");fNama.focus();return}
   if(!rtrw){setStatus("⚠️ RT / RW wajib diisi.");fRtRw.focus();return}
@@ -138,6 +149,7 @@ btnDaftar.addEventListener("click",async()=>{
       createdAt:firebase.database.ServerValue.TIMESTAMP
     });
     const code=ref.key.slice(-6).toUpperCase();
+    localStorage.setItem(DP_LOCAL_KEY,JSON.stringify({nama,rtrw,code}));
     successName.textContent=`${nama} • ${rtrw}`;
     ticketCode.textContent="#"+code;
     formCard.style.display="none";successCard.style.display="block";
@@ -147,13 +159,6 @@ btnDaftar.addEventListener("click",async()=>{
   }finally{
     btnDaftar.disabled=false;btnDaftar.textContent="🎟️ DAFTAR SEKARANG";
   }
-});
-
-btnLagi.addEventListener("click",()=>{
-  fNama.value="";fRtRw.value="";
-  successCard.style.display="none";formCard.style.display="block";
-  setStatus("✅ Form pendaftaran siap digunakan");
-  fNama.focus();
 });
 
 initFirebase();
