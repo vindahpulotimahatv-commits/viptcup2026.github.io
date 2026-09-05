@@ -64,28 +64,11 @@ input.field{
 .stat b{display:block;font-size:20px;color:var(--gold)}
 .stat span{font-size:9.5px;color:var(--muted)}
 
-/* ==== REEL ==== */
-.reel-wrap{
-  position:relative;overflow:hidden;border:1px solid #6f4d13;border-radius:14px;
-  background:#080807;height:64px;margin-bottom:16px
-}
-.reel-wrap:before,.reel-wrap:after{
-  content:"";position:absolute;top:0;bottom:0;width:40%;z-index:2;pointer-events:none
-}
-.reel-wrap:before{left:0;background:linear-gradient(90deg,#080807,transparent)}
-.reel-wrap:after{right:0;background:linear-gradient(270deg,#080807,transparent)}
-.reel-pointer{
-  position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--gold);
-  transform:translateX(-50%);z-index:3;box-shadow:0 0 8px var(--gold)
-}
-.reel-track{display:flex;align-items:center;height:100%;will-change:transform}
-.reel-item{
-  flex:0 0 auto;padding:0 26px;font-size:15px;font-weight:900;color:#665a3a;
-  white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.25
-}
-.reel-item small{font-size:9px;font-weight:700;color:#4a4130}
-.reel-item.center{color:var(--gold)}
-.reel-item.center small{color:#c99a3a}
+/* ==== WHEEL ==== */
+.wheel-wrap{position:relative;display:flex;justify-content:center;margin-bottom:18px;padding-top:14px}
+.wheel-pointer{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:26px;color:var(--gold);z-index:5;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+.wheel-spin{width:100%;max-width:320px;aspect-ratio:1/1;border-radius:50%;box-shadow:0 0 0 6px #6f4d13,0 10px 30px rgba(0,0,0,.5);transform:rotate(0deg)}
+.wheel-spin canvas{width:100%;height:100%;display:block;border-radius:50%}
 
 .winner-box{display:none;text-align:center;padding:16px 0 4px}
 .winner-box .crown{font-size:34px}
@@ -137,7 +120,10 @@ input.field{
     </div>
 
     <div class="card">
-      <div class="reel-wrap"><div class="reel-pointer"></div><div class="reel-track" id="reelTrack"></div></div>
+      <div class="wheel-wrap">
+        <div class="wheel-pointer">▼</div>
+        <div class="wheel-spin" id="wheelSpin"><canvas id="wheelCanvas" width="640" height="640"></canvas></div>
+      </div>
 
       <div class="winner-box" id="winnerBox">
         <div class="crown">👑</div>
@@ -184,14 +170,65 @@ let ENTRIES={}; // id -> {nama,rtrw,won}
 let currentPick=null; // {id,nama,rtrw}
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function truncateLabel(s,max){s=String(s||"");return s.length>max? s.slice(0,max-1)+"…":s}
 
 const gateCard=document.getElementById("gateCard"),panelWrap=document.getElementById("panelWrap"),
       pinInput=document.getElementById("pinInput"),btnUnlock=document.getElementById("btnUnlock"),gateStatus=document.getElementById("gateStatus"),
       statTotal=document.getElementById("statTotal"),statSisa=document.getElementById("statSisa"),statMenang=document.getElementById("statMenang"),
-      reelTrack=document.getElementById("reelTrack"),btnSpin=document.getElementById("btnSpin"),spinStatus=document.getElementById("spinStatus"),
+      wheelSpin=document.getElementById("wheelSpin"),wheelCanvas=document.getElementById("wheelCanvas"),wheelCtx=wheelCanvas.getContext("2d"),
+      btnSpin=document.getElementById("btnSpin"),spinStatus=document.getElementById("spinStatus"),
       winnerBox=document.getElementById("winnerBox"),winnerName=document.getElementById("winnerName"),winnerRtRw=document.getElementById("winnerRtRw"),
       confirmActions=document.getElementById("confirmActions"),btnConfirmWin=document.getElementById("btnConfirmWin"),btnSpinAgain=document.getElementById("btnSpinAgain"),
       winnersCard=document.getElementById("winnersCard");
+
+let isSpinning=false;
+const WHEEL_CV=wheelCanvas.width,WHEEL_CENTER=WHEEL_CV/2,WHEEL_RADIUS=WHEEL_CV/2-6;
+
+function drawWheel(list){
+  const ctx=wheelCtx,n=list.length;
+  ctx.clearRect(0,0,WHEEL_CV,WHEEL_CV);
+  if(!n){
+    ctx.beginPath();ctx.arc(WHEEL_CENTER,WHEEL_CENTER,WHEEL_RADIUS,0,Math.PI*2);
+    ctx.fillStyle="#0c0b09";ctx.fill();
+    ctx.strokeStyle="#6f4d13";ctx.lineWidth=5;ctx.stroke();
+    ctx.fillStyle="#c7c0b2";ctx.font="700 26px Arial";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("Belum ada peserta",WHEEL_CENTER,WHEEL_CENTER);
+    return;
+  }
+  const seg=(Math.PI*2)/n;
+  const maxChars = n<=10?18 : n<=20?13 : n<=40?9 : n<=80?6 : 4;
+  const fontSize = n<=10?26 : n<=20?21 : n<=40?16 : n<=80?12 : 10;
+  for(let i=0;i<n;i++){
+    const start=-Math.PI/2+i*seg,end=start+seg;
+    ctx.beginPath();
+    ctx.moveTo(WHEEL_CENTER,WHEEL_CENTER);
+    ctx.arc(WHEEL_CENTER,WHEEL_CENTER,WHEEL_RADIUS,start,end);
+    ctx.closePath();
+    ctx.fillStyle=i%2===0?"#f5b72b":"#1a1509";
+    ctx.fill();
+    ctx.strokeStyle="#050505";ctx.lineWidth=2;ctx.stroke();
+
+    const mid=start+seg/2;
+    ctx.save();
+    ctx.translate(WHEEL_CENTER,WHEEL_CENTER);
+    ctx.rotate(mid);
+    ctx.textAlign="right";ctx.textBaseline="middle";
+    ctx.fillStyle=i%2===0?"#241a06":"#f5c451";
+    ctx.font="800 "+fontSize+"px Arial";
+    ctx.fillText(truncateLabel(list[i].nama,maxChars),WHEEL_RADIUS-14,0);
+    ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(WHEEL_CENTER,WHEEL_CENTER,WHEEL_CV*0.055,0,Math.PI*2);
+  ctx.fillStyle="#050505";ctx.fill();
+  ctx.lineWidth=6;ctx.strokeStyle="#f5b72b";ctx.stroke();
+}
+
+function renderIdleWheel(){
+  if(isSpinning)return;
+  wheelSpin.style.transition="none";
+  wheelSpin.style.transform="rotate(0deg)";
+  drawWheel(pesertaBelumMenang());
+}
 
 btnUnlock.addEventListener("click",()=>{
   if(pinInput.value.trim()===ADMIN_PIN){
@@ -211,7 +248,7 @@ async function initFirebase(){
     if(!dpAuth.currentUser)await dpAuth.signInAnonymously();
     dpDB.ref(DP_ENTRIES_PATH).on("value",snap=>{
       ENTRIES=snap.val()||{};
-      renderStats();renderIdleReel();
+      renderStats();renderIdleWheel();
     });
     dpDB.ref(DP_WINNERS_PATH).on("value",snap=>{
       renderWinners(snap.val()||{});
@@ -236,18 +273,6 @@ function renderStats(){
   if(sisa.length===0)spinStatus.textContent="Belum ada peserta tersisa untuk diundi.";
 }
 
-function renderIdleReel(){
-  const sisa=pesertaBelumMenang();
-  reelTrack.innerHTML="";
-  if(!sisa.length){
-    reelTrack.innerHTML=`<div class="reel-item center">Belum ada peserta<small>Tunggu pendaftaran</small></div>`;
-    return;
-  }
-  const sample=sisa.slice(0,12);
-  reelTrack.style.transform="translateX(0)";
-  reelTrack.innerHTML=sample.map(p=>`<div class="reel-item">${esc(p.nama)}<small>${esc(p.rtrw)}</small></div>`).join("");
-}
-
 function renderWinners(winners){
   const arr=Object.values(winners).sort((a,b)=>(b.wonAt||0)-(a.wonAt||0));
   if(!arr.length){winnersCard.innerHTML=`<div class="empty">Belum ada pemenang.</div>`;return}
@@ -261,52 +286,36 @@ function renderWinners(winners){
 btnSpin.addEventListener("click",()=>{
   const sisa=pesertaBelumMenang();
   if(!sisa.length)return;
+  isSpinning=true;
   btnSpin.disabled=true;btnSpin.style.display="none";
   winnerBox.style.display="none";confirmActions.style.display="none";
   spinStatus.textContent="🎡 Sedang mengundi...";
 
-  const winnerIdx=Math.floor(Math.random()*sisa.length);
+  drawWheel(sisa);
+
+  const n=sisa.length;
+  const winnerIdx=Math.floor(Math.random()*n);
   const winner=sisa[winnerIdx];
   currentPick=winner;
 
-  // Bangun reel panjang berisi nama acak, lalu selipkan nama pemenang di posisi ke-40 (index dari 0)
-  const LANDING_POS=40;
-  const reelItems=[];
-  for(let i=0;i<LANDING_POS;i++){
-    const r=sisa[Math.floor(Math.random()*sisa.length)];
-    reelItems.push(r);
-  }
-  reelItems.push(winner);
-  for(let i=0;i<6;i++){
-    const r=sisa[Math.floor(Math.random()*sisa.length)];
-    reelItems.push(r);
-  }
+  const seg=360/n;
+  const thetaCenter=(winnerIdx+0.5)*seg;
+  const spins=8;
+  const targetRotation=spins*360-thetaCenter;
 
-  reelTrack.style.transition="none";
-  reelTrack.style.transform="translateX(0)";
-  reelTrack.innerHTML=reelItems.map(p=>`<div class="reel-item">${esc(p.nama)}<small>${esc(p.rtrw)}</small></div>`).join("");
-
-  // paksa reflow supaya transition berikutnya kepakai
-  void reelTrack.offsetWidth;
-
-  requestAnimationFrame(()=>{
-    const wrapWidth=reelTrack.parentElement.clientWidth;
-    const items=reelTrack.children;
-    const target=items[LANDING_POS];
-    const targetCenter=target.offsetLeft+target.offsetWidth/2;
-    const offset=targetCenter-wrapWidth/2;
-    reelTrack.style.transition="transform 4.2s cubic-bezier(.12,.75,.15,1)";
-    reelTrack.style.transform=`translateX(-${offset}px)`;
-  });
+  wheelSpin.style.transition="none";
+  wheelSpin.style.transform="rotate(0deg)";
+  void wheelSpin.offsetWidth;
+  wheelSpin.style.transition="transform 4.6s cubic-bezier(.12,.72,.15,1)";
+  wheelSpin.style.transform=`rotate(${targetRotation}deg)`;
 
   setTimeout(()=>{
-    Array.from(reelTrack.children).forEach((el,i)=>el.classList.toggle("center",i===LANDING_POS));
     winnerName.textContent=winner.nama;
     winnerRtRw.textContent=winner.rtrw;
     winnerBox.style.display="block";
     confirmActions.style.display="flex";
     spinStatus.textContent="🎉 Hasil undian ditemukan! Konfirmasi untuk mencatat pemenang.";
-  },4400);
+  },4700);
 });
 
 btnConfirmWin.addEventListener("click",async()=>{
@@ -335,12 +344,13 @@ btnSpinAgain.addEventListener("click",()=>{
 });
 
 function resetSpinUI(){
+  isSpinning=false;
   winnerBox.style.display="none";
   confirmActions.style.display="none";
   btnSpin.style.display="block";
   btnSpin.disabled=false;
   btnConfirmWin.disabled=false;
-  renderIdleReel();
+  renderIdleWheel();
 }
 </script>
 </body>
