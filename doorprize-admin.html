@@ -155,7 +155,7 @@ input.field{
 
 <script>
 /* Ganti PIN di sini kapan saja */
-const ADMIN_PIN="VIPT2026";
+const ADMIN_PIN="12345";
 
 const DOORPRIZE_FIREBASE_CONFIG={
   apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",
@@ -208,7 +208,7 @@ async function initFirebase(){
     spinStatus.textContent="✅ Terhubung • data peserta live";
   }catch(e){
     console.error("Admin init:",e);
-    spinStatus.textContent="⚠️ Gagal terhubung: "+(e?.code||"koneksi-error");
+    spinStatus.textContent="⚠️ Gagal terhubung ["+(e?.code||"koneksi-error")+"]";
   }
 }
 
@@ -313,7 +313,7 @@ btnConfirmWin.addEventListener("click",async()=>{
     resetSpinUI();
   }catch(e){
     console.error("Confirm win:",e);
-    spinStatus.textContent="⚠️ Gagal mencatat pemenang, coba lagi.";
+    spinStatus.textContent="⚠️ Gagal mencatat pemenang ["+(e?.code||"unknown")+"], coba lagi.";
     btnConfirmWin.disabled=false;
   }
 });
