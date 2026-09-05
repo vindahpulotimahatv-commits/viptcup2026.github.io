@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050505">
+<title>Panel Undian Doorprize • Panitia VIPT CUP IV 2026</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+<style>
+:root{
+  --bg:#050505;--panel:#0b0b0b;--line:#7a5514;--text:#fff;--muted:#c7c0b2;
+  --gold:#f5b72b;--green:#1ed393;--red:#ff5a5f
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:#030303;color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;padding-bottom:30px
+}
+button,input{font:inherit}
+.app{max-width:560px;margin:auto;min-height:100vh;padding:0 16px}
+header{padding:20px 0 8px;text-align:center}
+header .logo{font-size:26px}
+header h1{font-size:16px;margin:8px 0 2px;color:var(--gold)}
+header p{font-size:11px;color:var(--muted);margin:0}
+.card{
+  background:linear-gradient(145deg,#11100d,#050505);
+  border:1px solid #6f4d13;border-radius:17px;padding:18px;margin-bottom:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35)
+}
+label{display:block;font-size:11px;font-weight:900;color:var(--gold);margin:0 0 6px}
+input.field{
+  width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;
+  border-radius:12px;padding:13px 14px;outline:none;margin-bottom:14px;font-size:14px
+}
+.btn{
+  display:block;width:100%;text-align:center;text-decoration:none;color:#090705;
+  background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;
+  border-radius:12px;padding:14px;font-size:12.5px;font-weight:900;cursor:pointer
+}
+.btn.secondary{background:linear-gradient(135deg,#2a2a2a,#0e0e0e);color:#f5c451;border:1px solid #6f4d13}
+.btn:disabled{opacity:.5}
+#gateCard{max-width:400px;margin:60px auto 0}
+
+/* ==== STATS ==== */
+.stats{display:flex;gap:10px;margin-bottom:14px}
+.stat{flex:1;background:#0c0b09;border:1px solid #6f4d13;border-radius:12px;padding:12px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--gold)}
+.stat span{font-size:9.5px;color:var(--muted)}
+
+/* ==== REEL ==== */
+.reel-wrap{
+  position:relative;overflow:hidden;border:1px solid #6f4d13;border-radius:14px;
+  background:#080807;height:64px;margin-bottom:16px
+}
+.reel-wrap:before,.reel-wrap:after{
+  content:"";position:absolute;top:0;bottom:0;width:40%;z-index:2;pointer-events:none
+}
+.reel-wrap:before{left:0;background:linear-gradient(90deg,#080807,transparent)}
+.reel-wrap:after{right:0;background:linear-gradient(270deg,#080807,transparent)}
+.reel-pointer{
+  position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--gold);
+  transform:translateX(-50%);z-index:3;box-shadow:0 0 8px var(--gold)
+}
+.reel-track{display:flex;align-items:center;height:100%;will-change:transform}
+.reel-item{
+  flex:0 0 auto;padding:0 26px;font-size:15px;font-weight:900;color:#665a3a;
+  white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.25
+}
+.reel-item small{font-size:9px;font-weight:700;color:#4a4130}
+.reel-item.center{color:var(--gold)}
+.reel-item.center small{color:#c99a3a}
+
+.winner-box{display:none;text-align:center;padding:16px 0 4px}
+.winner-box .crown{font-size:34px}
+.winner-box h2{margin:8px 0 2px;font-size:20px;color:var(--gold)}
+.winner-box p{margin:0;font-size:12px;color:var(--muted)}
+
+.actions{display:flex;gap:10px;margin-top:14px}
+.actions .btn{flex:1}
+
+.list-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0;border-bottom:1px solid #221c10;font-size:12px
+}
+.list-item:last-child{border-bottom:none}
+.list-item b{color:#fff}
+.list-item span{color:var(--muted);font-size:10.5px}
+.badge{background:rgba(30,211,147,.15);color:var(--green);border:1px solid var(--green);border-radius:99px;padding:2px 8px;font-size:9px;font-weight:900}
+.empty{text-align:center;color:var(--muted);font-size:11px;padding:14px 0}
+.status{font-size:11px;text-align:center;margin-top:6px;color:var(--muted);min-height:14px}
+.back{display:block;text-align:center;margin-top:16px;font-size:11px;color:#f5c451;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="card" id="gateCard">
+    <header style="padding-top:0">
+      <div class="logo">🔒</div>
+      <h1>PANEL PANITIA</h1>
+      <p>Masukkan PIN untuk membuka undian doorprize</p>
+    </header>
+    <label for="pinInput">PIN Panitia</label>
+    <input class="field" id="pinInput" type="password" inputmode="numeric" placeholder="••••••">
+    <button class="btn" id="btnUnlock">🔓 BUKA PANEL</button>
+    <div class="status" id="gateStatus"></div>
+  </div>
+
+  <div id="panelWrap" style="display:none">
+    <header>
+      <div class="logo">🎡</div>
+      <h1>UNDIAN DOORPRIZE</h1>
+      <p>VIPT CUP IV 2026 • Khusus Panitia</p>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><b id="statTotal">0</b><span>TOTAL PESERTA</span></div>
+      <div class="stat"><b id="statSisa">0</b><span>BELUM MENANG</span></div>
+      <div class="stat"><b id="statMenang">0</b><span>SUDAH MENANG</span></div>
+    </div>
+
+    <div class="card">
+      <div class="reel-wrap"><div class="reel-pointer"></div><div class="reel-track" id="reelTrack"></div></div>
+
+      <div class="winner-box" id="winnerBox">
+        <div class="crown">👑</div>
+        <h2 id="winnerName">-</h2>
+        <p id="winnerRtRw">-</p>
+      </div>
+
+      <button class="btn" id="btnSpin">🎡 PUTAR UNDIAN</button>
+      <div class="actions" id="confirmActions" style="display:none">
+        <button class="btn" id="btnConfirmWin">✅ TANDAI PEMENANG</button>
+        <button class="btn secondary" id="btnSpinAgain">🔁 PUTAR ULANG</button>
+      </div>
+      <div class="status" id="spinStatus"></div>
+    </div>
+
+    <div class="section" style="display:flex;justify-content:space-between;align-items:center;margin:19px 2px 9px">
+      <h2 style="font-size:15px;margin:0">🏆 Riwayat Pemenang</h2>
+    </div>
+    <div class="card" id="winnersCard">
+      <div class="empty">Belum ada pemenang.</div>
+    </div>
+  </div>
+
+  <a class="back" href="index.html">← Kembali ke Beranda</a>
+</div>
+
+<script>
+/* Ganti PIN di sini kapan saja */
+const ADMIN_PIN="VIPT2026";
+
+const DOORPRIZE_FIREBASE_CONFIG={
+  apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",
+  authDomain:"vipt-survey-2026.firebaseapp.com",
+  databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"vipt-survey-2026",
+  storageBucket:"vipt-survey-2026.firebasestorage.app",
+  messagingSenderId:"761699971320",
+  appId:"1:761699971320:web:2cabe1effb822597534b0d"
+};
+const DP_ENTRIES_PATH="vipt_doorprize/entries";
+const DP_WINNERS_PATH="vipt_doorprize/winners";
+let dpApp=null,dpAuth=null,dpDB=null;
+let ENTRIES={}; // id -> {nama,rtrw,won}
+let currentPick=null; // {id,nama,rtrw}
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+const gateCard=document.getElementById("gateCard"),panelWrap=document.getElementById("panelWrap"),
+      pinInput=document.getElementById("pinInput"),btnUnlock=document.getElementById("btnUnlock"),gateStatus=document.getElementById("gateStatus"),
+      statTotal=document.getElementById("statTotal"),statSisa=document.getElementById("statSisa"),statMenang=document.getElementById("statMenang"),
+      reelTrack=document.getElementById("reelTrack"),btnSpin=document.getElementById("btnSpin"),spinStatus=document.getElementById("spinStatus"),
+      winnerBox=document.getElementById("winnerBox"),winnerName=document.getElementById("winnerName"),winnerRtRw=document.getElementById("winnerRtRw"),
+      confirmActions=document.getElementById("confirmActions"),btnConfirmWin=document.getElementById("btnConfirmWin"),btnSpinAgain=document.getElementById("btnSpinAgain"),
+      winnersCard=document.getElementById("winnersCard");
+
+btnUnlock.addEventListener("click",()=>{
+  if(pinInput.value.trim()===ADMIN_PIN){
+    gateCard.style.display="none";panelWrap.style.display="block";
+    initFirebase();
+  }else{
+    gateStatus.textContent="⚠️ PIN salah, coba lagi.";
+  }
+});
+pinInput.addEventListener("keydown",e=>{if(e.key==="Enter")btnUnlock.click()});
+
+async function initFirebase(){
+  try{
+    dpApp=firebase.apps.find(a=>a.name==="viptDoorprize")||firebase.initializeApp(DOORPRIZE_FIREBASE_CONFIG,"viptDoorprize");
+    dpAuth=dpApp.auth();dpDB=dpApp.database();
+    await dpAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    if(!dpAuth.currentUser)await dpAuth.signInAnonymously();
+    dpDB.ref(DP_ENTRIES_PATH).on("value",snap=>{
+      ENTRIES=snap.val()||{};
+      renderStats();renderIdleReel();
+    });
+    dpDB.ref(DP_WINNERS_PATH).on("value",snap=>{
+      renderWinners(snap.val()||{});
+    });
+    spinStatus.textContent="✅ Terhubung • data peserta live";
+  }catch(e){
+    console.error("Admin init:",e);
+    spinStatus.textContent="⚠️ Gagal terhubung: "+(e?.code||"koneksi-error");
+  }
+}
+
+function pesertaBelumMenang(){
+  return Object.entries(ENTRIES).filter(([id,v])=>!v.won).map(([id,v])=>({id,...v}));
+}
+
+function renderStats(){
+  const all=Object.values(ENTRIES),sisa=pesertaBelumMenang();
+  statTotal.textContent=all.length;
+  statSisa.textContent=sisa.length;
+  statMenang.textContent=all.length-sisa.length;
+  btnSpin.disabled=sisa.length===0;
+  if(sisa.length===0)spinStatus.textContent="Belum ada peserta tersisa untuk diundi.";
+}
+
+function renderIdleReel(){
+  const sisa=pesertaBelumMenang();
+  reelTrack.innerHTML="";
+  if(!sisa.length){
+    reelTrack.innerHTML=`<div class="reel-item center">Belum ada peserta<small>Tunggu pendaftaran</small></div>`;
+    return;
+  }
+  const sample=sisa.slice(0,12);
+  reelTrack.style.transform="translateX(0)";
+  reelTrack.innerHTML=sample.map(p=>`<div class="reel-item">${esc(p.nama)}<small>${esc(p.rtrw)}</small></div>`).join("");
+}
+
+function renderWinners(winners){
+  const arr=Object.values(winners).sort((a,b)=>(b.wonAt||0)-(a.wonAt||0));
+  if(!arr.length){winnersCard.innerHTML=`<div class="empty">Belum ada pemenang.</div>`;return}
+  winnersCard.innerHTML=arr.map(w=>`
+    <div class="list-item">
+      <div><b>${esc(w.nama)}</b><br><span>${esc(w.rtrw)}</span></div>
+      <span class="badge">🏆 MENANG</span>
+    </div>`).join("");
+}
+
+btnSpin.addEventListener("click",()=>{
+  const sisa=pesertaBelumMenang();
+  if(!sisa.length)return;
+  btnSpin.disabled=true;btnSpin.style.display="none";
+  winnerBox.style.display="none";confirmActions.style.display="none";
+  spinStatus.textContent="🎡 Sedang mengundi...";
+
+  const winnerIdx=Math.floor(Math.random()*sisa.length);
+  const winner=sisa[winnerIdx];
+  currentPick=winner;
+
+  // Bangun reel panjang berisi nama acak, lalu selipkan nama pemenang di posisi ke-40 (index dari 0)
+  const LANDING_POS=40;
+  const reelItems=[];
+  for(let i=0;i<LANDING_POS;i++){
+    const r=sisa[Math.floor(Math.random()*sisa.length)];
+    reelItems.push(r);
+  }
+  reelItems.push(winner);
+  for(let i=0;i<6;i++){
+    const r=sisa[Math.floor(Math.random()*sisa.length)];
+    reelItems.push(r);
+  }
+
+  reelTrack.style.transition="none";
+  reelTrack.style.transform="translateX(0)";
+  reelTrack.innerHTML=reelItems.map(p=>`<div class="reel-item">${esc(p.nama)}<small>${esc(p.rtrw)}</small></div>`).join("");
+
+  // paksa reflow supaya transition berikutnya kepakai
+  void reelTrack.offsetWidth;
+
+  requestAnimationFrame(()=>{
+    const wrapWidth=reelTrack.parentElement.clientWidth;
+    const items=reelTrack.children;
+    const target=items[LANDING_POS];
+    const targetCenter=target.offsetLeft+target.offsetWidth/2;
+    const offset=targetCenter-wrapWidth/2;
+    reelTrack.style.transition="transform 4.2s cubic-bezier(.12,.75,.15,1)";
+    reelTrack.style.transform=`translateX(-${offset}px)`;
+  });
+
+  setTimeout(()=>{
+    Array.from(reelTrack.children).forEach((el,i)=>el.classList.toggle("center",i===LANDING_POS));
+    winnerName.textContent=winner.nama;
+    winnerRtRw.textContent=winner.rtrw;
+    winnerBox.style.display="block";
+    confirmActions.style.display="flex";
+    spinStatus.textContent="🎉 Hasil undian ditemukan! Konfirmasi untuk mencatat pemenang.";
+  },4400);
+});
+
+btnConfirmWin.addEventListener("click",async()=>{
+  if(!currentPick||!dpDB)return;
+  btnConfirmWin.disabled=true;
+  try{
+    const updates={};
+    updates[`${DP_ENTRIES_PATH}/${currentPick.id}/won`]=true;
+    updates[`${DP_WINNERS_PATH}/${currentPick.id}`]={
+      nama:currentPick.nama,rtrw:currentPick.rtrw,entryId:currentPick.id,
+      wonAt:firebase.database.ServerValue.TIMESTAMP
+    };
+    await dpDB.ref().update(updates);
+    spinStatus.textContent="✅ Pemenang tercatat!";
+    resetSpinUI();
+  }catch(e){
+    console.error("Confirm win:",e);
+    spinStatus.textContent="⚠️ Gagal mencatat pemenang, coba lagi.";
+    btnConfirmWin.disabled=false;
+  }
+});
+
+btnSpinAgain.addEventListener("click",()=>{
+  currentPick=null;
+  resetSpinUI();
+});
+
+function resetSpinUI(){
+  winnerBox.style.display="none";
+  confirmActions.style.display="none";
+  btnSpin.style.display="block";
+  btnSpin.disabled=false;
+  btnConfirmWin.disabled=false;
+  renderIdleReel();
+}
+</script>
+</body>
+</html>

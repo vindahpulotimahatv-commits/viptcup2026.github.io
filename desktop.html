@@ -217,6 +217,10 @@ button, input { font: inherit; }
   border-radius: 12px; padding: 12px; margin-top: 16px; font-size: 12px; font-weight: 900; transition: .2s;
 }
 .btn:hover { filter: brightness(1.1); }
+.saweria-marquee-wrap{overflow:hidden;white-space:nowrap;position:relative;width:100%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.saweria-marquee-track{display:inline-flex;gap:30px;white-space:nowrap;animation:saweriaScroll 25s linear infinite}
+.saweria-marquee-track span{font-size:12px;font-weight:800;color:#e8c65f;white-space:nowrap}
+@keyframes saweriaScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* JADWAL & MATCHES GRID */
 .search { width: 100%; background: #080807; border: 1px solid #6f4d13; color: #fff; border-radius: 12px; padding: 14px 16px; outline: none; margin-bottom: 16px; font-size: 14px; }
@@ -381,6 +385,12 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
       <div class="location">📍 <span>LOKASI UTAMA</span> Lapangan Central Villa Indah Pulo Timaha</div>
     </section>
 
+    <div class="card" style="text-align:center;background:linear-gradient(145deg,#1a1305,#0b0904);border-color:#f5b72b">
+      <div style="font-size:16px;font-weight:900;color:#f5b72b">🎁 DOORPRIZE VIPT CUP IV 2026</div>
+      <p style="font-size:12px;color:#bdb5a7;margin:8px 0 12px;line-height:1.6">Daftarkan namamu sekarang, menangkan hadiah menarik! Pengundian dilakukan langsung di lokasi & live streaming.</p>
+      <a class="btn" href="doorprize.html" style="max-width:320px;margin:0 auto">🎟️ DAFTAR DOORPRIZE</a>
+    </div>
+
     <nav class="desktop-nav">
       <a class="nav-item active" href="desktop.html">🏠 Beranda Dashboard</a>
       <a class="nav-item" href="#jadwal">📅 Jadwal & Klasemen</a>
@@ -480,6 +490,11 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
           <p style="font-size:11px;color:#bdb5a7;margin-top:6px;line-height:1.5">Live streaming, hadiah, dan seluruh rangkaian acara VIPT CUP berjalan berkat dukungan Anda. Yuk beri dukungan lewat Saweria agar acara ini terus berlanjut!</p>
           <a class="btn" href="https://saweria.co/VIPTSPORT" target="_blank" rel="noopener noreferrer">☕ SAWERIA – DUKUNG VIPT CUP</a>
         </div>
+
+        <div class="card" style="margin-top:12px;padding:16px 0;overflow:hidden">
+          <div style="text-align:center;font-size:13px;font-weight:900;color:#f5b72b;margin-bottom:10px">🙏 TERIMA KASIH KEPADA PENDUKUNG SAWERIA</div>
+          <div class="saweria-marquee-wrap"><div class="saweria-marquee-track" id="saweriaMarqueeTrack"></div></div>
+        </div>
       </div>
     </div>
 
@@ -509,6 +524,31 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
 <script>
 // Logic JavaScript dari file asli diletakkan persis seperti aslinya
 // agar koneksi Firebase Database, Notifikasi, Search, dan Logic Survey tetap 100% jalan.
+
+// ====== DAFTAR PENDUKUNG SAWERIA ======
+// Tambahkan / hapus nama di sini saja (TANPA nominal), otomatis tampil berjalan di web.
+const SAWERIA_SUPPORTERS=[
+  "Hamba Allah",
+  "Warga RT 02 / RW 021",
+  "Warga RT 04 / RW 021",
+  "Warga RT 06 / RW 021",
+  "Warga RT 07 / RW 014",
+  "Warga RT 08 / RW 014",
+  "Warga RT 08 / RW 021",
+  "Warga RT 09 / RW 014",
+  "Warga RT 10 / RW 014",
+  "Warga RT 10 / RW 021",
+  "Warga RT 11 / RW 021",
+  "Warga RT 13 / RW 021"
+];
+function renderSaweriaSupporters(){
+  const el=document.getElementById("saweriaMarqueeTrack");
+  if(!el)return;
+  if(!SAWERIA_SUPPORTERS.length){el.innerHTML="<span>Jadilah pendukung pertama VIPT CUP IV 2026 💛</span>";return}
+  const items=SAWERIA_SUPPORTERS.map(n=>`<span>💛 ${esc(n)}</span>`).join("");
+  el.innerHTML=items+items // digandakan agar loop berjalan mulus tanpa putus
+}
+if(document.getElementById("saweriaMarqueeTrack")) renderSaweriaSupporters();
 
 const TOPSCOR_FUTSAL=[
   {name:"ARIFIN",team:"RT 13 / 021",goals:7},

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="theme-color" content="#050505">
+<title>Daftar Doorprize • VIPT CUP IV 2026</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+<style>
+:root{
+  --bg:#050505;--panel:#0b0b0b;--line:#7a5514;--text:#fff;--muted:#c7c0b2;
+  --gold:#f5b72b;--green:#1ed393;--red:#ff5a5f
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;min-height:100%}
+body{
+  margin:0;background:#030303;color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  padding-bottom:calc(30px + env(safe-area-inset-bottom))
+}
+button,input{font:inherit}
+.app{max-width:520px;margin:auto;min-height:100vh;padding:0 16px}
+header{padding:22px 0 10px;text-align:center}
+header .logo{font-size:26px}
+header h1{font-size:17px;margin:8px 0 2px;color:var(--gold)}
+header p{font-size:11px;color:var(--muted);margin:0}
+.card{
+  background:linear-gradient(145deg,#11100d,#050505);
+  border:1px solid #6f4d13;border-radius:17px;padding:18px;margin-bottom:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35)
+}
+label{display:block;font-size:11px;font-weight:900;color:var(--gold);margin:0 0 6px}
+input.field{
+  width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;
+  border-radius:12px;padding:13px 14px;outline:none;margin-bottom:16px;font-size:14px
+}
+input.field:focus{border-color:var(--gold)}
+.btn{
+  display:block;width:100%;text-align:center;text-decoration:none;color:#090705;
+  background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;
+  border-radius:12px;padding:14px;font-size:12.5px;font-weight:900;cursor:pointer
+}
+.btn:disabled{opacity:.55}
+.note{font-size:10px;color:#8a8378;margin-top:10px;line-height:1.5;text-align:center}
+.status{font-size:11px;text-align:center;margin-top:10px;color:var(--muted);min-height:14px}
+.success{display:none;text-align:center}
+.success .check{
+  width:60px;height:60px;border-radius:50%;background:rgba(30,211,147,.15);
+  border:2px solid var(--green);color:var(--green);font-size:30px;
+  display:flex;align-items:center;justify-content:center;margin:6px auto 14px
+}
+.success h3{margin:0 0 6px;font-size:16px;color:var(--gold)}
+.success p{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 4px}
+.ticket{
+  margin:14px 0;padding:14px;border:1px dashed var(--gold);border-radius:12px;
+  font-size:20px;font-weight:900;letter-spacing:2px;color:var(--gold)
+}
+.back{display:block;text-align:center;margin-top:16px;font-size:11px;color:#f5c451;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">🎁</div>
+    <h1>PENDAFTARAN DOORPRIZE</h1>
+    <p>VIPT CUP IV 2026</p>
+  </header>
+
+  <div class="card" id="formCard">
+    <label for="fNama">Nama Lengkap</label>
+    <input class="field" id="fNama" maxlength="60" placeholder="Contoh: Budi Santoso" autocomplete="off">
+    <label for="fRtRw">RT / RW</label>
+    <input class="field" id="fRtRw" maxlength="30" placeholder="Contoh: RT 08 / RW 021" autocomplete="off">
+    <button class="btn" id="btnDaftar">🎟️ DAFTAR SEKARANG</button>
+    <div class="status" id="statusMsg"></div>
+    <p class="note">Data hanya digunakan untuk pengundian doorprize VIPT CUP IV 2026. Satu tiket = satu kesempatan menang. Pemenang wajib hadir di lokasi saat pengundian.</p>
+  </div>
+
+  <div class="card success" id="successCard">
+    <div class="check">✓</div>
+    <h3 style="text-align:center">KAMU SUDAH TERDAFTAR!</h3>
+    <p style="text-align:center" id="successName"></p>
+    <div class="ticket" style="text-align:center" id="ticketCode"></div>
+    <p style="text-align:center">Simpan / screenshot kode tiket ini sebagai bukti pendaftaran. Nantikan pengundian doorprize langsung di lokasi & live streaming VIPT CUP!</p>
+    <button class="btn" id="btnLagi" style="margin-top:10px;background:linear-gradient(135deg,#2a2a2a,#0e0e0e);color:#f5c451">DAFTARKAN NAMA LAIN</button>
+  </div>
+
+  <a class="back" href="index.html">← Kembali ke Beranda</a>
+</div>
+
+<script>
+const DOORPRIZE_FIREBASE_CONFIG={
+  apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",
+  authDomain:"vipt-survey-2026.firebaseapp.com",
+  databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"vipt-survey-2026",
+  storageBucket:"vipt-survey-2026.firebasestorage.app",
+  messagingSenderId:"761699971320",
+  appId:"1:761699971320:web:2cabe1effb822597534b0d"
+};
+const DP_PATH="vipt_doorprize/entries";
+let dpApp=null,dpAuth=null,dpDB=null,dpUser=null;
+
+const formCard=document.getElementById("formCard"),successCard=document.getElementById("successCard"),
+      fNama=document.getElementById("fNama"),fRtRw=document.getElementById("fRtRw"),
+      btnDaftar=document.getElementById("btnDaftar"),statusMsg=document.getElementById("statusMsg"),
+      successName=document.getElementById("successName"),ticketCode=document.getElementById("ticketCode"),
+      btnLagi=document.getElementById("btnLagi");
+
+function setStatus(t){statusMsg.textContent=t}
+
+async function initFirebase(){
+  try{
+    dpApp=firebase.apps.find(a=>a.name==="viptDoorprize")||firebase.initializeApp(DOORPRIZE_FIREBASE_CONFIG,"viptDoorprize");
+    dpAuth=dpApp.auth();dpDB=dpApp.database();
+    await dpAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    let u=dpAuth.currentUser;if(!u){const c=await dpAuth.signInAnonymously();u=c.user}
+    dpUser=u;
+    setStatus("✅ Form pendaftaran siap digunakan");
+  }catch(e){console.error("Doorprize init:",e);setStatus("⚠️ Belum terhubung ke server: "+(e?.code||"koneksi-error"))}
+}
+
+btnDaftar.addEventListener("click",async()=>{
+  const nama=fNama.value.trim(),rtrw=fRtRw.value.trim();
+  if(!nama){setStatus("⚠️ Nama wajib diisi.");fNama.focus();return}
+  if(!rtrw){setStatus("⚠️ RT / RW wajib diisi.");fRtRw.focus();return}
+  if(!dpDB){setStatus("⚠️ Belum terhubung ke server, coba lagi sebentar.");return}
+  btnDaftar.disabled=true;btnDaftar.textContent="MENDAFTARKAN...";
+  try{
+    const ref=dpDB.ref(DP_PATH).push();
+    await ref.set({
+      nama,rtrw,won:false,
+      createdAt:firebase.database.ServerValue.TIMESTAMP
+    });
+    const code=ref.key.slice(-6).toUpperCase();
+    successName.textContent=`${nama} • ${rtrw}`;
+    ticketCode.textContent="#"+code;
+    formCard.style.display="none";successCard.style.display="block";
+  }catch(e){
+    console.error("Doorprize submit:",e);
+    setStatus("⚠️ Gagal mendaftar. Periksa koneksi internet lalu coba lagi.");
+  }finally{
+    btnDaftar.disabled=false;btnDaftar.textContent="🎟️ DAFTAR SEKARANG";
+  }
+});
+
+btnLagi.addEventListener("click",()=>{
+  fNama.value="";fRtRw.value="";
+  successCard.style.display="none";formCard.style.display="block";
+  setStatus("✅ Form pendaftaran siap digunakan");
+  fNama.focus();
+});
+
+initFirebase();
+</script>
+</body>
+</html>
