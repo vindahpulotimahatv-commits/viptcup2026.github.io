@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050505">
+<title>Daftar Hadir Malam Ceremony • Panitia VIPT CUP IV 2026</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+:root{
+  --bg:#050505;--panel:#0b0b0b;--line:#7a5514;--text:#fff;--muted:#c7c0b2;
+  --gold:#f5b72b;--green:#1ed393;--red:#ff5a5f
+}
+*{box-sizing:border-box}
+body{margin:0;background:#030303;color:var(--text);font-family:Arial,Helvetica,sans-serif;padding-bottom:40px}
+.app{max-width:640px;margin:auto;padding:0 16px}
+header{padding:20px 0 8px;text-align:center}
+header .logo{font-size:26px}
+header h1{font-size:16px;margin:8px 0 2px;color:var(--gold)}
+header p{font-size:11px;color:var(--muted);margin:0}
+.card{background:linear-gradient(145deg,#11100d,#050505);border:1px solid #6f4d13;border-radius:17px;padding:16px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+
+.stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.stat{flex:1;min-width:90px;background:#0c0b09;border:1px solid #6f4d13;border-radius:12px;padding:10px 8px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--gold)}
+.stat span{font-size:8.5px;color:var(--muted);line-height:1.3;display:block}
+
+select.field{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:12px 14px;margin-bottom:4px;font-size:13px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f5b72b' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 14px center;background-size:16px}
+select.field option{background:#0b0b0b;color:#fff}
+
+.list-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #221c10;font-size:12.5px;gap:10px}
+.list-item:last-child{border-bottom:none}
+.list-item b{color:#fff;display:block;font-size:13.5px}
+.list-item span{color:var(--muted);font-size:10.5px}
+.badge{background:rgba(245,183,43,.15);color:var(--gold);border:1px solid var(--gold);border-radius:99px;padding:3px 9px;font-size:9px;font-weight:900;white-space:nowrap}
+.empty{text-align:center;color:var(--muted);font-size:11.5px;padding:20px 0}
+.status{font-size:11px;text-align:center;margin:10px 0;color:var(--muted)}
+.back{display:block;text-align:center;margin-top:10px;font-size:11px;color:#f5c451;text-decoration:none}
+
+.btn{display:block;width:100%;text-align:center;text-decoration:none;color:#090705;background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;border-radius:12px;padding:13px;font-size:12px;font-weight:900;cursor:pointer;margin-bottom:14px}
+.btn:disabled{opacity:.5}
+
+.chart-title{font-size:12.5px;font-weight:900;color:var(--gold);margin:0 0 12px}
+.bar-row{margin-bottom:12px}
+.bar-row:last-child{margin-bottom:0}
+.bar-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.bar-label b{color:#fff}
+.bar-label span{color:var(--gold);font-weight:900}
+.bar-track{background:#0c0b09;border:1px solid #221c10;border-radius:99px;height:14px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#9a650b,#f5b72b);transition:width .5s ease}
+.bar-row.top .bar-fill{background:linear-gradient(90deg,#1ed393,#0d8f66)}
+.bar-row.top .bar-label span{color:var(--green)}
+.crown-tag{font-size:9px;color:var(--green);font-weight:900;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">🏆</div>
+    <h1>DAFTAR HADIR MALAM CEREMONY</h1>
+    <p>VIPT CUP IV 2026 • Khusus Panitia</p>
+  </header>
+
+  <div class="stats" id="statsBox"></div>
+
+  <button class="btn" id="btnExport">⬇️ DOWNLOAD EXCEL</button>
+
+  <div class="card">
+    <div class="chart-title">📊 INDIKATOR CABOR TERPOPULER</div>
+    <div id="chartBox"></div>
+  </div>
+
+  <select class="field" id="filterDivisi">
+    <option value="">Semua Divisi / Cabor</option>
+    <option value="Futsal">Cabor Futsal</option>
+    <option value="Volly Putra">Cabor Volly Putra</option>
+    <option value="Volly Putri">Cabor Volly Putri</option>
+    <option value="Badminton Putra">Cabor Badminton Putra</option>
+    <option value="Badminton Putri">Cabor Badminton Putri</option>
+    <option value="Pingpong">Cabor Pingpong</option>
+  </select>
+  <div class="status" id="statusMsg"></div>
+
+  <div class="card" id="listCard"><div class="empty">Memuat...</div></div>
+
+  <a class="back" href="index.html">← Kembali ke Beranda</a>
+</div>
+
+<script>
+const CEREMONY_FIREBASE_CONFIG={
+  apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",
+  authDomain:"vipt-survey-2026.firebaseapp.com",
+  databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"vipt-survey-2026",
+  storageBucket:"vipt-survey-2026.firebasestorage.app",
+  messagingSenderId:"761699971320",
+  appId:"1:761699971320:web:2cabe1effb822597534b0d"
+};
+const CR_PATH="vipt_ceremony/entries";
+const CABOR_LIST=["Futsal","Volly Putra","Volly Putri","Badminton Putra","Badminton Putri","Pingpong"];
+let crApp=null,crAuth=null,crDB=null;
+let ENTRIES={};
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+const statsBox=document.getElementById("statsBox"),filterDivisi=document.getElementById("filterDivisi"),
+      listCard=document.getElementById("listCard"),statusMsg=document.getElementById("statusMsg"),
+      chartBox=document.getElementById("chartBox"),btnExport=document.getElementById("btnExport");
+
+async function initFirebase(){
+  try{
+    crApp=firebase.apps.find(a=>a.name==="viptCeremony")||firebase.initializeApp(CEREMONY_FIREBASE_CONFIG,"viptCeremony");
+    crAuth=crApp.auth();crDB=crApp.database();
+    await crAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    if(!crAuth.currentUser)await crAuth.signInAnonymously();
+    crDB.ref(CR_PATH).on("value",snap=>{
+      ENTRIES=snap.val()||{};
+      renderStats();renderList();renderChart();
+    });
+    statusMsg.textContent="✅ Terhubung • data live";
+  }catch(e){
+    console.error("Ceremony admin init:",e);
+    statusMsg.textContent="⚠️ Gagal terhubung ["+(e?.code||"koneksi-error")+"]";
+  }
+}
+
+function renderStats(){
+  const all=Object.values(ENTRIES);
+  let html=`<div class="stat"><b>${all.length}</b><span>TOTAL HADIR</span></div>`;
+  CABOR_LIST.forEach(c=>{
+    const n=all.filter(e=>e.divisi===c).length;
+    html+=`<div class="stat"><b>${n}</b><span>${esc(c.toUpperCase())}</span></div>`;
+  });
+  statsBox.innerHTML=html;
+}
+
+function renderList(){
+  const filter=filterDivisi.value;
+  const arr=Object.values(ENTRIES)
+    .filter(e=>!filter||e.divisi===filter)
+    .sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(!arr.length){listCard.innerHTML=`<div class="empty">Belum ada yang daftar${filter?` untuk ${esc(filter)}`:""}.</div>`;return}
+  listCard.innerHTML=arr.map(e=>`
+    <div class="list-item">
+      <div><b>${esc(e.nama)}</b><span>${esc(e.telp)}</span></div>
+      <span class="badge">${esc(e.divisi)}</span>
+    </div>`).join("");
+}
+
+function renderChart(){
+  const all=Object.values(ENTRIES);
+  const counts=CABOR_LIST.map(c=>({cabor:c,n:all.filter(e=>e.divisi===c).length}))
+    .sort((a,b)=>b.n-a.n);
+  const max=Math.max(1,...counts.map(c=>c.n));
+  if(!all.length){chartBox.innerHTML=`<div class="empty">Belum ada data untuk ditampilkan.</div>`;return}
+  chartBox.innerHTML=counts.map((c,i)=>{
+    const pct=Math.round((c.n/max)*100);
+    const pctOfTotal=all.length?Math.round((c.n/all.length)*100):0;
+    return `
+    <div class="bar-row ${i===0&&c.n>0?"top":""}">
+      <div class="bar-label"><b>${esc(c.cabor)}${i===0&&c.n>0?'<span class="crown-tag">👑 TERBANYAK</span>':""}</b><span>${c.n} orang (${pctOfTotal}%)</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join("");
+}
+
+function exportExcel(){
+  if(typeof XLSX === "undefined"){
+    alert("Library Excel belum termuat. Cek koneksi internet, lalu refresh halaman ini dan coba lagi.");
+    return;
+  }
+  const all=Object.values(ENTRIES).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  if(!all.length){alert("Belum ada data untuk didownload.");return}
+
+  btnExport.disabled=true;btnExport.textContent="MENYIAPKAN FILE...";
+
+  try{
+    const rows=all.map((e,i)=>({
+      "No":i+1,
+      "Nama":e.nama||"",
+      "No. Telepon":e.telp||"",
+      "Divisi / Cabor":e.divisi||"",
+      "Waktu Daftar":e.createdAt?new Date(e.createdAt).toLocaleString("id-ID"):""
+    }));
+    const ws=XLSX.utils.json_to_sheet(rows);
+    ws["!cols"]=[{wch:5},{wch:26},{wch:18},{wch:20},{wch:22}];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,"Daftar Hadir");
+
+    const recapRows=CABOR_LIST.map(c=>({
+      "Cabor":c,
+      "Jumlah":all.filter(e=>e.divisi===c).length
+    }));
+    recapRows.push({"Cabor":"TOTAL","Jumlah":all.length});
+    const ws2=XLSX.utils.json_to_sheet(recapRows);
+    ws2["!cols"]=[{wch:22},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws2,"Rekap Per Cabor");
+
+    const fileName="Daftar-Hadir-Ceremony-VIPT-CUP-IV-2026.xlsx";
+    const wbout=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+    const blob=new Blob([wbout],{type:"application/octet-stream"});
+    const url=URL.createObjectURL(blob);
+
+    const isIOS=/iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+    if(isIOS){
+      // Safari iOS sering blokir download paksa — buka di tab baru, user tinggal tap Share > Simpan ke Files.
+      window.open(url,"_blank");
+      statusMsg.textContent="📄 File terbuka di tab baru — tap ikon Share lalu pilih 'Simpan ke Files'.";
+    }else{
+      const a=document.createElement("a");
+      a.href=url;a.download=fileName;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+    }
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }catch(e){
+    console.error("Export excel error:",e);
+    alert("Gagal membuat file Excel: "+(e?.message||e));
+  }finally{
+    btnExport.disabled=false;btnExport.textContent="⬇️ DOWNLOAD EXCEL";
+  }
+}
+
+btnExport.addEventListener("click",exportExcel);
+filterDivisi.addEventListener("change",renderList);
+initFirebase();
+</script>
+</body>
+</html>
