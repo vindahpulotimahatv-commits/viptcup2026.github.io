@@ -1002,8 +1002,14 @@ const SURVEY_FIREBASE_CONFIG={
   databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app", projectId:"vipt-survey-2026"
 };
 const SURVEY_QUESTIONS=[
+ {key:"q0",type:"text",title:"Bagaimana kesan dan komentar Anda terhadap kinerja Panitia selama rangkaian acara VIPT CUP IV 2026? (opsional)"},
  {key:"q1",type:"radio",title:"Bagaimana penilaian Anda terhadap layanan Multimedia VIPT CUP secara keseluruhan?",options:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
  {key:"q2",type:"radio",title:"Seberapa membantu Live Streaming VIPT CUP dalam memudahkan Anda mengikuti pertandingan?",options:["Sangat Membantu","Membantu","Cukup Membantu","Kurang Membantu","Tidak Membantu"]},
+ {key:"q11",type:"radio",title:"Seberapa siap Anda menjalankan jobdesk yang diberikan?",options:["🔴 Belum siap","🟠 Kurang siap","🟡 Cukup siap","🟢 Siap","🔵 Sangat siap"]},
+ {key:"q12",type:"radio",title:"Apakah perlengkapan dan kebutuhan bagian Anda sudah siap?",options:["🔴 Belum siap","🟠 Masih banyak yang kurang","🟡 Sebagian sudah siap","🟢 Hampir semua siap","🔵 Sudah siap 100%"]},
+ {key:"q13",type:"radio",title:"Seberapa paham Anda dengan rundown dan alur acara?",options:["🔴 Belum paham","🟠 Kurang paham","🟡 Cukup paham","🟢 Paham","🔵 Sangat paham"]},
+ {key:"q14",type:"radio",title:"Bagaimana menurut Anda koordinasi antar panitia saat ini?",options:["🔴 Sangat kurang","🟠 Kurang","🟡 Cukup","🟢 Baik","🔵 Sangat baik"]},
+ {key:"q15",type:"radio",title:"Secara keseluruhan, apakah Panitia VIPT CUP IV 2026 sudah siap melaksanakan acara?",options:["🔴 Belum siap","🟠 Kurang siap","🟡 Cukup siap","🟢 Siap","🔵 Sangat siap"]},
  {key:"q10",type:"text",title:"Apa kritik, saran, dan harapan Anda untuk pengembangan Multimedia serta pelaksanaan VIPT CUP berikutnya? (opsional)"}
 ];
 let surveyApp=null, surveyAuth=null, surveyDB=null, surveyUser=null, surveySubmitted=false, surveyStep=0, surveyAnswers={};

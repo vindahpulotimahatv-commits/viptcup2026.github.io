@@ -1561,6 +1561,7 @@ const SURVEY_PRIVATE_PATH=`vipt_survey_${SURVEY_VERSION}/responses`;
 const SURVEY_PUBLIC_PATH=`vipt_survey_public_${SURVEY_VERSION}/respondents`;
 const SURVEY_LOCAL_KEY="VIPT_SURVEY_EVAL_MULTIMEDIA_V2_DONE";
 const SURVEY_QUESTIONS=[
+ {key:"q0",type:"text",title:"Bagaimana kesan dan komentar Anda terhadap kinerja Panitia selama rangkaian acara VIPT CUP IV 2026? (opsional)"},
  {key:"q1",type:"radio",title:"Bagaimana penilaian Anda terhadap layanan Multimedia VIPT CUP secara keseluruhan?",options:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
  {key:"q2",type:"radio",title:"Seberapa membantu Live Streaming VIPT CUP dalam memudahkan Anda mengikuti pertandingan?",options:["Sangat Membantu","Membantu","Cukup Membantu","Kurang Membantu","Tidak Membantu"]},
  {key:"q3",type:"radio",title:"Bagaimana pendapat Anda mengenai penggunaan Saweria sebagai bentuk dukungan dan partisipasi penonton terhadap pelaksanaan VIPT CUP?",options:["Sangat Baik","Baik","Cukup Baik","Kurang Baik","Tidak Perlu"]},
@@ -1570,6 +1571,11 @@ const SURVEY_QUESTIONS=[
  {key:"q7",type:"radio",title:"Menurut Anda, apakah layanan Multimedia VIPT CUP perlu dipertahankan dan dikembangkan pada pelaksanaan berikutnya?",options:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]},
  {key:"q8",type:"radio",title:"Bagaimana penilaian Anda secara keseluruhan terhadap pelaksanaan VIPT CUP IV 2026?",options:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
  {key:"q9",type:"radio",title:"Menurut Anda, apakah VIPT CUP perlu diselenggarakan setiap tahun?",options:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]},
+ {key:"q11",type:"radio",title:"Seberapa siap Anda menjalankan jobdesk yang diberikan?",options:["🔴 Belum siap","🟠 Kurang siap","🟡 Cukup siap","🟢 Siap","🔵 Sangat siap"]},
+ {key:"q12",type:"radio",title:"Apakah perlengkapan dan kebutuhan bagian Anda sudah siap?",options:["🔴 Belum siap","🟠 Masih banyak yang kurang","🟡 Sebagian sudah siap","🟢 Hampir semua siap","🔵 Sudah siap 100%"]},
+ {key:"q13",type:"radio",title:"Seberapa paham Anda dengan rundown dan alur acara?",options:["🔴 Belum paham","🟠 Kurang paham","🟡 Cukup paham","🟢 Paham","🔵 Sangat paham"]},
+ {key:"q14",type:"radio",title:"Bagaimana menurut Anda koordinasi antar panitia saat ini?",options:["🔴 Sangat kurang","🟠 Kurang","🟡 Cukup","🟢 Baik","🔵 Sangat baik"]},
+ {key:"q15",type:"radio",title:"Secara keseluruhan, apakah Panitia VIPT CUP IV 2026 sudah siap melaksanakan acara?",options:["🔴 Belum siap","🟠 Kurang siap","🟡 Cukup siap","🟢 Siap","🔵 Sangat siap"]},
  {key:"q10",type:"text",title:"Apa kritik, saran, dan harapan Anda untuk pengembangan Multimedia serta pelaksanaan VIPT CUP berikutnya? (opsional)"}
 ];
 let surveyApp=null,surveyAuth=null,surveyDB=null,surveyUser=null,surveySubmitted=false,surveyStep=0,surveyAnswers={};
@@ -1591,13 +1597,17 @@ function saveSurveyCurrent(validate=false){const q=SURVEY_QUESTIONS[surveyStep];
 async function submitSurvey(){
  if(!surveyUser||surveySubmitted)return;const btn=document.getElementById("surveyNext");if(btn){btn.disabled=true;btn.textContent="MENGIRIM..."}
  const raw={
+   q0:(surveyAnswers.q0||"").slice(0,500),
    q1:surveyAnswers.q1,q2:surveyAnswers.q2,q3:surveyAnswers.q3,q4:surveyAnswers.q4,q5:surveyAnswers.q5,
    q6:surveyAnswers.q6,q7:surveyAnswers.q7,q8:surveyAnswers.q8,q9:surveyAnswers.q9,
+   q11:surveyAnswers.q11,q12:surveyAnswers.q12,q13:surveyAnswers.q13,q14:surveyAnswers.q14,q15:surveyAnswers.q15,
    q10:(surveyAnswers.q10||"").slice(0,500),submittedAt:firebase.database.ServerValue.TIMESTAMP
  };
  const publicAnswer={
+   q0:(surveyAnswers.q0||"").slice(0,500),
    q1:surveyAnswers.q1,q2:surveyAnswers.q2,q3:surveyAnswers.q3,q4:surveyAnswers.q4,q5:surveyAnswers.q5,
    q6:surveyAnswers.q6,q7:surveyAnswers.q7,q8:surveyAnswers.q8,q9:surveyAnswers.q9,
+   q11:surveyAnswers.q11,q12:surveyAnswers.q12,q13:surveyAnswers.q13,q14:surveyAnswers.q14,q15:surveyAnswers.q15,
    q10:(surveyAnswers.q10||"").slice(0,500),submittedAt:firebase.database.ServerValue.TIMESTAMP
  };
  try{

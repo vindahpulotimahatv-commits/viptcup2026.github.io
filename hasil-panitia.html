@@ -24,6 +24,7 @@
  <div class="card mini"><div class="k">LIVE STREAMING SANGAT MEMBANTU / MEMBANTU</div><div class="v" id="streamPct">0%</div></div>
 </div>
 <div class="grid" id="metrics"></div>
+<div class="card comments-card"><h3>👤 Komentar untuk Panitia <span id="panitiaCommentCount" style="color:#aaa;font-size:10px;font-weight:700"></span></h3><div id="panitiaComments" class="comments"><div class="comment-empty">Belum ada komentar tertulis.</div></div></div>
 <div class="card comments-card"><h3>💬 Kritik, Saran & Harapan Responden <span id="commentCount" style="color:#aaa;font-size:10px;font-weight:700"></span></h3><div id="comments" class="comments"><div class="comment-empty">Belum ada komentar tertulis.</div></div></div>
 <div class="card privacy"><b>Catatan:</b> komentar ditampilkan tanpa nama responden. Halaman ini ditujukan untuk internal panitia dan dibuka menggunakan password panitia.</div>
 <div class="status" id="status">Menghubungkan Firebase...</div>
@@ -51,7 +52,12 @@ const META={
  q6:{t:"Multimedia membuat event lebih menarik/profesional",o:["Sangat Setuju","Setuju","Cukup Setuju","Tidak Setuju","Sangat Tidak Setuju"]},
  q7:{t:"Multimedia perlu dipertahankan & dikembangkan",o:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]},
  q8:{t:"Penilaian pelaksanaan VIPT CUP IV 2026",o:["Sangat Baik","Baik","Cukup","Kurang","Sangat Kurang"]},
- q9:{t:"VIPT CUP perlu diselenggarakan setiap tahun",o:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]}
+ q9:{t:"VIPT CUP perlu diselenggarakan setiap tahun",o:["Sangat Perlu","Perlu","Cukup Perlu","Tidak Perlu","Sangat Tidak Perlu"]},
+ q11:{t:"Kesiapan menjalankan jobdesk",o:["🔴 Belum siap","🟠 Kurang siap","🟡 Cukup siap","🟢 Siap","🔵 Sangat siap"]},
+ q12:{t:"Kesiapan perlengkapan & kebutuhan bagian",o:["🔴 Belum siap","🟠 Masih banyak yang kurang","🟡 Sebagian sudah siap","🟢 Hampir semua siap","🔵 Sudah siap 100%"]},
+ q13:{t:"Pemahaman rundown & alur acara",o:["🔴 Belum paham","🟠 Kurang paham","🟡 Cukup paham","🟢 Paham","🔵 Sangat paham"]},
+ q14:{t:"Koordinasi antar panitia",o:["🔴 Sangat kurang","🟠 Kurang","🟡 Cukup","🟢 Baik","🔵 Sangat baik"]},
+ q15:{t:"Kesiapan Panitia secara keseluruhan",o:["🔴 Belum siap","🟠 Kurang siap","🟡 Cukup siap","🟢 Siap","🔵 Sangat siap"]}
 };
 function pct(n,d){return d?Math.round(n/d*100):0}
 function count(rows,key,val){let n=0;rows.forEach(r=>{if(r&&r[key]===val)n++});return n}
@@ -73,6 +79,12 @@ function render(rows){
  const escHtml=t=>String(t).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
  document.getElementById('commentCount').textContent=`• ${comments.length} komentar`;
  document.getElementById('comments').innerHTML=comments.length?comments.map((t,i)=>`<div class="comment"><div class="comment-num">KOMENTAR ${i+1}</div><div class="comment-text">${escHtml(t)}</div></div>`).join(''):'<div class="comment-empty">Belum ada komentar tertulis.</div>';
+
+ const panitiaComments=rows.map(r=>String(r?.q0||'').trim()).filter(Boolean);
+ const seenP=new Set();
+ const panitiaUnique=panitiaComments.filter(t=>{const k=norm(t);if(!k||seenP.has(k))return false;seenP.add(k);return true;});
+ document.getElementById('panitiaCommentCount').textContent=`• ${panitiaUnique.length} komentar`;
+ document.getElementById('panitiaComments').innerHTML=panitiaUnique.length?panitiaUnique.map((t,i)=>`<div class="comment"><div class="comment-num">KOMENTAR ${i+1}</div><div class="comment-text">${escHtml(t)}</div></div>`).join(''):'<div class="comment-empty">Belum ada komentar tertulis.</div>';
  document.getElementById('status').textContent=`✅ Terhubung • ${total} responden • diperbarui otomatis`;
 }
 const PASS_HASH="d57c257513fa90c0285a633ccfbe5f313c8dff9f705bc977a18e43a44ffcc768"; // VIPT2026PANITIA
