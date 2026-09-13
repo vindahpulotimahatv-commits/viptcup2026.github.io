@@ -385,30 +385,12 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
       <div class="location">📍 <span>LOKASI UTAMA</span> Lapangan Central Villa Indah Pulo Timaha</div>
     </section>
 
-    <div class="card" style="background:linear-gradient(145deg,#1a1305,#0b0904);border-color:#f5b72b">
-      <div style="text-align:center;font-size:10px;font-weight:900;color:#f5c451;letter-spacing:1px">✨ MALAM PUNCAK ✨</div>
-      <div style="text-align:center;font-size:18px;font-weight:900;color:#f5b72b;margin:4px 0 2px">GLOW IN UNITY</div>
-      <div style="text-align:center;font-size:12px;color:#bdb5a7;margin-bottom:8px">Closing Ceremony & Grand Final VIPT CUP IV 2026</div>
-      <div style="text-align:center;font-size:11px;color:#f5c451;font-style:italic;margin-bottom:10px">"Satu Cahaya, Dua Wilayah, Sejuta Kebanggaan"</div>
-      <div style="font-size:12px;color:#fff;line-height:1.8;border-top:1px solid #3a2a08;padding-top:10px">
-        📅 <b>Sabtu, 12 September 2026</b><br>
-        🕖 <b>19.00 WIB – Selesai</b><br>
-        📍 <b>Lapangan Futsal & Panggung Pergola</b>
-      </div>
-      <div style="font-size:11px;color:#bdb5a7;margin-top:10px;padding-top:10px;border-top:1px solid #3a2a08;line-height:1.7;text-align:left">
-        🏓 20.10 — Grand Final Tenis Meja<br>
-        ⚽ 21.10 — Futsal Perebutan Juara 3 &amp; 4<br>
-        🏆 22.20 — Grand Final Futsal<br>
-        🎁 Pengundian Doorprize Pembuka &amp; Grand Doorprize Utama sepanjang acara — siapkan kuponmu!<br>
-        🏅 23.00 — Awarding &amp; Penyerahan Piala Bergilir
-      </div>
-    </div>
-
     <div class="card" style="text-align:center;background:linear-gradient(145deg,#1a1305,#0b0904);border-color:#f5b72b">
-      <div style="font-size:16px;font-weight:900;color:#f5b72b">🎁 DOORPRIZE VIPT CUP IV 2026</div>
-      <p style="font-size:12px;color:#bdb5a7;margin:8px 0 12px;line-height:1.6">Daftarkan namamu sekarang, menangkan hadiah menarik! Pengundian dilakukan langsung di lokasi & live streaming.</p>
-      <a class="btn" href="doorprize.html" style="max-width:320px;margin:0 auto">🎟️ DAFTAR DOORPRIZE</a>
-    </div>
+      <div style="font-size:10px;font-weight:900;color:#f5c451;letter-spacing:1px">🏆 TERIMA KASIH VIPT CUP IV 2026 🏆</div>
+      <div style="font-size:13px;color:#bdb5a7;margin:6px 0 8px">Seluruh rangkaian pertandingan telah usai!</div>
+      <div style="font-size:12px;color:#f5c451;font-weight:900;margin-bottom:4px">JUARA UMUM</div>
+      <div style="font-size:32px;font-weight:900;color:#f5b72b;line-height:1.2;margin-bottom:8px">RT 11 / RW 021</div>
+      <div style="font-size:12px;color:#bdb5a7;line-height:1.7;max-width:480px;margin:0 auto">Selamat kepada RT 11 / RW 021 yang keluar sebagai Juara Umum VIPT CUP IV 2026! Terima kasih untuk semangat sportivitas dan kebersamaan seluruh RT/RW yang telah berjuang di setiap cabang olahraga. Sampai jumpa di VIPT CUP berikutnya! 🎉</div>
     </div>
 
     <nav class="desktop-nav">
@@ -455,6 +437,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
 
     <div class="top-dashboard-grid">
       <div class="col-live">
+        <div style="display:none">
         <div class="section"><h2>🔴 Live Score</h2></div>
         <div class="card live">
           <div class="livebar">
@@ -481,6 +464,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
             <div class="lc-match" id="lcMatch">Memuat jadwal...</div>
             <button class="lc-bell" id="lcBell" type="button">🔔 Klik lonceng untuk mengingatkan saya</button>
           </div>
+        </div>
         </div>
 
         <div class="card survey-invite" id="surveyInvite">
@@ -519,6 +503,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
     </div>
 
     <div style="margin-top: 10px;">
+      <div style="display:none">
       <div class="section" id="jadwal">
         <h2>📅 Jadwal & Daftar Pertandingan</h2>
         <span id="count" style="font-size:12px; color:var(--muted)"></span>
@@ -526,6 +511,7 @@ h1,h2,h3,.hero h1,.hero h2,.section h2,.cover h2,.news-card h3,.survey-title,.su
       <input class="search" id="search" type="search" placeholder="Cari tim, RT, atau cabang olahraga...">
       <div id="sportFilters" style="display:none"></div>
       <div id="jadwalList"></div>
+      </div>
     </div>
 
   </main>
@@ -609,7 +595,7 @@ const MATCHES=[
   {id:"TM-3RD",sport:"TENIS MEJA",round:"PEREBUTAN JUARA 3",date:"2026-09-06",time:"19:30 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
   {id:"BDM-3RD",sport:"BADMINTON",round:"PEREBUTAN JUARA 3 • REGU PUTRA",date:"2026-09-06",time:"20:30 WIB",a:"RT 10 / RW 021",b:"RT 08 / RW 021",status:"JADWAL"},
   {id:"BDM-FINAL",sport:"BADMINTON",round:"FINAL • REGU PUTRA",date:"2026-09-06",time:"23:03 WIB",a:"RT 07 / RW 014",b:"RT 11 / RW 021",status:"SELESAI",winner:"RT 07 / RW 014"},
-  {id:"TM-FINAL",sport:"TENIS MEJA",round:"FINAL",date:"2026-09-12",time:"20:10 WIB",a:"RT 13 / RW 021",b:"RT 04 / RW 021",status:"JADWAL"},
+  {id:"TM-FINAL",sport:"TENIS MEJA",round:"FINAL",date:"2026-09-12",time:"20:10 WIB",a:"RT 11 / RW 021",b:"RT 10 / RW 014",status:"JADWAL"},
   {id:"FS-3RD",sport:"FUTSAL",round:"PEREBUTAN JUARA 3",date:"2026-09-12",time:"21:10 WIB",a:"RT 04 / RW 021",b:"RT 02 / RW 021",status:"JADWAL"},
   {id:"FS-FINAL",sport:"FUTSAL",round:"FINAL",date:"2026-09-12",time:"22:20 WIB",a:"RT 13 / RW 021",b:"RT 11 / RW 021",status:"JADWAL"}
 ];
@@ -1040,6 +1026,60 @@ async function submitSurvey(){
 }
 document.getElementById("surveyStartBtn")?.addEventListener("click",()=>{ document.getElementById("surveyModal").classList.add("open"); surveyStep=0; renderSurveyStep(); });
 document.getElementById("surveyCloseBtn")?.addEventListener("click",()=>{ document.getElementById("surveyModal").classList.remove("open"); });
+</script>
+
+
+<canvas id="confettiCanvas" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9999"></canvas>
+<script>
+(function(){
+  var canvas=document.getElementById("confettiCanvas");
+  var ctx=canvas.getContext("2d");
+  var W,H;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+  resize();window.addEventListener("resize",resize);
+
+  var colors=["#f5b72b","#ff5a5f","#1ed393","#ffffff","#f5c451","#9a650b"];
+  var pieces=[];
+  var COUNT=140;
+  for(var i=0;i<COUNT;i++){
+    pieces.push({
+      x:Math.random()*W,
+      y:-20-Math.random()*H*0.5,
+      r:4+Math.random()*5,
+      c:colors[Math.floor(Math.random()*colors.length)],
+      speedY:2+Math.random()*3,
+      speedX:(Math.random()-0.5)*2.2,
+      rot:Math.random()*360,
+      rotSpeed:(Math.random()-0.5)*10,
+      shape:Math.random()>0.5?"rect":"circle"
+    });
+  }
+
+  var start=null,duration=4200;
+  function frame(ts){
+    if(!start)start=ts;
+    var elapsed=ts-start;
+    ctx.clearRect(0,0,W,H);
+    pieces.forEach(function(p){
+      p.x+=p.speedX;p.y+=p.speedY;p.rot+=p.rotSpeed;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.c;
+      if(p.shape==="rect"){ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6)}
+      else{ctx.beginPath();ctx.arc(0,0,p.r/2,0,Math.PI*2);ctx.fill()}
+      ctx.restore();
+    });
+    if(elapsed<duration){
+      requestAnimationFrame(frame);
+    }else{
+      canvas.style.transition="opacity .6s";
+      canvas.style.opacity="0";
+      setTimeout(function(){canvas.remove()},700);
+    }
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 
 </body>
