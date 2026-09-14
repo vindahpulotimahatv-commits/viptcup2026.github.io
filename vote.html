@@ -12,44 +12,21 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 
 <style>
-:root{
-  --bg:#050505;--panel:#0b0b0b;--line:#7a5514;--text:#fff;--muted:#c7c0b2;
-  --gold:#f5b72b;--green:#1ed393;--red:#ff5a5f
-}
+:root{--bg:#050505;--panel:#0b0b0b;--line:#7a5514;--text:#fff;--muted:#c7c0b2;--gold:#f5b72b;--green:#1ed393;--red:#ff5a5f}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;min-height:100%}
-body{
-  margin:0;background:#030303;color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-  padding-bottom:calc(30px + env(safe-area-inset-bottom))
-}
+body{margin:0;background:#030303;color:var(--text);font-family:Arial,Helvetica,sans-serif;padding-bottom:calc(30px + env(safe-area-inset-bottom))}
 button{font:inherit}
 .app{max-width:520px;margin:auto;min-height:100vh;padding:0 16px}
 header{padding:22px 0 10px;text-align:center}
 header .logo{font-size:26px}
 header h1{font-size:17px;margin:8px 0 2px;color:var(--gold)}
-header p{font-size:11px;color:var(--muted);margin:0}
+header p{font-size:11px;color:var(--muted);margin:0 0 16px}
 
-.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
-.tab{
-  flex:0 0 auto;padding:9px 14px;border-radius:99px;border:1px solid #6f4d13;
-  background:#0c0b09;color:#f5c451;font-size:10.5px;font-weight:900;cursor:pointer;white-space:nowrap
-}
-.tab.active{background:linear-gradient(135deg,#f5b72b,#9a650b);color:#090705;border-color:transparent}
+.card{background:linear-gradient(145deg,#11100d,#050505);border:1px solid #6f4d13;border-radius:17px;padding:16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.cat-title{font-size:15px;font-weight:900;color:var(--gold);margin:0 0 12px;text-align:center;border-bottom:1px dashed #3a2a08;padding-bottom:10px}
 
-.card{
-  background:linear-gradient(145deg,#11100d,#050505);
-  border:1px solid #6f4d13;border-radius:17px;padding:16px;margin-bottom:14px;
-  box-shadow:0 8px 24px rgba(0,0,0,.35)
-}
-.cat-title{font-size:14px;font-weight:900;color:var(--gold);margin:0 0 4px;text-align:center}
-.cat-sub{font-size:10.5px;color:var(--muted);margin:0 0 14px;text-align:center}
-
-.candidate{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  background:#080807;border:1px solid #3a2a08;border-radius:12px;padding:13px 14px;margin-bottom:10px;
-  cursor:pointer;transition:.15s
-}
+.candidate{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#080807;border:1px solid #3a2a08;border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:.15s}
 .candidate:last-child{margin-bottom:0}
 .candidate.selected{border-color:var(--gold);background:rgba(245,183,43,.08)}
 .candidate b{font-size:13px}
@@ -58,26 +35,14 @@ header p{font-size:11px;color:var(--muted);margin:0}
 .candidate.selected .radio-dot:after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--gold)}
 
 label{display:block;font-size:11px;font-weight:900;color:var(--gold);margin:0 0 6px}
-input.field{
-  width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;
-  border-radius:12px;padding:12px 13px;outline:none;margin-bottom:14px;font-size:14px
-}
+input.field{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:12px 13px;outline:none;margin-bottom:14px;font-size:14px}
 input.field:focus{border-color:var(--gold)}
 
-.btn{
-  display:block;width:100%;text-align:center;text-decoration:none;color:#090705;
-  background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;
-  border-radius:12px;padding:14px;font-size:12.5px;font-weight:900;cursor:pointer;margin-top:14px
-}
+.btn{display:block;width:100%;text-align:center;text-decoration:none;color:#090705;background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;border-radius:12px;padding:14px;font-size:12.5px;font-weight:900;cursor:pointer;margin-top:20px}
 .btn:disabled{opacity:.5}
 .note{font-size:10px;color:#8a8378;margin-top:10px;line-height:1.5;text-align:center}
-.status{font-size:11px;text-align:center;margin-top:10px;color:var(--muted);min-height:14px}
-.empty{text-align:center;color:var(--muted);font-size:11.5px;padding:20px 0}
-
-.voted-badge{
-  text-align:center;padding:14px;border:1px dashed var(--green);border-radius:12px;
-  color:var(--green);font-size:12px;font-weight:900
-}
+.status{font-size:11px;text-align:center;margin-top:10px;color:var(--gold);min-height:14px;font-weight:bold}
+.voted-badge{text-align:center;padding:14px;border:1px dashed var(--green);border-radius:12px;color:var(--green);font-size:12px;font-weight:900;margin-top:20px}
 .back{display:block;text-align:center;margin-top:16px;font-size:11px;color:#f5c451;text-decoration:none}
 </style>
 </head>
@@ -88,8 +53,6 @@ input.field:focus{border-color:var(--gold)}
     <h1>ATLET TERFAVORIT RT 08 RW 021</h1>
     <p>VIPT CUP IV 2026</p>
   </header>
-
-  <div class="tabs" id="tabs"></div>
 
   <div id="voteArea"></div>
 
@@ -107,10 +70,9 @@ const VOTE_FIREBASE_CONFIG={
   appId:"1:761699971320:web:2cabe1effb822597534b0d"
 };
 const VOTE_PATH="vipt_vote/votes";
-const VOTE_LOCAL_KEY="VIPT_VOTE_DONE_V1";
+const VOTE_LOCAL_KEY="VIPT_VOTE_DONE_ALL_V2"; 
+const VOTER_INFO_KEY="VIPT_VOTE_VOTER_INFO_V1";
 
-// ====== KATEGORI & KANDIDAT ======
-// Tambahkan nama pemain di sini kapan saja (array kosong = "Kandidat belum diisi" otomatis tampil).
 const CATEGORIES=[
   {id:"bdw",label:"Badminton Putri",candidates:["Erni (E2/45)","Nopy (E2/39)","Sherly (E2/40)","Ressya (E2/28)","Bety (E5/08)","Risna (E5/3A)","Neza (E2/22)","Dina (E2/41)","Nina (E5/07)"]},
   {id:"bdm",label:"Badminton Putra",candidates:["Adin (E8/02)","Diantoro (E2/22)","Iqbal (E2/39)","Hendy (E2/39)","Jarun (E2/46)","Lambang (E2/22)","Ngudi (E2/15)","Faozi (E5/16)","Ajrul (E2/40)"]},
@@ -118,124 +80,135 @@ const CATEGORIES=[
 ];
 
 let voteApp=null,voteAuth=null,voteDB=null;
-let activeCat=CATEGORIES[0].id;
-let votedList={};
-let selectedCandidate=null;
+let hasVotedAll = false;
+let selections = { bdw: null, bdm: null, vw: null };
 let voterName="",voterAddress="";
-const VOTER_INFO_KEY="VIPT_VOTE_VOTER_INFO_V1";
 
-function loadVoterInfo(){
+function loadStorageData(){
   try{
-    const saved=JSON.parse(localStorage.getItem(VOTER_INFO_KEY)||"{}");
-    voterName=saved.name||"";voterAddress=saved.address||"";
+    const savedInfo=JSON.parse(localStorage.getItem(VOTER_INFO_KEY)||"{}");
+    voterName=savedInfo.name||"";voterAddress=savedInfo.address||"";
+    hasVotedAll=localStorage.getItem(VOTE_LOCAL_KEY) === "true";
   }catch(e){}
 }
-function saveVoterInfo(){
-  try{localStorage.setItem(VOTER_INFO_KEY,JSON.stringify({name:voterName,address:voterAddress}))}catch(e){}
-}
 
-const tabsEl=document.getElementById("tabs"),voteArea=document.getElementById("voteArea");
+function saveStorageData(){
+  try{
+    localStorage.setItem(VOTER_INFO_KEY,JSON.stringify({name:voterName,address:voterAddress}));
+    localStorage.setItem(VOTE_LOCAL_KEY, "true");
+  }catch(e){}
+}
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 
-function loadVotedList(){
-  try{votedList=JSON.parse(localStorage.getItem(VOTE_LOCAL_KEY)||"{}")}catch(e){votedList={}}
-}
-function saveVotedList(){
-  localStorage.setItem(VOTE_LOCAL_KEY,JSON.stringify(votedList));
-}
-
-function renderTabs(){
-  tabsEl.innerHTML=CATEGORIES.map(c=>
-    `<button class="tab ${c.id===activeCat?"active":""}" data-id="${c.id}">${esc(c.label)}</button>`
-  ).join("");
-  tabsEl.querySelectorAll(".tab").forEach(btn=>{
-    btn.addEventListener("click",()=>{activeCat=btn.dataset.id;selectedCandidate=null;renderTabs();renderVoteArea()});
-  });
-}
+const voteArea=document.getElementById("voteArea");
 
 function renderVoteArea(){
-  const cat=CATEGORIES.find(c=>c.id===activeCat);
-  if(!cat)return;
-
-  if(votedList[cat.id]){
+  if(hasVotedAll){
     voteArea.innerHTML=`
       <div class="card">
-        <div class="cat-title">${esc(cat.label)}</div>
-        <div class="cat-sub">Terima kasih sudah memilih!</div>
-        <div class="voted-badge">✅ Kamu sudah vote: ${esc(votedList[cat.id])}</div>
-        <p class="note">Satu perangkat hanya bisa vote 1x per kategori.</p>
+        <div class="cat-title">Terima Kasih!</div>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin:0">Suaramu telah berhasil masuk ke dalam sistem.</p>
+        <div class="voted-badge">✅ Kamu sudah melakukan voting.</div>
       </div>`;
     return;
   }
 
-  if(!cat.candidates.length){
-    voteArea.innerHTML=`
-      <div class="card">
-        <div class="cat-title">${esc(cat.label)}</div>
-        <div class="empty">Kandidat untuk kategori ini belum diisi panitia. Cek lagi nanti ya!</div>
-      </div>`;
-    return;
-  }
-
-  voteArea.innerHTML=`
+  let htmlStr = `
     <div class="card">
-      <div class="cat-title">${esc(cat.label)}</div>
-      <div class="cat-sub">Pilih 1 pemain favoritmu di kategori ini</div>
-
       <label for="voterName">Nama Anda</label>
       <input class="field" id="voterName" maxlength="60" placeholder="Contoh: Budi Santoso" autocomplete="off" value="${esc(voterName)}">
       <label for="voterAddress">Alamat Anda</label>
       <input class="field" id="voterAddress" maxlength="30" placeholder="Contoh: E2/45" autocomplete="off" value="${esc(voterAddress)}">
-
-      <div id="candidateList"></div>
-      <button class="btn" id="btnVote" disabled>🗳️ KIRIM VOTE</button>
-      <div class="status" id="statusMsg"></div>
-      <p class="note">Nama & alamat wajib diisi. Satu perangkat hanya bisa vote 1x per kategori. Vote tidak bisa diubah setelah dikirim.</p>
     </div>`;
 
-  const list=document.getElementById("candidateList");
-  list.innerHTML=cat.candidates.map((name,i)=>`
-    <div class="candidate" data-name="${esc(name)}">
-      <b>${esc(name)}</b>
-      <div class="radio-dot"></div>
-    </div>`).join("");
+  CATEGORIES.forEach(cat => {
+    htmlStr += `
+      <div class="card" id="card-${cat.id}">
+        <div class="cat-title">${esc(cat.label)}</div>
+        <div class="candidate-list" data-cat="${cat.id}">
+          ${cat.candidates.map(name => `
+            <div class="candidate" data-name="${esc(name)}">
+              <b>${esc(name)}</b>
+              <div class="radio-dot"></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  });
 
-  const btnVote=document.getElementById("btnVote"),statusMsg=document.getElementById("statusMsg");
+  htmlStr += `
+    <button class="btn" id="btnVoteAll">🗳️ KIRIM SEMUA VOTE SEKALIGUS</button>
+    <div class="status" id="statusMsg"></div>
+    <p class="note">Nama & alamat wajib diisi. Pilih satu kandidat di setiap kategori. Vote tidak bisa diubah setelah dikirim.</p>`;
 
-  list.querySelectorAll(".candidate").forEach(el=>{
-    el.addEventListener("click",()=>{
-      selectedCandidate=el.dataset.name;
-      list.querySelectorAll(".candidate").forEach(c=>c.classList.toggle("selected",c===el));
-      btnVote.disabled=false;
+  voteArea.innerHTML = htmlStr;
+
+  // Interaksi Pilihan Kandidat
+  CATEGORIES.forEach(cat => {
+    const listWrapper = document.querySelector(`.candidate-list[data-cat="${cat.id}"]`);
+    const candidates = listWrapper.querySelectorAll(".candidate");
+    
+    candidates.forEach(el => {
+      el.addEventListener("click", () => {
+        selections[cat.id] = el.dataset.name;
+        candidates.forEach(c => c.classList.toggle("selected", c === el));
+      });
     });
   });
 
-  btnVote.addEventListener("click",async()=>{
-    const inputName=document.getElementById("voterName").value.trim();
-    const inputAddress=document.getElementById("voterAddress").value.trim();
+  // Interaksi Submit
+  const btnVote = document.getElementById("btnVoteAll");
+  const statusMsg = document.getElementById("statusMsg");
+
+  btnVote.addEventListener("click", async () => {
+    const inputName = document.getElementById("voterName").value.trim();
+    const inputAddress = document.getElementById("voterAddress").value.trim();
+    
     if(!inputName){statusMsg.textContent="⚠️ Nama wajib diisi.";document.getElementById("voterName").focus();return}
     if(!inputAddress){statusMsg.textContent="⚠️ Alamat wajib diisi.";document.getElementById("voterAddress").focus();return}
-    if(!selectedCandidate){statusMsg.textContent="⚠️ Pilih salah satu kandidat dulu.";return}
-    if(votedList[cat.id]){statusMsg.textContent="⚠️ Kamu sudah vote di kategori ini.";return}
+    
+    // Pastikan semua kategori sudah dipilih
+    for(const cat of CATEGORIES) {
+      if(!selections[cat.id]) {
+        statusMsg.textContent=`⚠️ Anda belum memilih kandidat untuk ${cat.label}.`;
+        document.getElementById(`card-${cat.id}`).scrollIntoView({behavior: "smooth", block: "center"});
+        return;
+      }
+    }
+
     if(!voteDB){statusMsg.textContent="⚠️ Belum terhubung ke server, coba lagi sebentar.";return}
-    btnVote.disabled=true;btnVote.textContent="MENGIRIM...";
+    
+    btnVote.disabled=true;
+    btnVote.textContent="MENGIRIM DATA...";
+    statusMsg.textContent="Memproses suara Anda...";
+
     try{
-      const ref=voteDB.ref(VOTE_PATH).push();
-      await ref.set({
-        category:cat.id,categoryLabel:cat.label,candidate:selectedCandidate,
-        voterName:inputName,voterAddress:inputAddress,
-        votedAt:firebase.database.ServerValue.TIMESTAMP
+      // Persiapkan semua vote untuk di-push ke database
+      const promises = CATEGORIES.map(cat => {
+        return voteDB.ref(VOTE_PATH).push().set({
+          category: cat.id,
+          categoryLabel: cat.label,
+          candidate: selections[cat.id],
+          voterName: inputName,
+          voterAddress: inputAddress,
+          votedAt: firebase.database.ServerValue.TIMESTAMP
+        });
       });
-      voterName=inputName;voterAddress=inputAddress;
-      saveVoterInfo();
-      votedList[cat.id]=selectedCandidate;
-      saveVotedList();
+
+      await Promise.all(promises);
+
+      voterName=inputName;
+      voterAddress=inputAddress;
+      hasVotedAll = true;
+      saveStorageData();
       renderVoteArea();
+      
     }catch(e){
       console.error("Vote submit:",e);
-      statusMsg.textContent="⚠️ Gagal mengirim vote ["+(e?.code||"unknown")+"]. "+(e?.code==="PERMISSION_DENIED"?"Server menolak (Firebase Rules).":"Periksa koneksi internet.");
-      btnVote.disabled=false;btnVote.textContent="🗳️ KIRIM VOTE";
+      statusMsg.textContent="⚠️ Gagal mengirim vote. Periksa koneksi internet Anda.";
+      btnVote.disabled=false;
+      btnVote.textContent="🗳️ KIRIM SEMUA VOTE SEKALIGUS";
     }
   });
 }
@@ -251,9 +224,7 @@ async function initFirebase(){
   }
 }
 
-loadVotedList();
-loadVoterInfo();
-renderTabs();
+loadStorageData();
 renderVoteArea();
 initFirebase();
 </script>
