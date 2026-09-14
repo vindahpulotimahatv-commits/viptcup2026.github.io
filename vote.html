@@ -34,10 +34,6 @@ header p{font-size:11px;color:var(--muted);margin:0 0 16px}
 .candidate.selected .radio-dot{border-color:var(--gold)}
 .candidate.selected .radio-dot:after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--gold)}
 
-label{display:block;font-size:11px;font-weight:900;color:var(--gold);margin:0 0 6px}
-input.field{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:12px 13px;outline:none;margin-bottom:14px;font-size:14px}
-input.field:focus{border-color:var(--gold)}
-
 .btn{display:block;width:100%;text-align:center;text-decoration:none;color:#090705;background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;border-radius:12px;padding:14px;font-size:12.5px;font-weight:900;cursor:pointer;margin-top:20px}
 .btn:disabled{opacity:.5}
 .note{font-size:10px;color:#8a8378;margin-top:10px;line-height:1.5;text-align:center}
@@ -70,8 +66,7 @@ const VOTE_FIREBASE_CONFIG={
   appId:"1:761699971320:web:2cabe1effb822597534b0d"
 };
 const VOTE_PATH="vipt_vote/votes";
-const VOTE_LOCAL_KEY="VIPT_VOTE_DONE_ALL_V2"; 
-const VOTER_INFO_KEY="VIPT_VOTE_VOTER_INFO_V1";
+const VOTE_LOCAL_KEY="VIPT_VOTE_DONE_ALL_V3"; 
 
 const CATEGORIES=[
   {id:"bdw",label:"Badminton Putri",candidates:["Erni (E2/45)","Nopy (E2/39)","Sherly (E2/40)","Ressya (E2/28)","Bety (E5/08)","Risna (E5/3A)","Neza (E2/22)","Dina (E2/41)","Nina (E5/07)"]},
@@ -82,19 +77,15 @@ const CATEGORIES=[
 let voteApp=null,voteAuth=null,voteDB=null;
 let hasVotedAll = false;
 let selections = { bdw: null, bdm: null, vw: null };
-let voterName="",voterAddress="";
 
 function loadStorageData(){
   try{
-    const savedInfo=JSON.parse(localStorage.getItem(VOTER_INFO_KEY)||"{}");
-    voterName=savedInfo.name||"";voterAddress=savedInfo.address||"";
     hasVotedAll=localStorage.getItem(VOTE_LOCAL_KEY) === "true";
   }catch(e){}
 }
 
 function saveStorageData(){
   try{
-    localStorage.setItem(VOTER_INFO_KEY,JSON.stringify({name:voterName,address:voterAddress}));
     localStorage.setItem(VOTE_LOCAL_KEY, "true");
   }catch(e){}
 }
@@ -114,13 +105,7 @@ function renderVoteArea(){
     return;
   }
 
-  let htmlStr = `
-    <div class="card">
-      <label for="voterName">Nama Anda</label>
-      <input class="field" id="voterName" maxlength="60" placeholder="Contoh: Budi Santoso" autocomplete="off" value="${esc(voterName)}">
-      <label for="voterAddress">Alamat Anda</label>
-      <input class="field" id="voterAddress" maxlength="30" placeholder="Contoh: E2/45" autocomplete="off" value="${esc(voterAddress)}">
-    </div>`;
+  let htmlStr = "";
 
   CATEGORIES.forEach(cat => {
     htmlStr += `
@@ -140,7 +125,7 @@ function renderVoteArea(){
   htmlStr += `
     <button class="btn" id="btnVoteAll">🗳️ KIRIM SEMUA VOTE SEKALIGUS</button>
     <div class="status" id="statusMsg"></div>
-    <p class="note">Nama & alamat wajib diisi. Pilih satu kandidat di setiap kategori. Vote tidak bisa diubah setelah dikirim.</p>`;
+    <p class="note">Pilih satu kandidat di setiap kategori. Satu perangkat hanya bisa vote 1x. Vote bersifat anonim dan tidak bisa diubah setelah dikirim.</p>`;
 
   voteArea.innerHTML = htmlStr;
 
@@ -162,12 +147,6 @@ function renderVoteArea(){
   const statusMsg = document.getElementById("statusMsg");
 
   btnVote.addEventListener("click", async () => {
-    const inputName = document.getElementById("voterName").value.trim();
-    const inputAddress = document.getElementById("voterAddress").value.trim();
-    
-    if(!inputName){statusMsg.textContent="⚠️ Nama wajib diisi.";document.getElementById("voterName").focus();return}
-    if(!inputAddress){statusMsg.textContent="⚠️ Alamat wajib diisi.";document.getElementById("voterAddress").focus();return}
-    
     // Pastikan semua kategori sudah dipilih
     for(const cat of CATEGORIES) {
       if(!selections[cat.id]) {
@@ -184,22 +163,18 @@ function renderVoteArea(){
     statusMsg.textContent="Memproses suara Anda...";
 
     try{
-      // Persiapkan semua vote untuk di-push ke database
+      // Persiapkan semua vote untuk di-push ke database tanpa data diri
       const promises = CATEGORIES.map(cat => {
         return voteDB.ref(VOTE_PATH).push().set({
           category: cat.id,
           categoryLabel: cat.label,
           candidate: selections[cat.id],
-          voterName: inputName,
-          voterAddress: inputAddress,
           votedAt: firebase.database.ServerValue.TIMESTAMP
         });
       });
 
       await Promise.all(promises);
 
-      voterName=inputName;
-      voterAddress=inputAddress;
       hasVotedAll = true;
       saveStorageData();
       renderVoteArea();
