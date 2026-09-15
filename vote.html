@@ -4,26 +4,195 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#050505">
-<title>Link Ditutup • VIPT CUP IV 2026</title>
+<title>Voting Pemain Idola • VIPT CUP IV 2026</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
 <style>
-:root{--gold:#f5b72b;--muted:#c7c0b2}
+:root{--bg:#050505;--panel:#0b0b0b;--line:#7a5514;--text:#fff;--muted:#c7c0b2;--gold:#f5b72b;--green:#1ed393;--red:#ff5a5f}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:#030303;color:#fff;font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
-.card{max-width:420px;text-align:center;background:linear-gradient(145deg,#11100d,#050505);border:1px solid #6f4d13;border-radius:18px;padding:28px 22px}
-.logo{font-size:40px;margin-bottom:10px}
-h1{font-size:17px;color:var(--gold);margin:0 0 10px}
-p{font-size:12.5px;color:var(--muted);line-height:1.7;margin:0}
-.back{display:inline-block;margin-top:18px;color:#f5c451;text-decoration:none;font-size:12px;font-weight:900;border:1px solid #6f4d13;padding:10px 18px;border-radius:10px}
+html{scroll-behavior:smooth;min-height:100%}
+body{margin:0;background:#030303;color:var(--text);font-family:Arial,Helvetica,sans-serif;padding-bottom:calc(30px + env(safe-area-inset-bottom))}
+button,input{font:inherit}
+.app{max-width:520px;margin:auto;min-height:100vh;padding:0 16px}
+header{padding:22px 0 10px;text-align:center}
+header .logo{font-size:26px}
+header h1{font-size:17px;margin:8px 0 2px;color:var(--gold)}
+header p{font-size:11px;color:var(--muted);margin:0}
+
+.card{background:linear-gradient(145deg,#11100d,#050505);border:1px solid #6f4d13;border-radius:17px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+label{display:block;font-size:11px;font-weight:900;color:var(--gold);margin:0 0 6px}
+input.field{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:13px 14px;outline:none;margin-bottom:16px;font-size:14px}
+input.field:focus{border-color:var(--gold)}
+.search-field{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:12px 14px;outline:none;margin-bottom:14px;font-size:13px}
+
+.candidate{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#080807;border:1px solid #3a2a08;border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:.15s}
+.candidate:last-child{margin-bottom:0}
+.candidate.selected{border-color:var(--gold);background:rgba(245,183,43,.08)}
+.candidate b{font-size:13px}
+.radio-dot{width:18px;height:18px;border-radius:50%;border:2px solid #6f4d13;flex:0 0 auto;position:relative}
+.candidate.selected .radio-dot{border-color:var(--gold)}
+.candidate.selected .radio-dot:after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--gold)}
+
+.btn{display:block;width:100%;text-align:center;text-decoration:none;color:#090705;background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;border-radius:12px;padding:14px;font-size:12.5px;font-weight:900;cursor:pointer;margin-top:6px}
+.btn:disabled{opacity:.55}
+.note{font-size:10px;color:#8a8378;margin-top:10px;line-height:1.5;text-align:center}
+.status{font-size:11px;text-align:center;margin-top:10px;color:var(--muted);min-height:14px}
+.empty{text-align:center;color:var(--muted);font-size:12px;padding:20px 0}
+
+.success{display:none;text-align:center}
+.success .check{width:60px;height:60px;border-radius:50%;background:rgba(30,211,147,.15);border:2px solid var(--green);color:var(--green);font-size:30px;display:flex;align-items:center;justify-content:center;margin:6px auto 14px}
+.success h3{margin:0 0 6px;font-size:16px;color:var(--gold)}
+.success p{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 4px}
+
+.back{display:block;text-align:center;margin-top:16px;font-size:11px;color:#f5c451;text-decoration:none}
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">🔒</div>
-  <h1>Link Voting Ini Sudah Tidak Aktif</h1>
-  <p>Silakan gunakan link terbaru yang dibagikan panitia untuk voting Atlet Terfavorit RT 08 RW 021 VIPT CUP IV 2026.</p>
+<div class="app">
+  <header>
+    <div class="logo">🌟</div>
+    <h1>VOTING PEMAIN IDOLA</h1>
+    <p>VIPT CUP IV 2026</p>
+  </header>
+
+  <div id="voteArea"></div>
+
   <a class="back" href="index.html">← Kembali ke Beranda</a>
 </div>
+
+<script>
+const VOTE_FIREBASE_CONFIG={
+  apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",
+  authDomain:"vipt-survey-2026.firebaseapp.com",
+  databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"vipt-survey-2026",
+  storageBucket:"vipt-survey-2026.firebasestorage.app",
+  messagingSenderId:"761699971320",
+  appId:"1:761699971320:web:2cabe1effb822597534b0d"
+};
+const VOTE_PATH="vipt_vote/idola";
+const LOCAL_KEY="VIPT_VOTE_IDOLA_DONE_V1";
+
+// ====== DAFTAR PEMAIN IDOLA ======
+// Gabungan semua nama, tanpa dipisah cabor. Tambah/hapus nama di sini kapan saja.
+const CANDIDATES=[
+  "Erni (E2/45)","Nopy (E2/39)","Sherly (E2/40)","Ressya (E2/28)","Bety (E5/08)","Risna (E5/3A)","Neza (E2/22)","Dina (E2/41)","Nina (E5/07)",
+  "Adin (E8/02)","Diantoro (E2/22)","Iqbal (E2/39)","Hendy (E2/39)","Jarun (E2/46)","Lambang (E2/22)","Ngudi (E2/15)","Faozi (E5/16)","Ajrul (E2/40)",
+  "Puji (E2/22)","Rohyana (E2/07)","Rosiyati (E2/15)","Seny (E2/14)","Ayu (E2/03)","Adel (E5/06)","Syifa (E2/29)","Bilqis (E2/07)","Hafiza (E2/03)","Jihan (E2/13)"
+];
+
+let voteApp=null,voteAuth=null,voteDB=null;
+let selected=null;
+let alreadyVoted=false,votedName="";
+
+const voteArea=document.getElementById("voteArea");
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function renderVoteArea(){
+  if(alreadyVoted){
+    voteArea.innerHTML=`
+      <div class="card success" style="display:block">
+        <div class="check">✓</div>
+        <h3 style="text-align:center">SUDAH VOTING!</h3>
+        <p style="text-align:center">Terima kasih! Kamu sudah memilih <b>${esc(votedName)}</b> sebagai Pemain Idola.</p>
+        <p style="text-align:center">Sampai jumpa lagi di VIPT CUP berikutnya 🌟</p>
+      </div>`;
+    return;
+  }
+
+  voteArea.innerHTML=`
+    <div class="card">
+      <label for="inpName">Nama Anda</label>
+      <input class="field" id="inpName" maxlength="60" placeholder="Contoh: Budi Santoso" autocomplete="off">
+      <label for="inpAddress">Alamat Anda</label>
+      <input class="field" id="inpAddress" maxlength="30" placeholder="Contoh: E2/45" autocomplete="off">
+
+      <label for="searchCand">Cari Nama Pemain</label>
+      <input class="search-field" id="searchCand" placeholder="Ketik nama pemain...">
+
+      <div id="candidateList"></div>
+      <button class="btn" id="btnVote" disabled>🌟 KIRIM VOTE</button>
+      <div class="status" id="statusMsg"></div>
+      <p class="note">Nama & alamat wajib diisi. Pilih 1 pemain favoritmu. Satu perangkat hanya bisa vote 1x.</p>
+    </div>`;
+
+  const candidateList=document.getElementById("candidateList"),btnVote=document.getElementById("btnVote"),
+        searchCand=document.getElementById("searchCand"),statusMsg=document.getElementById("statusMsg");
+
+  function renderCandidates(filterText){
+    const filter=(filterText||"").trim().toLowerCase();
+    const list=filter?CANDIDATES.filter(n=>n.toLowerCase().includes(filter)):CANDIDATES;
+    if(!list.length){
+      candidateList.innerHTML=`<div class="empty">Tidak ada nama yang cocok dicari.</div>`;
+      return;
+    }
+    candidateList.innerHTML=list.map(name=>`
+      <div class="candidate ${selected===name?"selected":""}" data-name="${esc(name)}">
+        <b>${esc(name)}</b>
+        <div class="radio-dot"></div>
+      </div>`).join("");
+    candidateList.querySelectorAll(".candidate").forEach(el=>{
+      el.addEventListener("click",()=>{
+        selected=el.dataset.name;
+        candidateList.querySelectorAll(".candidate").forEach(c=>c.classList.toggle("selected",c.dataset.name===selected));
+        btnVote.disabled=false;
+      });
+    });
+  }
+  renderCandidates("");
+  searchCand.addEventListener("input",()=>renderCandidates(searchCand.value));
+
+  btnVote.addEventListener("click",async()=>{
+    const name=document.getElementById("inpName").value.trim();
+    const address=document.getElementById("inpAddress").value.trim();
+    if(!name){statusMsg.textContent="⚠️ Nama wajib diisi.";document.getElementById("inpName").focus();return}
+    if(!address){statusMsg.textContent="⚠️ Alamat wajib diisi.";document.getElementById("inpAddress").focus();return}
+    if(!selected){statusMsg.textContent="⚠️ Pilih salah satu pemain dulu.";return}
+    if(!voteDB){statusMsg.textContent="⚠️ Belum terhubung ke server, coba lagi sebentar.";return}
+    btnVote.disabled=true;btnVote.textContent="MENGIRIM...";
+    try{
+      const ref=voteDB.ref(VOTE_PATH).push();
+      await ref.set({
+        candidate:selected,voterName:name,voterAddress:address,
+        votedAt:firebase.database.ServerValue.TIMESTAMP
+      });
+      alreadyVoted=true;votedName=selected;
+      localStorage.setItem(LOCAL_KEY,JSON.stringify({name:selected}));
+      renderVoteArea();
+    }catch(e){
+      console.error("Vote submit:",e);
+      statusMsg.textContent="⚠️ Gagal mengirim vote ["+(e?.code||"unknown")+"]. "+(e?.code==="PERMISSION_DENIED"?"Server menolak (Firebase Rules).":"Periksa koneksi internet.");
+      btnVote.disabled=false;btnVote.textContent="🌟 KIRIM VOTE";
+    }
+  });
+}
+
+function loadLocalState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(LOCAL_KEY)||"null");
+    if(saved){alreadyVoted=true;votedName=saved.name||""}
+  }catch(e){}
+}
+
+async function initFirebase(){
+  try{
+    voteApp=firebase.apps.find(a=>a.name==="viptVote")||firebase.initializeApp(VOTE_FIREBASE_CONFIG,"viptVote");
+    voteAuth=voteApp.auth();voteDB=voteApp.database();
+    await voteAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    if(!voteAuth.currentUser)await voteAuth.signInAnonymously();
+  }catch(e){
+    console.error("Vote init:",e);
+  }
+}
+
+loadLocalState();
+renderVoteArea();
+initFirebase();
+</script>
 </body>
 </html>

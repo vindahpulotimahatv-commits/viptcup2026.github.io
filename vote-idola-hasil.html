@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050505">
+<title>Hasil Voting Pemain Idola • Panitia VIPT CUP IV 2026</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+<style>
+:root{--bg:#050505;--gold:#f5b72b;--muted:#c7c0b2;--green:#1ed393}
+*{box-sizing:border-box}
+body{margin:0;background:#030303;color:#fff;font-family:Arial,Helvetica,sans-serif;padding-bottom:40px}
+.app{max-width:640px;margin:auto;padding:0 16px}
+header{padding:20px 0 8px;text-align:center}
+header .logo{font-size:26px}
+header h1{font-size:16px;margin:8px 0 2px;color:var(--gold)}
+header p{font-size:11px;color:var(--muted);margin:0}
+.card{background:linear-gradient(145deg,#11100d,#050505);border:1px solid #6f4d13;border-radius:17px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.cat-total{font-size:11px;color:var(--muted);margin-bottom:14px;text-align:center}
+.bar-row{margin-bottom:12px}
+.bar-row:last-child{margin-bottom:0}
+.bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.bar-label b{color:#fff}
+.bar-label span{color:var(--gold);font-weight:900}
+.bar-track{background:#0c0b09;border:1px solid #221c10;border-radius:99px;height:14px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#9a650b,#f5b72b);transition:width .5s ease}
+.bar-row.top .bar-fill{background:linear-gradient(90deg,#1ed393,#0d8f66)}
+.bar-row.top .bar-label span{color:var(--green)}
+.crown-tag{font-size:9px;color:var(--green);font-weight:900;margin-left:6px}
+.empty{text-align:center;color:var(--muted);font-size:11.5px;padding:14px 0}
+.status{font-size:11px;text-align:center;margin:10px 0;color:var(--muted)}
+.search-field{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:11px 14px;outline:none;margin-bottom:12px;font-size:13px;box-sizing:border-box}
+.section-title{font-size:13px;font-weight:900;color:var(--gold);margin:20px 2px 10px}
+.voter-item{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #1a1509;font-size:12px}
+.voter-item:last-child{border-bottom:none}
+.voter-item span{color:var(--muted)}
+.voter-item b{color:#fff;text-align:right}
+.back{display:block;text-align:center;margin-top:10px;font-size:11px;color:#f5c451;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">🌟</div>
+    <h1>HASIL VOTING PEMAIN IDOLA</h1>
+    <p>VIPT CUP IV 2026 • Khusus Panitia</p>
+  </header>
+
+  <div class="status" id="statusMsg">Memuat...</div>
+  <div id="resultBox"></div>
+
+  <div class="section-title" id="detailTitle" style="display:none">📋 Daftar Pemilih</div>
+  <input class="search-field" id="searchVoter" placeholder="Cari nama pemilih / pemain..." style="display:none">
+  <div id="detailBox"></div>
+
+  <a class="back" href="index.html">← Kembali ke Beranda</a>
+</div>
+
+<script>
+const VOTE_FIREBASE_CONFIG={
+  apiKey:"AIzaSyC1g7aKyRf5l6zV0MMbvSY4Gyf7VbDOlCM",
+  authDomain:"vipt-survey-2026.firebaseapp.com",
+  databaseURL:"https://vipt-survey-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"vipt-survey-2026",
+  storageBucket:"vipt-survey-2026.firebasestorage.app",
+  messagingSenderId:"761699971320",
+  appId:"1:761699971320:web:2cabe1effb822597534b0d"
+};
+const VOTE_PATH="vipt_vote/idola";
+const BASELINE_PATH="vipt_vote/idola_baseline";
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+const resultBox=document.getElementById("resultBox"),statusMsg=document.getElementById("statusMsg");
+const detailBox=document.getElementById("detailBox"),detailTitle=document.getElementById("detailTitle"),searchVoter=document.getElementById("searchVoter");
+let ALL_VOTES=[];
+let BASELINE={};
+
+function renderResults(){
+  const tally={};
+  Object.values(BASELINE).forEach(b=>{tally[b.name]=(tally[b.name]||0)+(b.count||0)});
+  ALL_VOTES.forEach(v=>{tally[v.candidate]=(tally[v.candidate]||0)+1});
+  const rows=Object.entries(tally).map(([name,n])=>({name,n})).sort((a,b)=>b.n-a.n);
+  const max=Math.max(1,...rows.map(r=>r.n));
+  const total=rows.reduce((s,r)=>s+r.n,0);
+
+  if(!rows.length){
+    resultBox.innerHTML=`<div class="card"><div class="cat-total">0 suara masuk</div><div class="empty">Belum ada yang voting.</div></div>`;
+    return;
+  }
+
+  resultBox.innerHTML=`<div class="card">
+    <div class="cat-total">${total} suara masuk (termasuk data awal)</div>
+    ${rows.map((r,i)=>{
+      const pct=Math.round((r.n/max)*100);
+      const pctTotal=total?Math.round((r.n/total)*100):0;
+      return `<div class="bar-row ${i===0?"top":""}">
+        <div class="bar-label"><b>${esc(r.name)}${i===0?'<span class="crown-tag">👑 TERATAS</span>':""}</b><span>${r.n} suara (${pctTotal}%)</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderVoterList(filterText){
+  const filter=(filterText||"").trim().toLowerCase();
+  let list=[...ALL_VOTES].sort((a,b)=>(b.votedAt||0)-(a.votedAt||0));
+  if(filter)list=list.filter(v=>(v.voterName||"").toLowerCase().includes(filter)||(v.candidate||"").toLowerCase().includes(filter)||(v.voterAddress||"").toLowerCase().includes(filter));
+
+  if(!list.length){
+    detailBox.innerHTML=`<div class="card"><div class="empty">${filter?"Tidak ada yang cocok dicari.":"Belum ada suara masuk."}</div></div>`;
+    return;
+  }
+  detailBox.innerHTML=`<div class="card">` + list.map(v=>`
+    <div class="voter-item"><span>${esc(v.voterName||"-")} (${esc(v.voterAddress||"-")})</span><b>${esc(v.candidate)}</b></div>
+  `).join("") + `</div>`;
+}
+
+searchVoter.addEventListener("input",()=>renderVoterList(searchVoter.value));
+
+async function initFirebase(){
+  try{
+    const app=firebase.apps.find(a=>a.name==="viptVote")||firebase.initializeApp(VOTE_FIREBASE_CONFIG,"viptVote");
+    const auth=app.auth(),db=app.database();
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    if(!auth.currentUser)await auth.signInAnonymously();
+    db.ref(VOTE_PATH).on("value",snap=>{
+      ALL_VOTES=Object.values(snap.val()||{});
+      renderResults();
+      detailTitle.style.display="block";
+      searchVoter.style.display="block";
+      renderVoterList(searchVoter.value);
+      statusMsg.textContent="✅ Data live • otomatis update";
+    });
+    db.ref(BASELINE_PATH).on("value",snap=>{
+      BASELINE=snap.val()||{};
+      renderResults();
+    });
+  }catch(e){
+    console.error("Vote result init:",e);
+    statusMsg.textContent="⚠️ Gagal terhubung ["+(e?.code||"koneksi-error")+"]";
+  }
+}
+
+initFirebase();
+</script>
+</body>
+</html>
