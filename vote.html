@@ -26,6 +26,18 @@ header p{font-size:11px;color:var(--muted);margin:0 0 16px}
 .card{background:linear-gradient(145deg,#11100d,#050505);border:1px solid #6f4d13;border-radius:17px;padding:16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 .cat-title{font-size:15px;font-weight:900;color:var(--gold);margin:0 0 12px;text-align:center;border-bottom:1px dashed #3a2a08;padding-bottom:10px}
 
+label{display:block;font-size:11px;font-weight:900;color:var(--gold);margin:0 0 6px}
+select.field, input.field{
+  width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;
+  border-radius:12px;padding:12px 13px;outline:none;margin-bottom:14px;font-size:14px;
+}
+select.field{
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url('data:image/svg+xml;utf8,<svg fill="%23f5b72b" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat:no-repeat;background-position-x:96%;background-position-y:center;
+}
+select.field:focus, input.field:focus{border-color:var(--gold)}
+
 .candidate{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#080807;border:1px solid #3a2a08;border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:.15s}
 .candidate:last-child{margin-bottom:0}
 .candidate.selected{border-color:var(--gold);background:rgba(245,183,43,.08)}
@@ -65,95 +77,67 @@ const VOTE_FIREBASE_CONFIG={
   messagingSenderId:"761699971320",
   appId:"1:761699971320:web:2cabe1effb822597534b0d"
 };
-const VOTE_PATH="vipt_vote/votes";
-const VOTE_LOCAL_KEY="VIPT_VOTE_DONE_ALL_V3"; 
+
+// DATA AKAN DISIMPAN DI FOLDER BARU (RESET)
+const VOTE_PATH="vipt_vote/votes_final";
+
+const VALID_HOUSES = ["E2-1", "E2-2", "E2-3", "E2-3A", "E2-5", "E2-6", "E2-7", "E2-8", "E2-9", "E2-10", "E2-11", "E2-12", "E2-12A", "E2-14", "E2-15", "E2-16", "E2-17", "E2-18", "E2-19", "E2-20", "E2-21", "E2-22", "E2-23", "E2-24", "E2-25", "E2-26", "E2-27", "E2-28", "E2-29", "E2-30", "E2-31", "E2-32", "E2-33", "E2-33A", "E2-35", "E2-36", "E2-37", "E2-38", "E2-39", "E2-40", "E2-41", "E2-42", "E2-43", "E2-44", "E2-45", "E2-46", "E2-47", "E2-48", "E5-1", "E5-2", "E5-3", "E5-3A", "E5-5", "E5-6", "E5-7", "E5-8", "E5-9", "E5-10", "E5-11", "E5-12", "E5-12A", "E5-14", "E5-15", "E5-16", "E5-17", "E5-18", "E5-19", "E5-20", "E6-1", "E6-2", "E6-3", "E6-3A", "E6-5", "E6-6", "E6-7", "E6-8", "E6-9", "E6-10", "E6-11", "E6-12", "E6-12A", "E6-14", "E6-15", "E6-16", "E6-17", "E6-18", "E6-19", "E6-20", "E6-21", "E6-22", "E6-23", "E6-24", "E7-1", "E7-2", "E7-3", "E7-3A", "E7-5", "E7-6", "E7-7", "E7-8", "E7-9", "E7-10", "E7-11", "E7-12", "E7-12A", "E7-14", "E7-15", "E7-16", "E7-17", "E7-18", "E7-19", "E7-20", "E7-21", "E7-22", "E7-23", "E7-24", "E8-1", "E8-2", "E8-3", "E8-3A", "E8-5", "E8-6", "E8-7", "E8-8", "E8-9", "E8-10", "E8-11", "E8-12", "E8-12A", "E8-14", "E8-15", "E8-16", "E8-17", "E8-18", "E8-19", "E8-20", "E8-21", "E8-22", "E8-23", "E8-24"];
 
 const CATEGORIES=[
   {
     id: "bdw",
     label: "Badminton Putri",
     candidates: [
-      "Erni (E2/45 - mm wishang)", 
-      "Nopy (E2/39 - Tante nopy)", 
-      "Sherly (E2/40 - Tante Sherly)", 
-      "Ressya (E2/28 - Tante Resya)", 
-      "Bety (E5/08 - mm Vino)", 
-      "Risna (E5/3A - bunda Riza)", 
-      "Neza (E2/22)", 
-      "Dina (E2/41 - mm qiandra)", 
-      "Nina (E5/07 - Tante Nina)", 
-      "Puji (E2/22 - mm lambang)"
+      "Erni (E2/45 - mm wishang)", "Nopy (E2/39 - Tante nopy)", "Sherly (E2/40 - Tante Sherly)", 
+      "Ressya (E2/28 - Tante Resya)", "Bety (E5/08 - mm Vino)", "Risna (E5/3A - bunda Riza)", 
+      "Neza (E2/22)", "Dina (E2/41 - mm qiandra)", "Nina (E5/07 - Tante Nina)", "Puji (E2/22 - mm lambang)"
     ]
   },
   {
     id: "bdm",
     label: "Badminton Putra",
     candidates: [
-      "Adin (E8/02)", 
-      "Diantoro (E2/22)", 
-      "Iqbal (E2/39)", 
-      "Hendy (E2/39)", 
-      "Jarun (E2/46)", 
-      "Lambang (E2/22)", 
-      "Ngudi (E2/15)", 
-      "Faozi (E5/16)", 
-      "Ajrul (E2/40)", 
-      "Pak uki", 
-      "Kang ded", 
-      "P.susilo"
+      "Adin (E8/02)", "Diantoro (E2/22)", "Iqbal (E2/39)", "Hendy (E2/39)", "Jarun (E2/46)", 
+      "Lambang (E2/22)", "Ngudi (E2/15)", "Faozi (E5/16)", "Ajrul (E2/40)", "Pak uki", "Kang ded", "P.susilo"
     ]
   },
   {
     id: "vw",
     label: "Volly Putri",
     candidates: [
-      "Puji (E2/22 - mm lambang)", 
-      "Rohyana (E2/07 - mm bilqis)", 
-      "Rosiyati (E2/15 - mm Fadia)", 
-      "Seny (E2/14 - mm Hanum)", 
-      "Ayu (E2/03 - Mak Ndut)", 
-      "Adel (E5/06)", 
-      "Syifa (E2/29)", 
-      "Bilqis (E2/07)", 
-      "Hafiza (E2/03)", 
-      "Jihan (E2/13)", 
-      "Erni (E2/45 - mm wishang)"
+      "Puji (E2/22 - mm lambang)", "Rohyana (E2/07 - mm bilqis)", "Rosiyati (E2/15 - mm Fadia)", 
+      "Seny (E2/14 - mm Hanum)", "Ayu (E2/03 - Mak Ndut)", "Adel (E5/06)", "Syifa (E2/29)", 
+      "Bilqis (E2/07)", "Hafiza (E2/03)", "Jihan (E2/13)", "Erni (E2/45 - mm wishang)"
     ]
   }
 ];
 
 let voteApp=null,voteAuth=null,voteDB=null;
-let hasVotedAll = false;
 let selections = { bdw: null, bdm: null, vw: null };
-
-function loadStorageData(){
-  try{
-    hasVotedAll=localStorage.getItem(VOTE_LOCAL_KEY) === "true";
-  }catch(e){}
-}
-
-function saveStorageData(){
-  try{
-    localStorage.setItem(VOTE_LOCAL_KEY, "true");
-  }catch(e){}
-}
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 
 const voteArea=document.getElementById("voteArea");
 
 function renderVoteArea(){
-  if(hasVotedAll){
-    voteArea.innerHTML=`
-      <div class="card">
-        <div class="cat-title">Terima Kasih!</div>
-        <p style="text-align:center;font-size:12px;color:var(--muted);margin:0">Suaramu telah berhasil masuk ke dalam sistem.</p>
-        <div class="voted-badge">✅ Kamu sudah melakukan voting.</div>
-      </div>`;
-    return;
-  }
+  let optionsHtml = `<option value="" selected disabled>-- Pilih Blok & Nomer Rumah --</option>`;
+  VALID_HOUSES.forEach(house => {
+    optionsHtml += `<option value="${house}">${house}</option>`;
+  });
 
-  let htmlStr = "";
+  let htmlStr = `
+    <div class="card">
+      <label for="inputHouse">Nomor Rumah Warga</label>
+      <select class="field" id="inputHouse">
+        ${optionsHtml}
+      </select>
+      
+      <label for="inputName">Nama Pemilih</label>
+      <input type="text" class="field" id="inputName" placeholder="Contoh: Budi Santoso" autocomplete="off" maxlength="60" style="margin-bottom:10px;">
+      
+      <p class="note" style="margin-top:0;text-align:left">Silakan pilih nomer rumah dan isi nama Anda. Maksimal 2 orang pemilih untuk satu nomor rumah.</p>
+    </div>
+  `;
 
   CATEGORIES.forEach(cat => {
     htmlStr += `
@@ -173,11 +157,10 @@ function renderVoteArea(){
   htmlStr += `
     <button class="btn" id="btnVoteAll">🗳️ KIRIM SEMUA VOTE SEKALIGUS</button>
     <div class="status" id="statusMsg"></div>
-    <p class="note">Pilih satu kandidat di setiap kategori. Satu perangkat hanya bisa vote 1x. Vote bersifat anonim dan tidak bisa diubah setelah dikirim.</p>`;
+    <p class="note">Pilih satu kandidat di setiap kategori. Vote bersifat anonim untuk publik, tapi tercatat oleh panitia. Tidak bisa diubah setelah dikirim.</p>`;
 
   voteArea.innerHTML = htmlStr;
 
-  // Interaksi Pilihan Kandidat
   CATEGORIES.forEach(cat => {
     const listWrapper = document.querySelector(`.candidate-list[data-cat="${cat.id}"]`);
     const candidates = listWrapper.querySelectorAll(".candidate");
@@ -190,12 +173,24 @@ function renderVoteArea(){
     });
   });
 
-  // Interaksi Submit
   const btnVote = document.getElementById("btnVoteAll");
   const statusMsg = document.getElementById("statusMsg");
 
   btnVote.addEventListener("click", async () => {
-    // Pastikan semua kategori sudah dipilih
+    let houseVal = document.getElementById("inputHouse").value;
+    let voterNameVal = document.getElementById("inputName").value.trim();
+    
+    if(!houseVal) {
+        statusMsg.textContent="⚠️ Silakan pilih nomer rumah Anda terlebih dahulu.";
+        document.getElementById("inputHouse").focus();
+        return;
+    }
+    if(!voterNameVal) {
+        statusMsg.textContent="⚠️ Silakan isi nama pemilih.";
+        document.getElementById("inputName").focus();
+        return;
+    }
+
     for(const cat of CATEGORIES) {
       if(!selections[cat.id]) {
         statusMsg.textContent=`⚠️ Anda belum memilih kandidat untuk ${cat.label}.`;
@@ -207,25 +202,44 @@ function renderVoteArea(){
     if(!voteDB){statusMsg.textContent="⚠️ Belum terhubung ke server, coba lagi sebentar.";return}
     
     btnVote.disabled=true;
-    btnVote.textContent="MENGIRIM DATA...";
-    statusMsg.textContent="Memproses suara Anda...";
+    btnVote.textContent="MEMERIKSA KUOTA...";
+    statusMsg.textContent="Memeriksa kuota rumah Anda...";
 
     try{
-      // Persiapkan semua vote untuk di-push ke database tanpa data diri
+      const snap = await voteDB.ref(VOTE_PATH).orderByChild("houseNumber").equalTo(houseVal).once("value");
+      const existingData = snap.val() || {};
+      const totalRecords = Object.keys(existingData).length;
+      
+      if (totalRecords >= 6) {
+          statusMsg.innerHTML=`⚠️ Nomer rumah <b>${houseVal}</b> sudah mencapai batas maksimal (2 pemilih).`;
+          btnVote.disabled=false;
+          btnVote.textContent="🗳️ KIRIM SEMUA VOTE SEKALIGUS";
+          return;
+      }
+
+      btnVote.textContent="MENGIRIM DATA...";
+      statusMsg.textContent="Memproses suara Anda...";
+
       const promises = CATEGORIES.map(cat => {
         return voteDB.ref(VOTE_PATH).push().set({
           category: cat.id,
           categoryLabel: cat.label,
           candidate: selections[cat.id],
+          houseNumber: houseVal,
+          voterName: voterNameVal,
           votedAt: firebase.database.ServerValue.TIMESTAMP
         });
       });
 
       await Promise.all(promises);
 
-      hasVotedAll = true;
-      saveStorageData();
-      renderVoteArea();
+      voteArea.innerHTML=`
+        <div class="card">
+          <div class="cat-title">Terima Kasih, ${esc(voterNameVal)}!</div>
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin:0">Suara dari perwakilan warga rumah <b>${houseVal}</b> berhasil masuk.</p>
+          <div class="voted-badge">✅ Kamu sudah melakukan voting.</div>
+          <button class="btn" style="margin-top:16px; background:linear-gradient(135deg,#3a2a08,#11100d); color:var(--gold); border:1px solid #6f4d13;" onclick="location.reload()">🔄 Isi Suara Anggota Keluarga Lain</button>
+        </div>`;
       
     }catch(e){
       console.error("Vote submit:",e);
@@ -247,7 +261,6 @@ async function initFirebase(){
   }
 }
 
-loadStorageData();
 renderVoteArea();
 initFirebase();
 </script>
