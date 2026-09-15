@@ -37,6 +37,18 @@ header p{font-size:11px;color:var(--muted);margin:0}
 .empty{text-align:center;color:var(--muted);font-size:11.5px;padding:14px 0}
 .status{font-size:11px;text-align:center;margin:10px 0;color:var(--muted)}
 .back{display:block;text-align:center;margin-top:10px;font-size:11px;color:#f5c451;text-decoration:none}
+
+.section-title{font-size:13px;font-weight:900;color:var(--gold);margin:20px 2px 10px}
+.search-field{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:11px 14px;outline:none;margin-bottom:12px;font-size:13px;box-sizing:border-box}
+.house-item{border:1px solid #221c10;border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.house-item:last-child{margin-bottom:0}
+.house-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.house-head b{font-size:14px;color:var(--gold)}
+.house-head span{font-size:10px;color:var(--muted)}
+.house-pick{display:flex;justify-content:space-between;font-size:11.5px;padding:5px 0;border-top:1px solid #1a1509}
+.house-pick:first-of-type{border-top:none}
+.house-pick span{color:var(--muted)}
+.house-pick b{color:#fff;text-align:right}
 </style>
 </head>
 <body>
@@ -49,6 +61,10 @@ header p{font-size:11px;color:var(--muted);margin:0}
 
   <div class="status" id="statusMsg">Memuat...</div>
   <div id="resultBox"></div>
+
+  <div class="section-title" id="detailTitle" style="display:none">🏠 Detail Suara per Rumah</div>
+  <input class="search-field" id="searchHouse" placeholder="Cari nomor rumah, misal: E2/47" style="display:none">
+  <div id="detailBox"></div>
 
   <a class="back" href="index.html">← Kembali ke Beranda</a>
 </div>
@@ -75,6 +91,34 @@ const CATEGORIES=[
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 
 const resultBox=document.getElementById("resultBox"),statusMsg=document.getElementById("statusMsg");
+const detailBox=document.getElementById("detailBox"),detailTitle=document.getElementById("detailTitle"),searchHouse=document.getElementById("searchHouse");
+let ALL_VOTES=[];
+
+function renderDetailByHouse(filterText){
+  const filter=(filterText||"").trim().toLowerCase();
+  const byHouse={};
+  ALL_VOTES.forEach(v=>{
+    const house=v.houseNumber||"-";
+    if(!byHouse[house])byHouse[house]={voterName:v.voterName||"",picks:{}};
+    byHouse[house].picks[v.category]=v.candidate;
+    if(v.voterName)byHouse[house].voterName=v.voterName;
+  });
+  let houses=Object.entries(byHouse).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(filter)houses=houses.filter(([house,d])=>house.toLowerCase().includes(filter)||(d.voterName||"").toLowerCase().includes(filter));
+
+  if(!houses.length){
+    detailBox.innerHTML=`<div class="card"><div class="empty">${filter?"Tidak ada rumah yang cocok dicari.":"Belum ada suara masuk."}</div></div>`;
+    return;
+  }
+
+  detailBox.innerHTML=`<div class="card">` + houses.map(([house,d])=>`
+    <div class="house-item">
+      <div class="house-head"><b>🏠 ${esc(house)}</b><span>${esc(d.voterName||"-")}</span></div>
+      ${CATEGORIES.map(cat=>`<div class="house-pick"><span>${esc(cat.label)}</span><b>${esc(d.picks[cat.id]||"-")}</b></div>`).join("")}
+    </div>`).join("") + `</div>`;
+}
+
+searchHouse.addEventListener("input",()=>renderDetailByHouse(searchHouse.value));
 
 function renderResults(votes){
   const all=Object.values(votes);
@@ -116,7 +160,12 @@ async function initFirebase(){
     await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     if(!auth.currentUser)await auth.signInAnonymously();
     db.ref(VOTE_PATH).on("value",snap=>{
-      renderResults(snap.val()||{});
+      const votes=snap.val()||{};
+      ALL_VOTES=Object.values(votes);
+      renderResults(votes);
+      detailTitle.style.display="block";
+      searchHouse.style.display="block";
+      renderDetailByHouse(searchHouse.value);
       statusMsg.textContent="✅ Data live • otomatis update";
     });
   }catch(e){
