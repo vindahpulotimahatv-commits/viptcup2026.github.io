@@ -37,6 +37,11 @@ header p{font-size:11px;color:var(--muted);margin:0}
 .empty{text-align:center;color:var(--muted);font-size:11.5px;padding:14px 0}
 .status{font-size:11px;text-align:center;margin:10px 0;color:var(--muted)}
 .back{display:block;text-align:center;margin-top:10px;font-size:11px;color:#f5c451;text-decoration:none}
+#gateCard{max-width:360px;margin:60px auto 0;text-align:center}
+label{display:block;font-size:11px;font-weight:900;color:var(--gold);margin:0 0 6px;text-align:left}
+input.pinField{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:13px 14px;outline:none;margin-bottom:14px;font-size:14px;box-sizing:border-box}
+.btn{display:block;width:100%;text-align:center;color:#090705;background:linear-gradient(135deg,#f5b72b,#9a650b);border:none;border-radius:12px;padding:13px;font-size:12.5px;font-weight:900;cursor:pointer}
+.gate-status{font-size:11px;color:#ff5a5f;margin-top:10px;min-height:14px}
 
 .section-title{font-size:13px;font-weight:900;color:var(--gold);margin:20px 2px 10px}
 .search-field{width:100%;background:#080807;border:1px solid #6f4d13;color:#fff;border-radius:12px;padding:11px 14px;outline:none;margin-bottom:12px;font-size:13px;box-sizing:border-box}
@@ -53,6 +58,17 @@ header p{font-size:11px;color:var(--muted);margin:0}
 </head>
 <body>
 <div class="app">
+  <div class="card" id="gateCard">
+    <div style="font-size:30px;margin-bottom:8px">🔒</div>
+    <h1 style="font-size:15px;color:var(--gold);margin:0 0 10px">PANEL PANITIA</h1>
+    <p style="font-size:11px;color:var(--muted);margin:0 0 16px">Masukkan PIN untuk melihat hasil voting</p>
+    <label for="pinInput">PIN Panitia</label>
+    <input class="pinField" id="pinInput" type="password" inputmode="text" placeholder="••••••••••••">
+    <button class="btn" id="btnUnlock">🔓 BUKA HASIL</button>
+    <div class="gate-status" id="gateStatus"></div>
+  </div>
+
+  <div id="panelWrap" style="display:none">
   <header>
     <div class="logo">🗳️</div>
     <h1>HASIL ATLET TERFAVORIT RT 08 RW 021</h1>
@@ -67,6 +83,7 @@ header p{font-size:11px;color:var(--muted);margin:0}
   <div id="detailBox"></div>
 
   <a class="back" href="index.html">← Kembali ke Beranda</a>
+  </div>
 </div>
 
 <script>
@@ -87,6 +104,8 @@ const CATEGORIES=[
   {id:"bdm",label:"Badminton Putra"},
   {id:"vw",label:"Volly Putri"}
 ];
+
+const ADMIN_PIN="rt08admin123";
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 
@@ -174,7 +193,17 @@ async function initFirebase(){
   }
 }
 
-initFirebase();
+document.getElementById("btnUnlock").addEventListener("click",()=>{
+  const pinInput=document.getElementById("pinInput");
+  if(pinInput.value.trim()===ADMIN_PIN){
+    document.getElementById("gateCard").style.display="none";
+    document.getElementById("panelWrap").style.display="block";
+    initFirebase();
+  }else{
+    document.getElementById("gateStatus").textContent="⚠️ PIN salah, coba lagi.";
+  }
+});
+document.getElementById("pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("btnUnlock").click()});
 </script>
 </body>
 </html>
